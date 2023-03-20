@@ -255,7 +255,7 @@ public final class SlimefunItemSetup {
         .register(plugin);
 
         new OutputChest(itemGroups.basicMachines, SlimefunItems.OUTPUT_CHEST, RecipeType.ENHANCED_CRAFTING_TABLE,
-        new ItemStack[] {SlimefunItems.LEAD_INGOT, new ItemStack(Material.HOPPER), SlimefunItems.LEAD_INGOT, SlimefunItems.LEAD_INGOT, new ItemStack(Material.CHEST), SlimefunItems.LEAD_INGOT, null, SlimefunItems.LEAD_INGOT, null})
+        new ItemStack[] {new ItemStack(Material.COPPER_INGOT), new ItemStack(Material.HOPPER), new ItemStack(Material.COPPER_INGOT), new ItemStack(Material.COPPER_INGOT), new ItemStack(Material.CHEST), new ItemStack(Material.COPPER_INGOT), null, new ItemStack(Material.COPPER_INGOT), null})
         .register(plugin);
         
         new EnhancedCraftingTable(itemGroups.basicMachines, SlimefunItems.ENHANCED_CRAFTING_TABLE).register(plugin);

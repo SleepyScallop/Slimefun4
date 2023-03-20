@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElytraImpactListener.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.listeners</a> &gt; <span class="el_source">ElytraImpactListener.java</span></div><h1>ElytraImpactListener.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.listeners;
+
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.player.PlayerProfile;
+import io.github.thebusybiscuit.slimefun4.core.attributes.DamageableItem;
+import io.github.thebusybiscuit.slimefun4.core.attributes.ProtectionType;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.items.armor.ElytraCap;
+import io.github.thebusybiscuit.slimefun4.implementation.items.armor.SlimefunArmorPiece;
+
+/**
+ * The {@link Listener} for the {@link ElytraCap}.
+ *
+ * @author Seggan
+ * 
+ * @see ElytraCap
+ */
+public class ElytraImpactListener implements Listener {
+
+<span class="nc" id="L31">    public ElytraImpactListener(@Nonnull Slimefun plugin) {</span>
+<span class="nc" id="L32">        plugin.getServer().getPluginManager().registerEvents(this, plugin);</span>
+<span class="nc" id="L33">    }</span>
+
+    @EventHandler
+    public void onPlayerCrash(EntityDamageEvent e) {
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (!(e.getEntity() instanceof Player)) {</span>
+            // We only wanna handle damaged Players
+<span class="nc" id="L39">            return;</span>
+        }
+
+<span class="nc bnc" id="L42" title="All 4 branches missed.">        if (e.getCause() == DamageCause.FALL || e.getCause() == DamageCause.FLY_INTO_WALL) {</span>
+<span class="nc" id="L43">            Player p = (Player) e.getEntity();</span>
+
+<span class="nc bnc" id="L45" title="All 2 branches missed.">            if (p.isGliding()) {</span>
+<span class="nc" id="L46">                Optional&lt;PlayerProfile&gt; optional = PlayerProfile.find(p);</span>
+
+<span class="nc bnc" id="L48" title="All 2 branches missed.">                if (!optional.isPresent()) {</span>
+<span class="nc" id="L49">                    PlayerProfile.request(p);</span>
+<span class="nc" id="L50">                    return;</span>
+                }
+
+<span class="nc" id="L53">                PlayerProfile profile = optional.get();</span>
+<span class="nc" id="L54">                Optional&lt;SlimefunArmorPiece&gt; helmet = profile.getArmor()[0].getItem();</span>
+
+<span class="nc bnc" id="L56" title="All 2 branches missed.">                if (helmet.isPresent()) {</span>
+<span class="nc" id="L57">                    SlimefunItem item = helmet.get();</span>
+
+<span class="nc bnc" id="L59" title="All 4 branches missed.">                    if (item.canUse(p, true) &amp;&amp; profile.hasFullProtectionAgainst(ProtectionType.FLYING_INTO_WALL)) {</span>
+<span class="nc" id="L60">                        e.setDamage(0);</span>
+<span class="nc" id="L61">                        p.playSound(p.getLocation(), Sound.BLOCK_STONE_HIT, 20, 1);</span>
+
+<span class="nc bnc" id="L63" title="All 2 branches missed.">                        if (item instanceof DamageableItem damageableItem) {</span>
+<span class="nc" id="L64">                            damageableItem.damageItem(p, p.getInventory().getHelmet());</span>
+                        }
+                    }
+                }
+            }
+        }
+<span class="nc" id="L70">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

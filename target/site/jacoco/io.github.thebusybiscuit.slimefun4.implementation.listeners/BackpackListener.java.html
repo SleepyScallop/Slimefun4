@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BackpackListener.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.listeners</a> &gt; <span class="el_source">BackpackListener.java</span></div><h1>BackpackListener.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.listeners;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.Sound;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.event.player.PlayerDropItemEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.player.PlayerBackpack;
+import io.github.thebusybiscuit.slimefun4.api.player.PlayerProfile;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.items.backpacks.Cooler;
+import io.github.thebusybiscuit.slimefun4.implementation.items.backpacks.SlimefunBackpack;
+
+/**
+ * This {@link Listener} is responsible for all events centered around a {@link SlimefunBackpack}.
+ * This also includes the {@link Cooler}
+ * 
+ * @author TheBusyBiscuit
+ * @author Walshy
+ * @author NihilistBrew
+ * @author AtomicScience
+ * @author VoidAngel
+ * @author John000708
+ * 
+ * @see SlimefunBackpack
+ * @see PlayerBackpack
+ *
+ */
+<span class="fc" id="L50">public class BackpackListener implements Listener {</span>
+
+<span class="fc" id="L52">    private final Map&lt;UUID, ItemStack&gt; backpacks = new HashMap&lt;&gt;();</span>
+
+    public void register(@Nonnull Slimefun plugin) {
+<span class="fc" id="L55">        plugin.getServer().getPluginManager().registerEvents(this, plugin);</span>
+<span class="fc" id="L56">    }</span>
+
+    @EventHandler
+    public void onClose(InventoryCloseEvent e) {
+<span class="fc" id="L60">        Player p = (Player) e.getPlayer();</span>
+
+<span class="pc bpc" id="L62" title="1 of 2 branches missed.">        if (markBackpackDirty(p)) {</span>
+<span class="fc" id="L63">            p.playSound(p.getLocation(), Sound.ENTITY_HORSE_ARMOR, 1F, 1F);</span>
+        }
+<span class="fc" id="L65">    }</span>
+
+    private boolean markBackpackDirty(@Nonnull Player p) {
+<span class="fc" id="L68">        ItemStack backpack = backpacks.remove(p.getUniqueId());</span>
+
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (backpack != null) {</span>
+<span class="fc" id="L71">            PlayerProfile.getBackpack(backpack, PlayerBackpack::markDirty);</span>
+<span class="fc" id="L72">            return true;</span>
+        } else {
+<span class="fc" id="L74">            return false;</span>
+        }
+    }
+
+    @EventHandler
+    public void onItemDrop(PlayerDropItemEvent e) {
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (backpacks.containsKey(e.getPlayer().getUniqueId())) {</span>
+<span class="fc" id="L81">            ItemStack item = e.getItemDrop().getItemStack();</span>
+<span class="fc" id="L82">            SlimefunItem sfItem = SlimefunItem.getByItem(item);</span>
+
+<span class="pc bpc" id="L84" title="1 of 2 branches missed.">            if (sfItem instanceof SlimefunBackpack) {</span>
+<span class="nc" id="L85">                e.setCancelled(true);</span>
+            }
+        }
+<span class="fc" id="L88">    }</span>
+
+    @EventHandler(ignoreCancelled = true)
+    public void onClick(InventoryClickEvent e) {
+<span class="fc" id="L92">        ItemStack item = backpacks.get(e.getWhoClicked().getUniqueId());</span>
+
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        if (item != null) {</span>
+<span class="fc" id="L95">            SlimefunItem backpack = SlimefunItem.getByItem(item);</span>
+
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">            if (backpack instanceof SlimefunBackpack slimefunBackpack) {</span>
+<span class="fc bfc" id="L98" title="All 2 branches covered.">                if (e.getClick() == ClickType.NUMBER_KEY) {</span>
+                    // Prevent disallowed items from being moved using number keys.
+<span class="pc bpc" id="L100" title="1 of 2 branches missed.">                    if (e.getClickedInventory().getType() != InventoryType.PLAYER) {</span>
+<span class="fc" id="L101">                        ItemStack hotbarItem = e.getWhoClicked().getInventory().getItem(e.getHotbarButton());</span>
+
+<span class="fc bfc" id="L103" title="All 2 branches covered.">                        if (!isAllowed(slimefunBackpack, hotbarItem)) {</span>
+<span class="fc" id="L104">                            e.setCancelled(true);</span>
+                        }
+<span class="fc" id="L106">                    }</span>
+<span class="pc bpc" id="L107" title="1 of 2 branches missed.">                } else if (e.getClick() == ClickType.SWAP_OFFHAND) {</span>
+<span class="nc bnc" id="L108" title="All 2 branches missed.">                    if (e.getClickedInventory().getType() != InventoryType.PLAYER) {</span>
+                        // Fixes #3265 - Don't move disallowed items using the off hand.
+<span class="nc" id="L110">                        ItemStack offHandItem = e.getWhoClicked().getInventory().getItemInOffHand();</span>
+
+<span class="nc bnc" id="L112" title="All 2 branches missed.">                        if (!isAllowed(slimefunBackpack, offHandItem)) {</span>
+<span class="nc" id="L113">                            e.setCancelled(true);</span>
+                        }
+<span class="nc" id="L115">                    } else {</span>
+                        // Fixes #3664 - Do not swap the backpack to your off hand.
+<span class="nc bnc" id="L117" title="All 4 branches missed.">                        if (e.getCurrentItem() != null &amp;&amp; e.getCurrentItem().isSimilar(item)) {</span>
+<span class="nc" id="L118">                            e.setCancelled(true);</span>
+                        }
+                    }
+<span class="fc bfc" id="L121" title="All 2 branches covered.">                } else if (!isAllowed(slimefunBackpack, e.getCurrentItem())) {</span>
+<span class="fc" id="L122">                    e.setCancelled(true);</span>
+                }
+            }
+        }
+<span class="fc" id="L126">    }</span>
+
+    private boolean isAllowed(@Nonnull SlimefunBackpack backpack, @Nullable ItemStack item) {
+<span class="pc bpc" id="L129" title="1 of 4 branches missed.">        if (item == null || item.getType() == Material.AIR) {</span>
+<span class="fc" id="L130">            return true;</span>
+        }
+
+<span class="fc" id="L133">        return backpack.isItemAllowed(item, SlimefunItem.getByItem(item));</span>
+    }
+
+    @ParametersAreNonnullByDefault
+    public void openBackpack(Player p, ItemStack item, SlimefunBackpack backpack) {
+<span class="pc bpc" id="L138" title="1 of 2 branches missed.">        if (item.getAmount() == 1) {</span>
+<span class="pc bpc" id="L139" title="2 of 4 branches missed.">            if (backpack.canUse(p, true) &amp;&amp; !PlayerProfile.get(p, profile -&gt; openBackpack(p, item, profile, backpack.getSize()))) {</span>
+<span class="nc" id="L140">                Slimefun.getLocalization().sendMessage(p, &quot;messages.opening-backpack&quot;);</span>
+            }
+        } else {
+<span class="nc" id="L143">            Slimefun.getLocalization().sendMessage(p, &quot;backpack.no-stack&quot;, true);</span>
+        }
+<span class="fc" id="L145">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void openBackpack(Player p, ItemStack item, PlayerProfile profile, int size) {
+<span class="fc" id="L149">        List&lt;String&gt; lore = item.getItemMeta().getLore();</span>
+
+<span class="fc bfc" id="L151" title="All 2 branches covered.">        for (int line = 0; line &lt; lore.size(); line++) {</span>
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">            if (lore.get(line).equals(ChatColor.GRAY + &quot;ID: &lt;ID&gt;&quot;)) {</span>
+<span class="nc" id="L153">                setBackpackId(p, item, line, profile.createBackpack(size).getId());</span>
+<span class="nc" id="L154">                break;</span>
+            }
+        }
+
+        /*
+         * If the current Player is already viewing a backpack (for whatever reason),
+         * terminate that view.
+         */
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">        if (markBackpackDirty(p)) {</span>
+<span class="nc" id="L163">            p.closeInventory();</span>
+        }
+
+        // Check if someone else is currently viewing this backpack
+<span class="pc bpc" id="L167" title="1 of 2 branches missed.">        if (!backpacks.containsValue(item)) {</span>
+<span class="fc" id="L168">            p.playSound(p.getLocation(), Sound.ENTITY_HORSE_ARMOR, 1F, 1F);</span>
+<span class="fc" id="L169">            backpacks.put(p.getUniqueId(), item);</span>
+
+<span class="fc" id="L171">            PlayerProfile.getBackpack(item, backpack -&gt; {</span>
+<span class="pc bpc" id="L172" title="1 of 2 branches missed.">                if (backpack != null) {</span>
+<span class="fc" id="L173">                    backpack.open(p);</span>
+                }
+<span class="fc" id="L175">            });</span>
+        } else {
+<span class="nc" id="L177">            Slimefun.getLocalization().sendMessage(p, &quot;backpack.already-open&quot;, true);</span>
+        }
+<span class="fc" id="L179">    }</span>
+
+    /**
+     * This method sets the id for a backpack onto the given {@link ItemStack}.
+     * 
+     * @param backpackOwner
+     *            The owner of this backpack
+     * @param item
+     *            The {@link ItemStack} to modify
+     * @param line
+     *            The line at which the ID should be replaced
+     * @param id
+     *            The id of this backpack
+     */
+    public void setBackpackId(@Nonnull OfflinePlayer backpackOwner, @Nonnull ItemStack item, int line, int id) {
+<span class="fc" id="L194">        Validate.notNull(backpackOwner, &quot;Backpacks must have an owner!&quot;);</span>
+<span class="fc" id="L195">        Validate.notNull(item, &quot;Cannot set the id onto null!&quot;);</span>
+
+<span class="fc" id="L197">        ItemMeta im = item.getItemMeta();</span>
+
+<span class="fc bfc" id="L199" title="All 2 branches covered.">        if (!im.hasLore()) {</span>
+<span class="fc" id="L200">            throw new IllegalArgumentException(&quot;This backpack does not have any lore!&quot;);</span>
+        }
+
+<span class="fc" id="L203">        List&lt;String&gt; lore = im.getLore();</span>
+
+<span class="fc bfc" id="L205" title="All 4 branches covered.">        if (line &gt;= lore.size() || !lore.get(line).contains(&quot;&lt;ID&gt;&quot;)) {</span>
+<span class="fc" id="L206">            throw new IllegalArgumentException(&quot;Specified a line that is out of bounds or invalid!&quot;);</span>
+        }
+
+<span class="fc" id="L209">        lore.set(line, lore.get(line).replace(&quot;&lt;ID&gt;&quot;, backpackOwner.getUniqueId() + &quot;#&quot; + id));</span>
+<span class="fc" id="L210">        im.setLore(lore);</span>
+<span class="fc" id="L211">        item.setItemMeta(im);</span>
+<span class="fc" id="L212">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

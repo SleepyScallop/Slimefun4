@@ -1,0 +1,527 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PlayerProfile.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.api.player</a> &gt; <span class="el_source">PlayerProfile.java</span></div><h1>PlayerProfile.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.api.player;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
+import java.util.Set;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.stream.IntStream;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
+
+import io.github.bakedlibs.dough.common.ChatColors;
+import io.github.bakedlibs.dough.common.CommonPatterns;
+import io.github.bakedlibs.dough.config.Config;
+import io.github.thebusybiscuit.slimefun4.api.events.AsyncProfileLoadEvent;
+import io.github.thebusybiscuit.slimefun4.api.gps.Waypoint;
+import io.github.thebusybiscuit.slimefun4.api.items.HashedArmorpiece;
+import io.github.thebusybiscuit.slimefun4.api.researches.Research;
+import io.github.thebusybiscuit.slimefun4.core.attributes.ProtectionType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.ProtectiveArmor;
+import io.github.thebusybiscuit.slimefun4.core.guide.GuideHistory;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.items.armor.SlimefunArmorPiece;
+import io.github.thebusybiscuit.slimefun4.utils.NumberUtils;
+
+/**
+ * A class that can store a Player's {@link Research} progress for caching purposes.
+ * It also holds the backpacks of a {@link Player}.
+ * 
+ * @author TheBusyBiscuit
+ * 
+ * @see Research
+ * @see Waypoint
+ * @see PlayerBackpack
+ * @see HashedArmorpiece
+ *
+ */
+public class PlayerProfile {
+
+    private final UUID uuid;
+    private final String name;
+
+    private final Config configFile;
+    private final Config waypointsFile;
+
+<span class="fc" id="L67">    private boolean dirty = false;</span>
+<span class="fc" id="L68">    private boolean markedForDeletion = false;</span>
+
+<span class="fc" id="L70">    private final Set&lt;Research&gt; researches = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L71">    private final List&lt;Waypoint&gt; waypoints = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L72">    private final Map&lt;Integer, PlayerBackpack&gt; backpacks = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L73">    private final GuideHistory guideHistory = new GuideHistory(this);</span>
+
+<span class="fc" id="L75">    private final HashedArmorpiece[] armor = { new HashedArmorpiece(), new HashedArmorpiece(), new HashedArmorpiece(), new HashedArmorpiece() };</span>
+
+<span class="fc" id="L77">    protected PlayerProfile(@Nonnull OfflinePlayer p) {</span>
+<span class="fc" id="L78">        this.uuid = p.getUniqueId();</span>
+<span class="fc" id="L79">        this.name = p.getName();</span>
+
+<span class="fc" id="L81">        configFile = new Config(&quot;data-storage/Slimefun/Players/&quot; + uuid.toString() + &quot;.yml&quot;);</span>
+<span class="fc" id="L82">        waypointsFile = new Config(&quot;data-storage/Slimefun/waypoints/&quot; + uuid.toString() + &quot;.yml&quot;);</span>
+
+<span class="fc" id="L84">        loadProfileData();</span>
+<span class="fc" id="L85">    }</span>
+
+    private void loadProfileData() {
+<span class="fc bfc" id="L88" title="All 2 branches covered.">        for (Research research : Slimefun.getRegistry().getResearches()) {</span>
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">            if (configFile.contains(&quot;researches.&quot; + research.getID())) {</span>
+<span class="nc" id="L90">                researches.add(research);</span>
+            }
+<span class="fc" id="L92">        }</span>
+
+<span class="pc bpc" id="L94" title="1 of 2 branches missed.">        for (String key : waypointsFile.getKeys()) {</span>
+            try {
+<span class="nc bnc" id="L96" title="All 4 branches missed.">                if (waypointsFile.contains(key + &quot;.world&quot;) &amp;&amp; Bukkit.getWorld(waypointsFile.getString(key + &quot;.world&quot;)) != null) {</span>
+<span class="nc" id="L97">                    String waypointName = waypointsFile.getString(key + &quot;.name&quot;);</span>
+<span class="nc" id="L98">                    Location loc = waypointsFile.getLocation(key);</span>
+<span class="nc" id="L99">                    waypoints.add(new Waypoint(this, key, loc, waypointName));</span>
+                }
+<span class="nc" id="L101">            } catch (Exception x) {</span>
+<span class="nc" id="L102">                Slimefun.logger().log(Level.WARNING, x, () -&gt; &quot;Could not load Waypoint \&quot;&quot; + key + &quot;\&quot; for Player \&quot;&quot; + name + '&quot;');</span>
+<span class="nc" id="L103">            }</span>
+<span class="nc" id="L104">        }</span>
+<span class="fc" id="L105">    }</span>
+
+    /**
+     * This method provides a fast way to access the armor of a {@link Player}.
+     * It returns a cached version, represented by {@link HashedArmorpiece}.
+     * 
+     * @return The cached armor for this {@link Player}
+     */
+    public @Nonnull HashedArmorpiece[] getArmor() {
+<span class="fc" id="L114">        return armor;</span>
+    }
+
+    /**
+     * This returns the {@link Config} which is used to store the data.
+     * Only intended for internal usage.
+     * 
+     * @return The {@link Config} associated with this {@link PlayerProfile}
+     */
+    public @Nonnull Config getConfig() {
+<span class="fc" id="L124">        return configFile;</span>
+    }
+
+    /**
+     * This returns the {@link UUID} this {@link PlayerProfile} is linked to.
+     * 
+     * @return The {@link UUID} of our {@link PlayerProfile}
+     */
+    public @Nonnull UUID getUUID() {
+<span class="fc" id="L133">        return uuid;</span>
+    }
+
+    /**
+     * This method returns whether the {@link Player} has logged off.
+     * If this is true, then the Profile can be removed from RAM.
+     * 
+     * @return Whether the Profile is marked for deletion
+     */
+    public boolean isMarkedForDeletion() {
+<span class="fc" id="L143">        return markedForDeletion;</span>
+    }
+
+    /**
+     * This method returns whether the Profile has unsaved changes
+     * 
+     * @return Whether there are unsaved changes
+     */
+    public boolean isDirty() {
+<span class="fc" id="L152">        return dirty;</span>
+    }
+
+    /**
+     * This method will save the Player's Researches and Backpacks to the hard drive
+     */
+    public void save() {
+<span class="nc bnc" id="L159" title="All 2 branches missed.">        for (PlayerBackpack backpack : backpacks.values()) {</span>
+<span class="nc" id="L160">            backpack.save();</span>
+<span class="nc" id="L161">        }</span>
+
+<span class="nc" id="L163">        waypointsFile.save();</span>
+<span class="nc" id="L164">        configFile.save();</span>
+<span class="nc" id="L165">        dirty = false;</span>
+<span class="nc" id="L166">    }</span>
+
+    /**
+     * This method sets the Player's &quot;researched&quot; status for this Research.
+     * Use the boolean to unlock or lock the {@link Research}
+     * 
+     * @param research
+     *            The {@link Research} that should be unlocked or locked
+     * @param unlock
+     *            Whether the {@link Research} should be unlocked or locked
+     */
+    public void setResearched(@Nonnull Research research, boolean unlock) {
+<span class="fc" id="L178">        Validate.notNull(research, &quot;Research must not be null!&quot;);</span>
+<span class="fc" id="L179">        dirty = true;</span>
+
+<span class="fc bfc" id="L181" title="All 2 branches covered.">        if (unlock) {</span>
+<span class="fc" id="L182">            configFile.setValue(&quot;researches.&quot; + research.getID(), true);</span>
+<span class="fc" id="L183">            researches.add(research);</span>
+        } else {
+<span class="fc" id="L185">            configFile.setValue(&quot;researches.&quot; + research.getID(), null);</span>
+<span class="fc" id="L186">            researches.remove(research);</span>
+        }
+<span class="fc" id="L188">    }</span>
+
+    /**
+     * This method returns whether the {@link Player} has unlocked the given {@link Research}
+     * 
+     * @param research
+     *            The {@link Research} that is being queried
+     * 
+     * @return Whether this {@link Research} has been unlocked
+     */
+    public boolean hasUnlocked(@Nullable Research research) {
+<span class="fc bfc" id="L199" title="All 2 branches covered.">        if (research == null) {</span>
+            // No Research, no restriction
+<span class="fc" id="L201">            return true;</span>
+        }
+
+<span class="fc bfc" id="L204" title="All 4 branches covered.">        return !research.isEnabled() || researches.contains(research);</span>
+    }
+
+    /**
+     * This method returns whether this {@link Player} has unlocked all {@link Research Researches}.
+     * 
+     * @return Whether they unlocked every {@link Research}
+     */
+    public boolean hasUnlockedEverything() {
+<span class="nc bnc" id="L213" title="All 2 branches missed.">        for (Research research : Slimefun.getRegistry().getResearches()) {</span>
+            // If there is a single Research not unlocked: They haven't unlocked everything.
+<span class="nc bnc" id="L215" title="All 2 branches missed.">            if (!hasUnlocked(research)) {</span>
+<span class="nc" id="L216">                return false;</span>
+            }
+<span class="nc" id="L218">        }</span>
+
+        // Player has everything unlocked - Hooray!
+<span class="nc" id="L221">        return true;</span>
+    }
+
+    /**
+     * This Method will return all Researches that this {@link Player} has unlocked
+     * 
+     * @return A {@code Hashset&lt;Research&gt;} of all Researches this {@link Player} has unlocked
+     */
+    public @Nonnull Set&lt;Research&gt; getResearches() {
+<span class="fc" id="L230">        return ImmutableSet.copyOf(researches);</span>
+    }
+
+    /**
+     * This returns a {@link List} of all {@link Waypoint Waypoints} belonging to this
+     * {@link PlayerProfile}.
+     * 
+     * @return A {@link List} containing every {@link Waypoint}
+     */
+    public @Nonnull List&lt;Waypoint&gt; getWaypoints() {
+<span class="fc" id="L240">        return ImmutableList.copyOf(waypoints);</span>
+    }
+
+    /**
+     * This adds the given {@link Waypoint} to the {@link List} of {@link Waypoint Waypoints}
+     * of this {@link PlayerProfile}.
+     * 
+     * @param waypoint
+     *            The {@link Waypoint} to add
+     */
+    public void addWaypoint(@Nonnull Waypoint waypoint) {
+<span class="fc" id="L251">        Validate.notNull(waypoint, &quot;Cannot add a 'null' waypoint!&quot;);</span>
+
+<span class="fc bfc" id="L253" title="All 2 branches covered.">        for (Waypoint wp : waypoints) {</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">            if (wp.getId().equals(waypoint.getId())) {</span>
+<span class="fc" id="L255">                throw new IllegalArgumentException(&quot;A Waypoint with that id already exists for this Player&quot;);</span>
+            }
+<span class="fc" id="L257">        }</span>
+
+<span class="fc bfc" id="L259" title="All 2 branches covered.">        if (waypoints.size() &lt; 21) {</span>
+<span class="fc" id="L260">            waypoints.add(waypoint);</span>
+
+<span class="fc" id="L262">            waypointsFile.setValue(waypoint.getId(), waypoint.getLocation());</span>
+<span class="fc" id="L263">            waypointsFile.setValue(waypoint.getId() + &quot;.name&quot;, waypoint.getName());</span>
+<span class="fc" id="L264">            markDirty();</span>
+        }
+<span class="fc" id="L266">    }</span>
+
+    /**
+     * This removes the given {@link Waypoint} from the {@link List} of {@link Waypoint Waypoints}
+     * of this {@link PlayerProfile}.
+     * 
+     * @param waypoint
+     *            The {@link Waypoint} to remove
+     */
+    public void removeWaypoint(@Nonnull Waypoint waypoint) {
+<span class="fc" id="L276">        Validate.notNull(waypoint, &quot;Cannot remove a 'null' waypoint!&quot;);</span>
+
+<span class="fc bfc" id="L278" title="All 2 branches covered.">        if (waypoints.remove(waypoint)) {</span>
+<span class="fc" id="L279">            waypointsFile.setValue(waypoint.getId(), null);</span>
+<span class="fc" id="L280">            markDirty();</span>
+        }
+<span class="fc" id="L282">    }</span>
+
+    /**
+     * Call this method if the Player has left.
+     * The profile can then be removed from RAM.
+     */
+    public final void markForDeletion() {
+<span class="fc" id="L289">        markedForDeletion = true;</span>
+<span class="fc" id="L290">    }</span>
+
+    /**
+     * Call this method if this Profile has unsaved changes.
+     */
+    public final void markDirty() {
+<span class="fc" id="L296">        dirty = true;</span>
+<span class="fc" id="L297">    }</span>
+
+    public @Nonnull PlayerBackpack createBackpack(int size) {
+<span class="fc bfc" id="L300" title="All 2 branches covered.">        IntStream stream = IntStream.iterate(0, i -&gt; i + 1).filter(i -&gt; !configFile.contains(&quot;backpacks.&quot; + i + &quot;.size&quot;));</span>
+<span class="fc" id="L301">        int id = stream.findFirst().getAsInt();</span>
+
+<span class="fc" id="L303">        PlayerBackpack backpack = new PlayerBackpack(this, id, size);</span>
+<span class="fc" id="L304">        backpacks.put(id, backpack);</span>
+
+<span class="fc" id="L306">        return backpack;</span>
+    }
+
+    public @Nonnull Optional&lt;PlayerBackpack&gt; getBackpack(int id) {
+<span class="fc bfc" id="L310" title="All 2 branches covered.">        if (id &lt; 0) {</span>
+<span class="fc" id="L311">            throw new IllegalArgumentException(&quot;Backpacks cannot have negative ids!&quot;);</span>
+        }
+
+<span class="fc" id="L314">        PlayerBackpack backpack = backpacks.get(id);</span>
+
+<span class="fc bfc" id="L316" title="All 2 branches covered.">        if (backpack != null) {</span>
+<span class="fc" id="L317">            return Optional.of(backpack);</span>
+<span class="fc bfc" id="L318" title="All 2 branches covered.">        } else if (configFile.contains(&quot;backpacks.&quot; + id + &quot;.size&quot;)) {</span>
+<span class="fc" id="L319">            backpack = new PlayerBackpack(this, id);</span>
+<span class="fc" id="L320">            backpacks.put(id, backpack);</span>
+<span class="fc" id="L321">            return Optional.of(backpack);</span>
+        }
+
+<span class="fc" id="L324">        return Optional.empty();</span>
+    }
+
+    public @Nonnull String getTitle() {
+<span class="nc" id="L328">        List&lt;String&gt; titles = Slimefun.getRegistry().getResearchRanks();</span>
+
+<span class="nc" id="L330">        float fraction = (float) researches.size() / Slimefun.getRegistry().getResearches().size();</span>
+<span class="nc" id="L331">        int index = (int) (fraction * (titles.size() - 1));</span>
+
+<span class="nc" id="L333">        return titles.get(index);</span>
+    }
+
+    public void sendStats(@Nonnull CommandSender sender) {
+<span class="nc" id="L337">        Set&lt;Research&gt; unlockedResearches = getResearches();</span>
+<span class="nc" id="L338">        int levels = unlockedResearches.stream().mapToInt(Research::getCost).sum();</span>
+<span class="nc" id="L339">        int allResearches = Slimefun.getRegistry().getResearches().size();</span>
+
+<span class="nc" id="L341">        float progress = Math.round(((unlockedResearches.size() * 100.0F) / allResearches) * 100.0F) / 100.0F;</span>
+
+<span class="nc" id="L343">        sender.sendMessage(&quot;&quot;);</span>
+<span class="nc" id="L344">        sender.sendMessage(ChatColors.color(&quot;&amp;7Statistics for Player: &amp;b&quot; + name));</span>
+<span class="nc" id="L345">        sender.sendMessage(&quot;&quot;);</span>
+<span class="nc" id="L346">        sender.sendMessage(ChatColors.color(&quot;&amp;7Title: &quot; + ChatColor.AQUA + getTitle()));</span>
+<span class="nc" id="L347">        sender.sendMessage(ChatColors.color(&quot;&amp;7Research Progress: &quot; + NumberUtils.getColorFromPercentage(progress) + progress + &quot; &amp;r% &quot; + ChatColor.YELLOW + '(' + unlockedResearches.size() + &quot; / &quot; + allResearches + ')'));</span>
+<span class="nc" id="L348">        sender.sendMessage(ChatColors.color(&quot;&amp;7Total XP Levels spent: &quot; + ChatColor.AQUA + levels));</span>
+<span class="nc" id="L349">    }</span>
+
+    /**
+     * This returns the {@link Player} who this {@link PlayerProfile} belongs to.
+     * If the {@link Player} is offline, null will be returned.
+     * 
+     * @return The {@link Player} of this {@link PlayerProfile} or null
+     */
+    public @Nullable Player getPlayer() {
+<span class="fc" id="L358">        return Bukkit.getPlayer(getUUID());</span>
+    }
+
+    /**
+     * This returns the {@link GuideHistory} of this {@link Player}.
+     * It is basically that player's browsing history.
+     * 
+     * @return The {@link GuideHistory} of this {@link Player}
+     */
+    public @Nonnull GuideHistory getGuideHistory() {
+<span class="fc" id="L368">        return guideHistory;</span>
+    }
+
+    public static boolean fromUUID(@Nonnull UUID uuid, @Nonnull Consumer&lt;PlayerProfile&gt; callback) {
+<span class="fc" id="L372">        return get(Bukkit.getOfflinePlayer(uuid), callback);</span>
+    }
+
+    /**
+     * Get the {@link PlayerProfile} for a {@link OfflinePlayer} asynchronously.
+     *
+     * @param p
+     *            The {@link OfflinePlayer} who's {@link PlayerProfile} to retrieve
+     * @param callback
+     *            The callback with the {@link PlayerProfile}
+     * 
+     * @return If the {@link OfflinePlayer} was cached or not.
+     */
+    public static boolean get(@Nonnull OfflinePlayer p, @Nonnull Consumer&lt;PlayerProfile&gt; callback) {
+<span class="fc" id="L386">        Validate.notNull(p, &quot;Cannot get a PlayerProfile for: null!&quot;);</span>
+
+<span class="fc" id="L388">        UUID uuid = p.getUniqueId();</span>
+<span class="fc" id="L389">        PlayerProfile profile = Slimefun.getRegistry().getPlayerProfiles().get(uuid);</span>
+
+<span class="fc bfc" id="L391" title="All 2 branches covered.">        if (profile != null) {</span>
+<span class="fc" id="L392">            callback.accept(profile);</span>
+<span class="fc" id="L393">            return true;</span>
+        }
+
+<span class="fc" id="L396">        Bukkit.getScheduler().runTaskAsynchronously(Slimefun.instance(), () -&gt; {</span>
+<span class="fc" id="L397">            AsyncProfileLoadEvent event = new AsyncProfileLoadEvent(new PlayerProfile(p));</span>
+<span class="fc" id="L398">            Bukkit.getPluginManager().callEvent(event);</span>
+
+<span class="fc" id="L400">            Slimefun.getRegistry().getPlayerProfiles().put(uuid, event.getProfile());</span>
+<span class="fc" id="L401">            callback.accept(event.getProfile());</span>
+<span class="fc" id="L402">        });</span>
+
+<span class="fc" id="L404">        return false;</span>
+    }
+
+    /**
+     * This requests an instance of {@link PlayerProfile} to be loaded for the given {@link OfflinePlayer}.
+     * This method will return true if the {@link PlayerProfile} was already found.
+     * 
+     * @param p
+     *            The {@link OfflinePlayer} to request the {@link PlayerProfile} for.
+     * 
+     * @return Whether the {@link PlayerProfile} was already loaded
+     */
+    public static boolean request(@Nonnull OfflinePlayer p) {
+<span class="fc" id="L417">        Validate.notNull(p, &quot;Cannot request a Profile for null&quot;);</span>
+
+<span class="fc bfc" id="L419" title="All 2 branches covered.">        if (!Slimefun.getRegistry().getPlayerProfiles().containsKey(p.getUniqueId())) {</span>
+            // Should probably prevent multiple requests for the same profile in the future
+<span class="fc" id="L421">            Bukkit.getScheduler().runTaskAsynchronously(Slimefun.instance(), () -&gt; {</span>
+<span class="fc" id="L422">                PlayerProfile pp = new PlayerProfile(p);</span>
+<span class="fc" id="L423">                Slimefun.getRegistry().getPlayerProfiles().put(p.getUniqueId(), pp);</span>
+<span class="fc" id="L424">            });</span>
+
+<span class="fc" id="L426">            return false;</span>
+        }
+
+<span class="fc" id="L429">        return true;</span>
+    }
+
+    /**
+     * This method tries to search for a {@link PlayerProfile} of the given {@link OfflinePlayer}.
+     * The result of this method is an {@link Optional}, if no {@link PlayerProfile} was found, an empty
+     * {@link Optional} will be returned.
+     * 
+     * @param p
+     *            The {@link OfflinePlayer} to get the {@link PlayerProfile} for
+     * 
+     * @return An {@link Optional} describing the result
+     */
+    public static @Nonnull Optional&lt;PlayerProfile&gt; find(@Nonnull OfflinePlayer p) {
+<span class="fc" id="L443">        return Optional.ofNullable(Slimefun.getRegistry().getPlayerProfiles().get(p.getUniqueId()));</span>
+    }
+
+    public static @Nonnull Iterator&lt;PlayerProfile&gt; iterator() {
+<span class="fc" id="L447">        return Slimefun.getRegistry().getPlayerProfiles().values().iterator();</span>
+    }
+
+    public static void getBackpack(@Nullable ItemStack item, @Nonnull Consumer&lt;PlayerBackpack&gt; callback) {
+<span class="pc bpc" id="L451" title="3 of 6 branches missed.">        if (item == null || !item.hasItemMeta() || !item.getItemMeta().hasLore()) {</span>
+<span class="nc" id="L452">            return;</span>
+        }
+
+<span class="fc" id="L455">        OptionalInt id = OptionalInt.empty();</span>
+<span class="fc" id="L456">        String uuid = &quot;&quot;;</span>
+
+<span class="fc bfc" id="L458" title="All 2 branches covered.">        for (String line : item.getItemMeta().getLore()) {</span>
+<span class="pc bpc" id="L459" title="1 of 4 branches missed.">            if (line.startsWith(ChatColors.color(&quot;&amp;7ID: &quot;)) &amp;&amp; line.indexOf('#') != -1) {</span>
+<span class="fc" id="L460">                String[] splitLine = CommonPatterns.HASH.split(line);</span>
+
+<span class="pc bpc" id="L462" title="1 of 2 branches missed.">                if (CommonPatterns.NUMERIC.matcher(splitLine[1]).matches()) {</span>
+<span class="fc" id="L463">                    id = OptionalInt.of(Integer.parseInt(splitLine[1]));</span>
+<span class="fc" id="L464">                    uuid = splitLine[0].replace(ChatColors.color(&quot;&amp;7ID: &quot;), &quot;&quot;);</span>
+                }
+            }
+<span class="fc" id="L467">        }</span>
+
+<span class="pc bpc" id="L469" title="1 of 2 branches missed.">        if (id.isPresent()) {</span>
+<span class="fc" id="L470">            int number = id.getAsInt();</span>
+
+<span class="fc" id="L472">            fromUUID(UUID.fromString(uuid), profile -&gt; {</span>
+<span class="fc" id="L473">                Optional&lt;PlayerBackpack&gt; backpack = profile.getBackpack(number);</span>
+<span class="fc" id="L474">                backpack.ifPresent(callback);</span>
+<span class="fc" id="L475">            });</span>
+        }
+<span class="fc" id="L477">    }</span>
+
+    public boolean hasFullProtectionAgainst(@Nonnull ProtectionType type) {
+<span class="fc" id="L480">        Validate.notNull(type, &quot;ProtectionType must not be null.&quot;);</span>
+
+<span class="fc" id="L482">        int armorCount = 0;</span>
+<span class="fc" id="L483">        NamespacedKey setId = null;</span>
+
+<span class="fc bfc" id="L485" title="All 2 branches covered.">        for (HashedArmorpiece armorpiece : armor) {</span>
+<span class="fc" id="L486">            Optional&lt;SlimefunArmorPiece&gt; armorPiece = armorpiece.getItem();</span>
+
+<span class="fc bfc" id="L488" title="All 2 branches covered.">            if (!armorPiece.isPresent()) {</span>
+<span class="fc" id="L489">                setId = null;</span>
+<span class="fc bfc" id="L490" title="All 2 branches covered.">            } else if (armorPiece.get() instanceof ProtectiveArmor protectedArmor) {</span>
+<span class="pc bpc" id="L491" title="2 of 4 branches missed.">                if (setId == null &amp;&amp; protectedArmor.isFullSetRequired()) {</span>
+<span class="nc" id="L492">                    setId = protectedArmor.getArmorSetId();</span>
+                }
+
+<span class="pc bpc" id="L495" title="1 of 2 branches missed.">                for (ProtectionType protectionType : protectedArmor.getProtectionTypes()) {</span>
+<span class="pc bpc" id="L496" title="1 of 2 branches missed.">                    if (protectionType == type) {</span>
+<span class="pc bpc" id="L497" title="1 of 2 branches missed.">                        if (setId == null) {</span>
+<span class="fc" id="L498">                            return true;</span>
+<span class="nc bnc" id="L499" title="All 2 branches missed.">                        } else if (setId.equals(protectedArmor.getArmorSetId())) {</span>
+<span class="nc" id="L500">                            armorCount++;</span>
+                        }
+                    }
+                }
+
+            }
+        }
+
+<span class="pc bpc" id="L508" title="1 of 2 branches missed.">        return armorCount == 4;</span>
+    }
+
+    @Override
+    public int hashCode() {
+<span class="fc" id="L513">        return uuid.hashCode();</span>
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+<span class="pc bpc" id="L518" title="2 of 4 branches missed.">        return obj instanceof PlayerProfile profile &amp;&amp; uuid.equals(profile.uuid);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="nc" id="L523">        return &quot;PlayerProfile {&quot; + uuid + &quot;}&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

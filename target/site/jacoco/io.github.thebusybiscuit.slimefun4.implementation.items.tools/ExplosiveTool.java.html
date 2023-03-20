@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ExplosiveTool.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.tools</a> &gt; <span class="el_source">ExplosiveTool.java</span></div><h1>ExplosiveTool.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.tools;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Effect;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.bakedlibs.dough.protection.Interaction;
+import io.github.thebusybiscuit.slimefun4.api.events.ExplosiveToolBreakBlocksEvent;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.DamageableItem;
+import io.github.thebusybiscuit.slimefun4.core.attributes.NotPlaceable;
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
+import io.github.thebusybiscuit.slimefun4.core.handlers.ToolUseHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.items.SimpleSlimefunItem;
+import io.github.thebusybiscuit.slimefun4.utils.tags.SlimefunTag;
+
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
+
+/**
+ * This {@link SlimefunItem} is a super class for items like the {@link ExplosivePickaxe} or {@link ExplosiveShovel}.
+ * 
+ * @author TheBusyBiscuit
+ * 
+ * @see ExplosivePickaxe
+ * @see ExplosiveShovel
+ *
+ */
+public class ExplosiveTool extends SimpleSlimefunItem&lt;ToolUseHandler&gt; implements NotPlaceable, DamageableItem {
+
+<span class="fc" id="L47">    private final ItemSetting&lt;Boolean&gt; damageOnUse = new ItemSetting&lt;&gt;(this, &quot;damage-on-use&quot;, true);</span>
+<span class="fc" id="L48">    private final ItemSetting&lt;Boolean&gt; callExplosionEvent = new ItemSetting&lt;&gt;(this, &quot;call-explosion-event&quot;, false);</span>
+
+    @ParametersAreNonnullByDefault
+    public ExplosiveTool(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+<span class="fc" id="L52">        super(itemGroup, item, recipeType, recipe);</span>
+
+<span class="fc" id="L54">        addItemSetting(damageOnUse, callExplosionEvent);</span>
+<span class="fc" id="L55">    }</span>
+
+    @Nonnull
+    @Override
+    public ToolUseHandler getItemHandler() {
+<span class="fc" id="L60">        return (e, tool, fortune, drops) -&gt; {</span>
+<span class="nc" id="L61">            Player p = e.getPlayer();</span>
+
+<span class="nc bnc" id="L63" title="All 2 branches missed.">            if (!p.isSneaking()) {</span>
+<span class="nc" id="L64">                Block b = e.getBlock();</span>
+
+<span class="nc" id="L66">                b.getWorld().createExplosion(b.getLocation(), 0);</span>
+<span class="nc" id="L67">                b.getWorld().playSound(b.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 0.2F, 1F);</span>
+
+<span class="nc" id="L69">                List&lt;Block&gt; blocks = findBlocks(b);</span>
+<span class="nc" id="L70">                breakBlocks(e, p, tool, b, blocks, drops);</span>
+            }
+<span class="nc" id="L72">        };</span>
+    }
+
+    @ParametersAreNonnullByDefault
+    private void breakBlocks(BlockBreakEvent e, Player p, ItemStack item, Block b, List&lt;Block&gt; blocks, List&lt;ItemStack&gt; drops) {
+<span class="nc" id="L77">        List&lt;Block&gt; blocksToDestroy = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L79" title="All 2 branches missed.">        if (callExplosionEvent.getValue().booleanValue()) {</span>
+<span class="nc" id="L80">            BlockExplodeEvent blockExplodeEvent = new BlockExplodeEvent(b, blocks, 0);</span>
+<span class="nc" id="L81">            Bukkit.getServer().getPluginManager().callEvent(blockExplodeEvent);</span>
+
+<span class="nc bnc" id="L83" title="All 2 branches missed.">            if (!blockExplodeEvent.isCancelled()) {</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">                for (Block block : blockExplodeEvent.blockList()) {</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">                    if (canBreak(p, block)) {</span>
+<span class="nc" id="L86">                        blocksToDestroy.add(block);</span>
+                    }
+<span class="nc" id="L88">                }</span>
+            }
+<span class="nc" id="L90">        } else {</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            for (Block block : blocks) {</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">                if (canBreak(p, block)) {</span>
+<span class="nc" id="L93">                    blocksToDestroy.add(block);</span>
+                }
+<span class="nc" id="L95">            }</span>
+        }
+
+<span class="nc" id="L98">        ExplosiveToolBreakBlocksEvent event = new ExplosiveToolBreakBlocksEvent(p, b, blocksToDestroy, item, this);</span>
+<span class="nc" id="L99">        Bukkit.getServer().getPluginManager().callEvent(event);</span>
+
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (!event.isCancelled()) {</span>
+<span class="nc bnc" id="L102" title="All 2 branches missed.">            for (Block block : blocksToDestroy) {</span>
+<span class="nc" id="L103">                breakBlock(e, p, item, block, drops);</span>
+<span class="nc" id="L104">            }</span>
+        }
+<span class="nc" id="L106">    }</span>
+
+    @Nonnull
+    private List&lt;Block&gt; findBlocks(@Nonnull Block b) {
+<span class="nc" id="L110">        List&lt;Block&gt; blocks = new ArrayList&lt;&gt;(26);</span>
+
+<span class="nc bnc" id="L112" title="All 2 branches missed.">        for (int x = -1; x &lt;= 1; x++) {</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            for (int y = -1; y &lt;= 1; y++) {</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                for (int z = -1; z &lt;= 1; z++) {</span>
+                    // We can skip the center block since that will break as usual
+<span class="nc bnc" id="L116" title="All 6 branches missed.">                    if (x == 0 &amp;&amp; y == 0 &amp;&amp; z == 0) {</span>
+<span class="nc" id="L117">                        continue;</span>
+                    }
+
+<span class="nc" id="L120">                    blocks.add(b.getRelative(x, y, z));</span>
+                }
+            }
+        }
+
+<span class="nc" id="L125">        return blocks;</span>
+    }
+
+    @Override
+    public boolean isDamageable() {
+<span class="nc" id="L130">        return damageOnUse.getValue();</span>
+    }
+
+    protected boolean canBreak(@Nonnull Player p, @Nonnull Block b) {
+<span class="nc bnc" id="L134" title="All 4 branches missed.">        if (b.isEmpty() || b.isLiquid()) {</span>
+<span class="nc" id="L135">            return false;</span>
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        } else if (SlimefunTag.UNBREAKABLE_MATERIALS.isTagged(b.getType())) {</span>
+<span class="nc" id="L137">            return false;</span>
+<span class="nc bnc" id="L138" title="All 2 branches missed.">        } else if (!b.getWorld().getWorldBorder().isInside(b.getLocation())) {</span>
+<span class="nc" id="L139">            return false;</span>
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        } else if (Slimefun.getIntegrations().isCustomBlock(b)) {</span>
+<span class="nc" id="L141">            return false;</span>
+        } else {
+<span class="nc" id="L143">            return Slimefun.getProtectionManager().hasPermission(p, b.getLocation(), Interaction.BREAK_BLOCK);</span>
+        }
+    }
+
+    @ParametersAreNonnullByDefault
+    private void breakBlock(BlockBreakEvent e, Player p, ItemStack item, Block b, List&lt;ItemStack&gt; drops) {
+<span class="nc" id="L149">        Slimefun.getProtectionManager().logAction(p, b, Interaction.BREAK_BLOCK);</span>
+<span class="nc" id="L150">        Material material = b.getType();</span>
+
+<span class="nc" id="L152">        b.getWorld().playEffect(b.getLocation(), Effect.STEP_SOUND, material);</span>
+<span class="nc" id="L153">        SlimefunItem sfItem = BlockStorage.check(b);</span>
+
+<span class="nc bnc" id="L155" title="All 4 branches missed.">        if (sfItem != null &amp;&amp; !sfItem.useVanillaBlockBreaking()) {</span>
+            /*
+             * Fixes #2989
+             * We create a dummy here to pass onto the BlockBreakHandler.
+             * This will set the correct block context.
+             */
+<span class="nc" id="L161">            BlockBreakEvent dummyEvent = new BlockBreakEvent(b, e.getPlayer());</span>
+
+            /*
+             * Fixes #3036 and handling in general.
+             * Call the BlockBreakHandler if the block has one to allow for proper handling.
+             */
+<span class="nc" id="L167">            sfItem.callItemHandler(BlockBreakHandler.class, handler -&gt; handler.onPlayerBreak(dummyEvent, item, drops));</span>
+
+            // Make sure the event wasn't cancelled by the BlockBreakHandler.
+<span class="nc bnc" id="L170" title="All 2 branches missed.">            if (!dummyEvent.isCancelled()) {</span>
+<span class="nc" id="L171">                drops.addAll(sfItem.getDrops(p));</span>
+<span class="nc" id="L172">                b.setType(Material.AIR);</span>
+<span class="nc" id="L173">                BlockStorage.clearBlockInfo(b);</span>
+            }
+<span class="nc" id="L175">        } else {</span>
+<span class="nc" id="L176">            b.breakNaturally(item);</span>
+        }
+
+<span class="nc" id="L179">        damageItem(p, item);</span>
+<span class="nc" id="L180">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

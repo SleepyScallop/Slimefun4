@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SlimefunItemStack.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.api.items</a> &gt; <span class="el_source">SlimefunItemStack.java</span></div><h1>SlimefunItemStack.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.api.items;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.ChatColor;
+import org.bukkit.Color;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemFlag;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import io.github.bakedlibs.dough.common.CommonPatterns;
+import io.github.bakedlibs.dough.items.ItemMetaSnapshot;
+import io.github.bakedlibs.dough.skins.PlayerHead;
+import io.github.bakedlibs.dough.skins.PlayerSkin;
+import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion;
+import io.github.thebusybiscuit.slimefun4.api.exceptions.PrematureCodeException;
+import io.github.thebusybiscuit.slimefun4.api.exceptions.WrongItemStackException;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.utils.HeadTexture;
+
+/**
+ * The {@link SlimefunItemStack} functions as the base for any
+ * {@link SlimefunItem}.
+ * 
+ * @author TheBusyBiscuit
+ * @author Walshy
+ *
+ */
+public class SlimefunItemStack extends ItemStack {
+
+    private String id;
+    private ItemMetaSnapshot itemMetaSnapshot;
+
+<span class="fc" id="L49">    private boolean locked = false;</span>
+<span class="fc" id="L50">    private String texture = null;</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull ItemStack item) {
+<span class="fc" id="L53">        super(item);</span>
+
+<span class="fc" id="L55">        Validate.notNull(id, &quot;The Item id must never be null!&quot;);</span>
+<span class="fc" id="L56">        Validate.isTrue(id.equals(id.toUpperCase(Locale.ROOT)), &quot;Slimefun Item Ids must be uppercase! (e.g. 'MY_ITEM_ID')&quot;);</span>
+
+<span class="pc bpc" id="L58" title="1 of 2 branches missed.">        if (Slimefun.instance() == null) {</span>
+<span class="nc" id="L59">            throw new PrematureCodeException(&quot;A SlimefunItemStack must never be be created before your Plugin was enabled.&quot;);</span>
+        }
+
+<span class="fc" id="L62">        this.id = id;</span>
+
+<span class="fc" id="L64">        ItemMeta meta = getItemMeta();</span>
+
+<span class="fc" id="L66">        Slimefun.getItemDataService().setItemData(meta, id);</span>
+<span class="fc" id="L67">        Slimefun.getItemTextureService().setTexture(meta, id);</span>
+
+<span class="fc" id="L69">        setItemMeta(meta);</span>
+<span class="fc" id="L70">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull ItemStack item, @Nonnull Consumer&lt;ItemMeta&gt; consumer) {
+<span class="fc" id="L73">        this(id, item);</span>
+
+<span class="fc" id="L75">        ItemMeta im = getItemMeta();</span>
+<span class="fc" id="L76">        consumer.accept(im);</span>
+<span class="fc" id="L77">        setItemMeta(im);</span>
+<span class="fc" id="L78">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull Material type, @Nonnull Consumer&lt;ItemMeta&gt; consumer) {
+<span class="fc" id="L81">        this(id, new ItemStack(type), consumer);</span>
+<span class="fc" id="L82">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull Material type, @Nullable String name, @Nonnull Consumer&lt;ItemMeta&gt; consumer) {
+<span class="fc" id="L85">        this(id, type, meta -&gt; {</span>
+<span class="pc bpc" id="L86" title="1 of 2 branches missed.">            if (name != null) {</span>
+<span class="fc" id="L87">                meta.setDisplayName(ChatColor.translateAlternateColorCodes('&amp;', name));</span>
+            }
+
+<span class="fc" id="L90">            consumer.accept(meta);</span>
+<span class="fc" id="L91">        });</span>
+<span class="fc" id="L92">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull ItemStack item, @Nullable String name, String... lore) {
+<span class="fc" id="L95">        this(id, item, im -&gt; {</span>
+<span class="pc bpc" id="L96" title="1 of 2 branches missed.">            if (name != null) {</span>
+<span class="fc" id="L97">                im.setDisplayName(ChatColor.translateAlternateColorCodes('&amp;', name));</span>
+            }
+
+<span class="fc bfc" id="L100" title="All 2 branches covered.">            if (lore.length &gt; 0) {</span>
+<span class="fc" id="L101">                List&lt;String&gt; lines = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L103" title="All 2 branches covered.">                for (String line : lore) {</span>
+<span class="fc" id="L104">                    lines.add(ChatColor.translateAlternateColorCodes('&amp;', line));</span>
+                }
+<span class="fc" id="L106">                im.setLore(lines);</span>
+            }
+<span class="fc" id="L108">        });</span>
+<span class="fc" id="L109">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull Material type, @Nullable String name, String... lore) {
+<span class="fc" id="L112">        this(id, new ItemStack(type), name, lore);</span>
+<span class="fc" id="L113">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull Material type, @Nonnull Color color, @Nullable String name, String... lore) {
+<span class="fc" id="L116">        this(id, type, im -&gt; {</span>
+<span class="pc bpc" id="L117" title="1 of 2 branches missed.">            if (name != null) {</span>
+<span class="fc" id="L118">                im.setDisplayName(ChatColor.translateAlternateColorCodes('&amp;', name));</span>
+            }
+
+<span class="fc bfc" id="L121" title="All 2 branches covered.">            if (lore.length &gt; 0) {</span>
+<span class="fc" id="L122">                List&lt;String&gt; lines = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L124" title="All 2 branches covered.">                for (String line : lore) {</span>
+<span class="fc" id="L125">                    lines.add(ChatColor.translateAlternateColorCodes('&amp;', line));</span>
+                }
+
+<span class="fc" id="L128">                im.setLore(lines);</span>
+            }
+
+<span class="fc bfc" id="L131" title="All 2 branches covered.">            if (im instanceof LeatherArmorMeta leatherArmorMeta) {</span>
+<span class="fc" id="L132">                leatherArmorMeta.setColor(color);</span>
+            }
+
+<span class="fc bfc" id="L135" title="All 2 branches covered.">            if (im instanceof PotionMeta potionMeta) {</span>
+<span class="fc" id="L136">                potionMeta.setColor(color);</span>
+            }
+<span class="fc" id="L138">        });</span>
+<span class="fc" id="L139">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull Color color, @Nonnull PotionEffect effect, @Nullable String name, String... lore) {
+<span class="fc" id="L142">        this(id, Material.POTION, im -&gt; {</span>
+<span class="pc bpc" id="L143" title="1 of 2 branches missed.">            if (name != null) {</span>
+<span class="fc" id="L144">                im.setDisplayName(ChatColor.translateAlternateColorCodes('&amp;', name));</span>
+            }
+
+<span class="fc bfc" id="L147" title="All 2 branches covered.">            if (lore.length &gt; 0) {</span>
+<span class="fc" id="L148">                List&lt;String&gt; lines = new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L150" title="All 2 branches covered.">                for (String line : lore) {</span>
+<span class="fc" id="L151">                    lines.add(ChatColor.translateAlternateColorCodes('&amp;', line));</span>
+                }
+
+<span class="fc" id="L154">                im.setLore(lines);</span>
+            }
+
+<span class="pc bpc" id="L157" title="1 of 2 branches missed.">            if (im instanceof PotionMeta potionMeta) {</span>
+<span class="fc" id="L158">                potionMeta.setColor(color);</span>
+<span class="fc" id="L159">                potionMeta.addCustomEffect(effect, true);</span>
+
+<span class="fc bfc" id="L161" title="All 2 branches covered.">                if (effect.getType().equals(PotionEffectType.SATURATION)) {</span>
+<span class="fc" id="L162">                    im.addItemFlags(ItemFlag.HIDE_POTION_EFFECTS);</span>
+                }
+            }
+<span class="fc" id="L165">        });</span>
+<span class="fc" id="L166">    }</span>
+
+    public SlimefunItemStack(@Nonnull SlimefunItemStack item, int amount) {
+<span class="fc" id="L169">        this(item.getItemId(), item);</span>
+<span class="fc" id="L170">        setAmount(amount);</span>
+<span class="fc" id="L171">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull String texture, @Nullable String name, String... lore) {
+<span class="fc" id="L174">        this(id, getSkull(id, texture), name, lore);</span>
+<span class="fc" id="L175">        this.texture = getTexture(id, texture);</span>
+<span class="fc" id="L176">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull HeadTexture head, @Nullable String name, String... lore) {
+<span class="fc" id="L179">        this(id, head.getTexture(), name, lore);</span>
+<span class="fc" id="L180">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull String texture, @Nullable String name, @Nonnull Consumer&lt;ItemMeta&gt; consumer) {
+<span class="nc" id="L183">        this(id, getSkull(id, texture), meta -&gt; {</span>
+<span class="nc bnc" id="L184" title="All 2 branches missed.">            if (name != null) {</span>
+<span class="nc" id="L185">                meta.setDisplayName(ChatColor.translateAlternateColorCodes('&amp;', name));</span>
+            }
+
+<span class="nc" id="L188">            consumer.accept(meta);</span>
+<span class="nc" id="L189">        });</span>
+
+<span class="nc" id="L191">        this.texture = getTexture(id, texture);</span>
+<span class="nc" id="L192">    }</span>
+
+    public SlimefunItemStack(@Nonnull String id, @Nonnull String texture, @Nonnull Consumer&lt;ItemMeta&gt; consumer) {
+<span class="nc" id="L195">        this(id, getSkull(id, texture), consumer);</span>
+<span class="nc" id="L196">        this.texture = getTexture(id, texture);</span>
+<span class="nc" id="L197">    }</span>
+
+    /**
+     * Returns the id that was given to this {@link SlimefunItemStack}.
+     * 
+     * @return The {@link SlimefunItem} id for this {@link SlimefunItemStack}
+     */
+    public final @Nonnull String getItemId() {
+<span class="fc" id="L205">        return id;</span>
+    }
+
+    /**
+     * Gets the {@link SlimefunItem} associated for this {@link SlimefunItemStack}.
+     * Null if no item is found.
+     *
+     * @return The {@link SlimefunItem} for this {@link SlimefunItemStack}, null if not found.
+     */
+    public @Nullable SlimefunItem getItem() {
+<span class="fc" id="L215">        return SlimefunItem.getById(id);</span>
+    }
+
+    /**
+     * This method returns the associated {@link SlimefunItem} and casts it to the provided
+     * {@link Class}.
+     * 
+     * If no item was found or the found {@link SlimefunItem} is not of the requested type,
+     * the method will return null.
+     * 
+     * @param &lt;T&gt;
+     *            The type of {@link SlimefunItem} to cast this to
+     * @param type
+     *            The {@link Class} of the target {@link SlimefunItem}
+     * 
+     * @return The {@link SlimefunItem} this {@link SlimefunItem} represents, casted to the given type
+     */
+
+    public @Nullable &lt;T extends SlimefunItem&gt; T getItem(@Nonnull Class&lt;T&gt; type) {
+<span class="fc" id="L234">        SlimefunItem item = getItem();</span>
+<span class="pc bpc" id="L235" title="1 of 2 branches missed.">        return type.isInstance(item) ? type.cast(item) : null;</span>
+    }
+
+    public @Nonnull ItemMetaSnapshot getItemMetaSnapshot() {
+<span class="fc" id="L239">        return itemMetaSnapshot;</span>
+    }
+
+    @Override
+    public boolean setItemMeta(ItemMeta meta) {
+<span class="fc" id="L244">        validate();</span>
+<span class="fc" id="L245">        itemMetaSnapshot = new ItemMetaSnapshot(meta);</span>
+
+<span class="fc" id="L247">        return super.setItemMeta(meta);</span>
+    }
+
+    @Override
+    public void setType(Material type) {
+<span class="nc" id="L252">        validate();</span>
+<span class="nc" id="L253">        super.setType(type);</span>
+<span class="nc" id="L254">    }</span>
+
+    @Override
+    public void setAmount(int amount) {
+<span class="fc" id="L258">        validate();</span>
+<span class="fc" id="L259">        super.setAmount(amount);</span>
+<span class="fc" id="L260">    }</span>
+
+    private void validate() {
+<span class="fc bfc" id="L263" title="All 2 branches covered.">        if (locked) {</span>
+<span class="fc" id="L264">            throw new WrongItemStackException(id + &quot; is not mutable.&quot;);</span>
+        }
+<span class="fc" id="L266">    }</span>
+
+    public void lock() {
+<span class="fc" id="L269">        locked = true;</span>
+<span class="fc" id="L270">    }</span>
+
+    public @Nonnull Optional&lt;String&gt; getSkullTexture() {
+<span class="fc" id="L273">        return Optional.ofNullable(texture);</span>
+    }
+
+    public @Nullable String getDisplayName() {
+<span class="pc bpc" id="L277" title="1 of 2 branches missed.">        if (itemMetaSnapshot == null) {</span>
+            // Just to be extra safe
+<span class="nc" id="L279">            return null;</span>
+        }
+
+<span class="fc" id="L282">        return itemMetaSnapshot.getDisplayName().orElse(null);</span>
+    }
+
+    private static @Nonnull ItemStack getSkull(@Nonnull String id, @Nonnull String texture) {
+<span class="pc bpc" id="L286" title="1 of 2 branches missed.">        if (Slimefun.getMinecraftVersion() == MinecraftVersion.UNIT_TEST) {</span>
+<span class="fc" id="L287">            return new ItemStack(Material.PLAYER_HEAD);</span>
+        }
+
+<span class="nc" id="L290">        PlayerSkin skin = PlayerSkin.fromBase64(getTexture(id, texture));</span>
+<span class="nc" id="L291">        return PlayerHead.getItemStack(skin);</span>
+    }
+
+    private static @Nonnull String getTexture(@Nonnull String id, @Nonnull String texture) {
+<span class="fc" id="L295">        Validate.notNull(id, &quot;The id cannot be null&quot;);</span>
+<span class="fc" id="L296">        Validate.notNull(texture, &quot;The texture cannot be null&quot;);</span>
+
+<span class="pc bpc" id="L298" title="1 of 2 branches missed.">        if (texture.startsWith(&quot;ey&quot;)) {</span>
+<span class="nc" id="L299">            return texture;</span>
+<span class="pc bpc" id="L300" title="1 of 2 branches missed.">        } else if (CommonPatterns.HEXADECIMAL.matcher(texture).matches()) {</span>
+<span class="fc" id="L301">            String value = &quot;{\&quot;textures\&quot;:{\&quot;SKIN\&quot;:{\&quot;url\&quot;:\&quot;http://textures.minecraft.net/texture/&quot; + texture + &quot;\&quot;}}}&quot;;</span>
+<span class="fc" id="L302">            return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));</span>
+        } else {
+<span class="nc" id="L304">            throw new IllegalArgumentException(&quot;The provided texture for Item \&quot;&quot; + id + &quot;\&quot; does not seem to be a valid texture String!&quot;);</span>
+        }
+    }
+
+    @Override
+    public ItemStack clone() {
+<span class="fc" id="L310">        return new SlimefunItemStack(id, this);</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="pc bpc" id="L315" title="1 of 2 branches missed.">        return &quot;SlimefunItemStack (&quot; + id + (getAmount() &gt; 1 ? (&quot; x &quot; + getAmount()) : &quot;&quot;) + ')';</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final boolean equals(Object obj) {
+        // We don't want people to override this, it should use the super method
+<span class="fc" id="L324">        return super.equals(obj);</span>
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final int hashCode() {
+        // We don't want people to override this, it should use the super method
+<span class="fc" id="L333">        return super.hashCode();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

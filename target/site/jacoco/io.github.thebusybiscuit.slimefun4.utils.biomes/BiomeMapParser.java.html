@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BiomeMapParser.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.utils.biomes</a> &gt; <span class="el_source">BiomeMapParser.java</span></div><h1>BiomeMapParser.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.utils.biomes;
+
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.NamespacedKey;
+import org.bukkit.block.Biome;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+
+import io.github.bakedlibs.dough.common.CommonPatterns;
+import io.github.thebusybiscuit.slimefun4.api.exceptions.BiomeMapException;
+import io.github.thebusybiscuit.slimefun4.utils.JsonUtils;
+import io.github.thebusybiscuit.slimefun4.utils.PatternUtils;
+
+/**
+ * The {@link BiomeMapParser} allows you to parse json data into a {@link BiomeMap}.
+ * 
+ * @author TheBusyBiscuit
+ *
+ * @param &lt;T&gt;
+ *            The data type of the resulting {@link BiomeMap}
+ * 
+ * @see BiomeMap
+ */
+public class BiomeMapParser&lt;T&gt; {
+
+    private static final String VALUE_KEY = &quot;value&quot;;
+    private static final String BIOMES_KEY = &quot;biomes&quot;;
+
+    private final NamespacedKey key;
+    private final BiomeDataConverter&lt;T&gt; valueConverter;
+<span class="fc" id="L43">    private final Map&lt;Biome, T&gt; map = new EnumMap&lt;&gt;(Biome.class);</span>
+
+    /**
+     * This flag specifies whether the parsing is &quot;lenient&quot; or not.
+     * A lenient parser will not throw a {@link BiomeMapException} if the {@link Biome}
+     * could not be found.
+     * The default value is false.
+     */
+<span class="fc" id="L51">    private boolean isLenient = false;</span>
+
+    /**
+     * This constructs a new {@link BiomeMapParser}.
+     * &lt;p&gt;
+     * To parse data, use the {@link #read(JsonArray)} or {@link #read(String)} method.
+     * 
+     * @param key
+     *            The {@link NamespacedKey} for the resulting {@link BiomeMap}
+     * @param valueConverter
+     *            A function to convert {@link JsonElement}s into your desired data type
+     */
+    @ParametersAreNonnullByDefault
+<span class="fc" id="L64">    public BiomeMapParser(NamespacedKey key, BiomeDataConverter&lt;T&gt; valueConverter) {</span>
+<span class="fc" id="L65">        Validate.notNull(key, &quot;The key shall not be null.&quot;);</span>
+<span class="fc" id="L66">        Validate.notNull(valueConverter, &quot;You must provide a Function to convert raw json values to your desired data type.&quot;);</span>
+
+<span class="fc" id="L68">        this.key = key;</span>
+<span class="fc" id="L69">        this.valueConverter = valueConverter;</span>
+<span class="fc" id="L70">    }</span>
+
+    /**
+     * This method sets the &quot;lenient&quot; flag for this parser.
+     * &lt;p&gt;
+     * A lenient parser will not throw a {@link BiomeMapException} if the {@link Biome}
+     * could not be found.
+     * The default value is false.
+     * 
+     * @param isLenient
+     *            Whether this parser should be lenient or not.
+     */
+    public void setLenient(boolean isLenient) {
+<span class="fc" id="L83">        this.isLenient = isLenient;</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * This method returns whether this parser is flagged as &quot;lenient&quot;.
+     * &lt;p&gt;
+     * A lenient parser will not throw a {@link BiomeMapException} if the {@link Biome}
+     * could not be found.
+     * The default value is false.
+     * 
+     * @return Whether this parser is lenient or not.
+     */
+    public boolean isLenient() {
+<span class="fc" id="L96">        return isLenient;</span>
+    }
+
+    public void read(@Nonnull String json) throws BiomeMapException {
+<span class="fc" id="L100">        Validate.notNull(json, &quot;The JSON string should not be null!&quot;);</span>
+<span class="fc" id="L101">        JsonArray root = null;</span>
+
+        try {
+<span class="fc" id="L104">            root = JsonUtils.parseString(json).getAsJsonArray();</span>
+<span class="fc" id="L105">        } catch (IllegalStateException | JsonParseException x) {</span>
+<span class="fc" id="L106">            throw new BiomeMapException(key, x);</span>
+<span class="fc" id="L107">        }</span>
+
+        /*
+         * We don't include this in our try/catch, as this type of exception
+         * is already specified in the throws-declaration.
+         */
+<span class="fc" id="L113">        read(root);</span>
+<span class="fc" id="L114">    }</span>
+
+    public void read(@Nonnull JsonArray json) throws BiomeMapException {
+<span class="fc" id="L117">        Validate.notNull(json, &quot;The JSON Array should not be null!&quot;);</span>
+
+<span class="fc bfc" id="L119" title="All 2 branches covered.">        for (JsonElement element : json) {</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">            if (element instanceof JsonObject) {</span>
+<span class="fc" id="L121">                readEntry(element.getAsJsonObject());</span>
+            } else {
+<span class="fc" id="L123">                throw new BiomeMapException(key, &quot;Unexpected array element: &quot; + element.getClass().getSimpleName() + &quot; - &quot; + element.toString());</span>
+            }
+<span class="fc" id="L125">        }</span>
+<span class="fc" id="L126">    }</span>
+
+    private void readEntry(@Nonnull JsonObject entry) throws BiomeMapException {
+<span class="fc" id="L129">        Validate.notNull(entry, &quot;The JSON entry should not be null!&quot;);</span>
+
+        /*
+         * Check if the entry has a &quot;value&quot; element.
+         * The data type is irrelevant here, any JsonElement is supported (in theory).
+         * If you write a converter for it, you can also serialize complex objects this way.
+         */
+<span class="fc bfc" id="L136" title="All 2 branches covered.">        if (entry.has(VALUE_KEY)) {</span>
+<span class="fc" id="L137">            T value = valueConverter.convert(entry.get(VALUE_KEY));</span>
+
+            // Check if the entry has a &quot;biomes&quot; element of type JsonArray.
+<span class="fc bfc" id="L140" title="All 4 branches covered.">            if (entry.has(BIOMES_KEY) &amp;&amp; entry.get(BIOMES_KEY).isJsonArray()) {</span>
+<span class="fc" id="L141">                Set&lt;Biome&gt; biomes = readBiomes(entry.get(BIOMES_KEY).getAsJsonArray());</span>
+
+                // Loop through all biome strings in this array
+<span class="fc bfc" id="L144" title="All 2 branches covered.">                for (Biome biome : biomes) {</span>
+<span class="fc" id="L145">                    T prev = map.put(biome, value);</span>
+
+                    // Check for duplicates
+<span class="fc bfc" id="L148" title="All 2 branches covered.">                    if (prev != null) {</span>
+<span class="fc" id="L149">                        throw new BiomeMapException(key, &quot;Biome '&quot; + biome.getKey() + &quot;' is registered twice&quot;);</span>
+                    }
+<span class="fc" id="L151">                }</span>
+<span class="fc" id="L152">            } else {</span>
+<span class="fc" id="L153">                throw new BiomeMapException(key, &quot;Entry is missing a 'biomes' child of type array.&quot;);</span>
+            }
+<span class="fc" id="L155">        } else {</span>
+<span class="fc" id="L156">            throw new BiomeMapException(key, &quot;Entry is missing a 'value' child.&quot;);</span>
+        }
+<span class="fc" id="L158">    }</span>
+
+    private @Nonnull Set&lt;Biome&gt; readBiomes(@Nonnull JsonArray array) throws BiomeMapException {
+<span class="fc" id="L161">        Validate.notNull(array, &quot;The JSON array should not be null!&quot;);</span>
+<span class="fc" id="L162">        Set&lt;Biome&gt; biomes = EnumSet.noneOf(Biome.class);</span>
+
+<span class="fc bfc" id="L164" title="All 2 branches covered.">        for (JsonElement element : array) {</span>
+<span class="pc bpc" id="L165" title="1 of 4 branches missed.">            if (element.isJsonPrimitive() &amp;&amp; element.getAsJsonPrimitive().isString()) {</span>
+<span class="fc" id="L166">                String value = element.getAsString();</span>
+
+<span class="fc bfc" id="L168" title="All 2 branches covered.">                if (PatternUtils.MINECRAFT_NAMESPACEDKEY.matcher(value).matches()) {</span>
+<span class="fc" id="L169">                    String formattedValue = CommonPatterns.COLON.split(value)[1].toUpperCase(Locale.ROOT);</span>
+
+                    try {
+<span class="fc" id="L172">                        Biome biome = Biome.valueOf(formattedValue);</span>
+<span class="fc" id="L173">                        biomes.add(biome);</span>
+<span class="fc" id="L174">                    } catch (IllegalArgumentException x) {</span>
+                        // Lenient Parsers will ignore unknown biomes
+<span class="fc bfc" id="L176" title="All 2 branches covered.">                        if (isLenient) {</span>
+<span class="fc" id="L177">                            continue;</span>
+                        }
+
+<span class="fc" id="L180">                        throw new BiomeMapException(key, &quot;The Biome '&quot; + value + &quot;' does not exist!&quot;);</span>
+<span class="fc" id="L181">                    }</span>
+<span class="fc" id="L182">                } else {</span>
+                    // The regular expression did not match
+<span class="fc" id="L184">                    throw new BiomeMapException(key, &quot;Could not recognize value '&quot; + value + &quot;'&quot;);</span>
+                }
+<span class="fc" id="L186">            } else {</span>
+<span class="fc" id="L187">                throw new BiomeMapException(key, &quot;Unexpected array element: &quot; + element.getClass().getSimpleName() + &quot; - &quot; + element.toString());</span>
+            }
+<span class="fc" id="L189">        }</span>
+
+<span class="fc" id="L191">        return biomes;</span>
+    }
+
+    /**
+     * This method builds a {@link BiomeMap} based on the parsed data.
+     * &lt;p&gt;
+     * Make sure to parse data via {@link #read(JsonArray)} or {@link #read(String)}
+     * before calling this method! Otherwise the resulting {@link BiomeMap} will be empty.
+     * 
+     * @return The resulting {@link BiomeMap}
+     */
+    @Nonnull
+    public BiomeMap&lt;T&gt; buildBiomeMap() {
+<span class="fc" id="L204">        BiomeMap&lt;T&gt; biomeMap = new BiomeMap&lt;&gt;(key);</span>
+<span class="fc" id="L205">        biomeMap.putAll(map);</span>
+<span class="fc" id="L206">        return biomeMap;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

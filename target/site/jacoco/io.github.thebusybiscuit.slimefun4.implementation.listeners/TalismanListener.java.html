@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TalismanListener.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.listeners</a> &gt; <span class="el_source">TalismanListener.java</span></div><h1>TalismanListener.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.listeners;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.AbstractArrow;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.ChestedHorse;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
+import org.bukkit.entity.Trident;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.player.PlayerExpChangeEvent;
+import org.bukkit.event.player.PlayerItemBreakEvent;
+import org.bukkit.event.player.PlayerToggleSprintEvent;
+import org.bukkit.inventory.EntityEquipment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
+
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.implementation.items.magical.talismans.MagicianTalisman;
+import io.github.thebusybiscuit.slimefun4.implementation.items.magical.talismans.Talisman;
+import io.github.thebusybiscuit.slimefun4.implementation.settings.TalismanEnchantment;
+import io.github.thebusybiscuit.slimefun4.utils.tags.SlimefunTag;
+
+/**
+ * This {@link Listener} is responsible for handling any {@link Event}
+ * that is required for activating a {@link Talisman}.
+ * 
+ * @author TheBusyBiscuit
+ * @author StarWishsama
+ * @author svr333
+ * @author martinbrom
+ * @author Sfiguz7
+ * 
+ * @see Talisman
+ *
+ */
+public class TalismanListener implements Listener {
+
+<span class="nc" id="L68">    private final int[] armorSlots = { 39, 38, 37, 36 };</span>
+
+<span class="nc" id="L70">    public TalismanListener(@Nonnull Slimefun plugin) {</span>
+<span class="nc" id="L71">        plugin.getServer().getPluginManager().registerEvents(this, plugin);</span>
+<span class="nc" id="L72">    }</span>
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDamageGet(EntityDamageEvent e) {
+<span class="nc bnc" id="L76" title="All 2 branches missed.">        if (e.getEntity() instanceof Player) {</span>
+<span class="nc bnc" id="L77" title="All 7 branches missed.">            switch (e.getCause()) {</span>
+                case LAVA:
+                    // Fire Resistance when hitting lava
+<span class="nc" id="L80">                    Talisman.trigger(e, SlimefunItems.TALISMAN_LAVA);</span>
+<span class="nc" id="L81">                    break;</span>
+                case DROWNING:
+                    // Water Breathing when starting to drown
+<span class="nc" id="L84">                    Talisman.trigger(e, SlimefunItems.TALISMAN_WATER);</span>
+<span class="nc" id="L85">                    break;</span>
+                case FALL:
+                    // 75% chance to prevent fall damage
+<span class="nc" id="L88">                    Talisman.trigger(e, SlimefunItems.TALISMAN_ANGEL);</span>
+<span class="nc" id="L89">                    break;</span>
+                case FIRE:
+                    // Fire Resistance when starting to burn
+<span class="nc" id="L92">                    Talisman.trigger(e, SlimefunItems.TALISMAN_FIRE);</span>
+<span class="nc" id="L93">                    break;</span>
+                case ENTITY_ATTACK:
+                    // 30% chance to get Regeneration
+<span class="nc" id="L96">                    Talisman.trigger(e, SlimefunItems.TALISMAN_KNIGHT);</span>
+
+                    // Strength III when getting attacked
+<span class="nc" id="L99">                    Talisman.trigger(e, SlimefunItems.TALISMAN_WARRIOR);</span>
+<span class="nc" id="L100">                    break;</span>
+                case PROJECTILE:
+<span class="nc bnc" id="L102" title="All 2 branches missed.">                    if (e instanceof EntityDamageByEntityEvent entityDamageByEntityEvent) {</span>
+<span class="nc" id="L103">                        onProjectileDamage(entityDamageByEntityEvent);</span>
+                    }
+<span class="nc" id="L105">                    break;</span>
+                default:
+                    break;
+            }
+        }
+<span class="nc" id="L110">    }</span>
+
+    private void onProjectileDamage(@Nonnull EntityDamageByEntityEvent e) {
+        // &quot;Fixes&quot; #1022 - We just ignore Tridents now.
+<span class="nc bnc" id="L114" title="All 4 branches missed.">        if (e.getDamager() instanceof Projectile projectile &amp;&amp; !(e.getDamager() instanceof Trident)) {</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">            if (Talisman.trigger(e, SlimefunItems.TALISMAN_WHIRLWIND)) {</span>
+<span class="nc" id="L116">                Player p = (Player) e.getEntity();</span>
+<span class="nc" id="L117">                returnProjectile(p, projectile);</span>
+            }
+        }
+<span class="nc" id="L120">    }</span>
+
+    /**
+     * This method is used for the {@link Talisman} of the whirlwind, it returns a copy
+     * of a {@link Projectile} that was fired at a {@link Player}.
+     * 
+     * @param p
+     *            The {@link Player} who was hit
+     * @param projectile
+     *            The {@link Projectile} that hit this {@link Player}
+     */
+    private void returnProjectile(@Nonnull Player p, @Nonnull Projectile projectile) {
+<span class="nc" id="L132">        Vector direction = p.getEyeLocation().getDirection().multiply(2.0);</span>
+<span class="nc" id="L133">        Location loc = p.getEyeLocation().add(direction.getX(), direction.getY(), direction.getZ());</span>
+
+<span class="nc" id="L135">        Projectile returnedProjectile = (Projectile) p.getWorld().spawnEntity(loc, projectile.getType());</span>
+<span class="nc" id="L136">        returnedProjectile.setShooter(projectile.getShooter());</span>
+<span class="nc" id="L137">        returnedProjectile.setVelocity(direction);</span>
+
+<span class="nc bnc" id="L139" title="All 2 branches missed.">        if (projectile instanceof AbstractArrow firedArrow) {</span>
+<span class="nc" id="L140">            AbstractArrow returnedArrow = (AbstractArrow) returnedProjectile;</span>
+
+<span class="nc" id="L142">            returnedArrow.setDamage(firedArrow.getDamage());</span>
+<span class="nc" id="L143">            returnedArrow.setPickupStatus(firedArrow.getPickupStatus());</span>
+<span class="nc" id="L144">            returnedArrow.setPierceLevel(firedArrow.getPierceLevel());</span>
+        }
+
+<span class="nc" id="L147">        projectile.remove();</span>
+<span class="nc" id="L148">    }</span>
+
+    @EventHandler(ignoreCancelled = true)
+    public void onKill(EntityDeathEvent e) {
+<span class="nc bnc" id="L152" title="All 4 branches missed.">        if (e.getDrops().isEmpty() || e.getEntity().getKiller() == null) {</span>
+<span class="nc" id="L153">            return;</span>
+        }
+
+<span class="nc" id="L156">        LivingEntity entity = e.getEntity();</span>
+
+<span class="nc bnc" id="L158" title="All 4 branches missed.">        if (entity instanceof Player || entity instanceof ArmorStand) {</span>
+            /*
+             * We absolutely don't want to double the
+             * drops from players or ArmorStands
+             */
+<span class="nc" id="L163">            return;</span>
+        }
+
+        /*
+         * We are also excluding entities which can pickup items,
+         * this is not perfect but it at least prevents dupes
+         * by tossing items to zombies.
+         */
+<span class="nc bnc" id="L171" title="All 4 branches missed.">        if (!entity.getCanPickupItems() &amp;&amp; Talisman.trigger(e, SlimefunItems.TALISMAN_HUNTER)) {</span>
+<span class="nc" id="L172">            Collection&lt;ItemStack&gt; extraDrops = getExtraDrops(e.getEntity(), e.getDrops());</span>
+
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            for (ItemStack drop : extraDrops) {</span>
+<span class="nc bnc" id="L175" title="All 4 branches missed.">                if (drop != null &amp;&amp; drop.getType() != Material.AIR) {</span>
+<span class="nc" id="L176">                    e.getDrops().add(drop.clone());</span>
+                }
+<span class="nc" id="L178">            }</span>
+        }
+<span class="nc" id="L180">    }</span>
+
+    @Nonnull
+    @ParametersAreNonnullByDefault
+    private Collection&lt;ItemStack&gt; getExtraDrops(LivingEntity entity, Collection&lt;ItemStack&gt; drops) {
+<span class="nc" id="L185">        List&lt;ItemStack&gt; items = new ArrayList&lt;&gt;(drops);</span>
+
+        // Prevent duplication of items stored inside a Horse's chest
+<span class="nc bnc" id="L188" title="All 2 branches missed.">        if (entity instanceof ChestedHorse chestedHorse) {</span>
+<span class="nc bnc" id="L189" title="All 2 branches missed.">            if (chestedHorse.isCarryingChest()) {</span>
+                // The chest is not included in getStorageContents()
+<span class="nc" id="L191">                items.remove(new ItemStack(Material.CHEST));</span>
+
+<span class="nc bnc" id="L193" title="All 2 branches missed.">                for (ItemStack item : chestedHorse.getInventory().getStorageContents()) {</span>
+<span class="nc" id="L194">                    items.remove(item);</span>
+                }
+            }
+        }
+
+        /*
+         * WARNING: This check is broken as entities now set their
+         * equipment to NULL before calling the event!
+         * 
+         * It prevents duplication of handheld items or armor.
+         */
+<span class="nc" id="L205">        EntityEquipment equipment = entity.getEquipment();</span>
+
+<span class="nc bnc" id="L207" title="All 2 branches missed.">        if (equipment != null) {</span>
+<span class="nc bnc" id="L208" title="All 2 branches missed.">            for (ItemStack item : equipment.getArmorContents()) {</span>
+<span class="nc" id="L209">                items.remove(item);</span>
+            }
+
+<span class="nc" id="L212">            items.remove(equipment.getItemInMainHand());</span>
+<span class="nc" id="L213">            items.remove(equipment.getItemInOffHand());</span>
+        }
+
+<span class="nc" id="L216">        return items;</span>
+    }
+
+    @EventHandler
+    public void onItemBreak(PlayerItemBreakEvent e) {
+<span class="nc bnc" id="L221" title="All 2 branches missed.">        if (Talisman.trigger(e, SlimefunItems.TALISMAN_ANVIL)) {</span>
+<span class="nc" id="L222">            PlayerInventory inv = e.getPlayer().getInventory();</span>
+
+<span class="nc" id="L224">            ItemStack brokenItem = e.getBrokenItem();</span>
+
+<span class="nc" id="L226">            int slot = -1;</span>
+
+            // Did the tool in our hand break or was it an armor piece?
+<span class="nc bnc" id="L229" title="All 2 branches missed.">            if (brokenItem.equals(inv.getItemInMainHand())) {</span>
+<span class="nc" id="L230">                slot = inv.getHeldItemSlot();</span>
+<span class="nc bnc" id="L231" title="All 2 branches missed.">            } else if (brokenItem.equals(inv.getItemInOffHand())) {</span>
+<span class="nc" id="L232">                slot = 40;</span>
+            } else {
+<span class="nc bnc" id="L234" title="All 2 branches missed.">                for (int s : armorSlots) {</span>
+<span class="nc bnc" id="L235" title="All 2 branches missed.">                    if (e.getBrokenItem().equals(inv.getItem(s))) {</span>
+<span class="nc" id="L236">                        slot = s;</span>
+<span class="nc" id="L237">                        break;</span>
+                    }
+                }
+            }
+
+            // No item found, just return.
+<span class="nc bnc" id="L243" title="All 2 branches missed.">            if (slot &lt; 0) {</span>
+<span class="nc" id="L244">                return;</span>
+            }
+
+<span class="nc" id="L247">            ItemStack item = e.getBrokenItem().clone();</span>
+<span class="nc" id="L248">            ItemMeta meta = item.getItemMeta();</span>
+
+<span class="nc bnc" id="L250" title="All 2 branches missed.">            if (meta instanceof Damageable damageable) {</span>
+<span class="nc" id="L251">                damageable.setDamage(0);</span>
+            }
+
+<span class="nc" id="L254">            item.setItemMeta(meta);</span>
+
+<span class="nc" id="L256">            int itemSlot = slot;</span>
+
+            // Update the item forcefully
+<span class="nc" id="L259">            Slimefun.runSync(() -&gt; inv.setItem(itemSlot, item), 1L);</span>
+        }
+<span class="nc" id="L261">    }</span>
+
+    @EventHandler
+    public void onSprint(PlayerToggleSprintEvent e) {
+<span class="nc bnc" id="L265" title="All 2 branches missed.">        if (e.isSprinting()) {</span>
+<span class="nc" id="L266">            Talisman.trigger(e, SlimefunItems.TALISMAN_TRAVELLER);</span>
+        }
+<span class="nc" id="L268">    }</span>
+
+    @EventHandler
+    public void onEnchant(EnchantItemEvent e) {
+<span class="nc" id="L272">        Random random = ThreadLocalRandom.current();</span>
+<span class="nc" id="L273">        Map&lt;Enchantment, Integer&gt; enchantments = e.getEnchantsToAdd();</span>
+
+        // Magician Talisman
+<span class="nc" id="L276">        MagicianTalisman talisman = (MagicianTalisman) SlimefunItems.TALISMAN_MAGICIAN.getItem();</span>
+<span class="nc" id="L277">        TalismanEnchantment enchantment = talisman.getRandomEnchantment(e.getItem(), enchantments.keySet());</span>
+
+<span class="nc bnc" id="L279" title="All 4 branches missed.">        if (enchantment != null &amp;&amp; Talisman.trigger(e, SlimefunItems.TALISMAN_MAGICIAN)) {</span>
+            /*
+             * Fixes #2679
+             * 
+             * By default, the Bukkit API doesn't allow us to give enchantment books
+             * extra enchantments.
+             */
+<span class="nc bnc" id="L286" title="All 4 branches missed.">            if (talisman.isEnchantmentBookAllowed() &amp;&amp; e.getItem().getType() == Material.BOOK) {</span>
+<span class="nc" id="L287">                e.getItem().addUnsafeEnchantment(enchantment.getEnchantment(), enchantment.getLevel());</span>
+            } else {
+<span class="nc" id="L289">                enchantments.put(enchantment.getEnchantment(), enchantment.getLevel());</span>
+            }
+        }
+
+        // Wizard Talisman
+<span class="nc bnc" id="L294" title="All 6 branches missed.">        if (!enchantments.containsKey(Enchantment.SILK_TOUCH) &amp;&amp; Enchantment.LOOT_BONUS_BLOCKS.canEnchantItem(e.getItem()) &amp;&amp; Talisman.trigger(e, SlimefunItems.TALISMAN_WIZARD)) {</span>
+            // Randomly lower some enchantments
+<span class="nc bnc" id="L296" title="All 2 branches missed.">            for (Map.Entry&lt;Enchantment, Integer&gt; entry : enchantments.entrySet()) {</span>
+<span class="nc bnc" id="L297" title="All 4 branches missed.">                if (entry.getValue() &gt; 1 &amp;&amp; random.nextInt(100) &lt; 40) {</span>
+<span class="nc" id="L298">                    enchantments.put(entry.getKey(), entry.getValue() - 1);</span>
+                }
+<span class="nc" id="L300">            }</span>
+
+            // Give an extra Fortune boost (Lvl 3 - 5)
+<span class="nc" id="L303">            enchantments.put(Enchantment.LOOT_BONUS_BLOCKS, random.nextInt(3) + 3);</span>
+        }
+<span class="nc" id="L305">    }</span>
+
+    @EventHandler(ignoreCancelled = true)
+    public void onExperienceReceive(PlayerExpChangeEvent e) {
+        // Check if the experience change was positive.
+<span class="nc bnc" id="L310" title="All 4 branches missed.">        if (e.getAmount() &gt; 0 &amp;&amp; Talisman.trigger(e, SlimefunItems.TALISMAN_WISE)) {</span>
+            // Double-XP
+<span class="nc" id="L312">            e.setAmount(e.getAmount() * 2);</span>
+        }
+<span class="nc" id="L314">    }</span>
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockDropItems(BlockDropItemEvent e) {
+<span class="nc" id="L318">        ItemStack item = e.getPlayer().getInventory().getItemInMainHand();</span>
+
+        // We are going to ignore Silk Touch here
+<span class="nc bnc" id="L321" title="All 4 branches missed.">        if (item.getType() != Material.AIR &amp;&amp; item.getAmount() &gt; 0) {</span>
+<span class="nc" id="L322">            ItemMeta meta = item.getItemMeta();</span>
+
+            // Ignore Silk Touch Enchantment
+<span class="nc bnc" id="L325" title="All 2 branches missed.">            if (meta.hasEnchant(Enchantment.SILK_TOUCH)) {</span>
+<span class="nc" id="L326">                return;</span>
+            }
+
+<span class="nc" id="L329">            Material type = e.getBlockState().getType();</span>
+
+            // Handle double drops for Miner Talisman
+<span class="nc" id="L332">            doubleTalismanDrops(e, SlimefunItems.TALISMAN_MINER, SlimefunTag.MINER_TALISMAN_TRIGGERS, type, meta);</span>
+
+            // Handle double drops for Farmer Talisman
+<span class="nc" id="L335">            doubleTalismanDrops(e, SlimefunItems.TALISMAN_FARMER, SlimefunTag.FARMER_TALISMAN_TRIGGERS, type, meta);</span>
+        }
+<span class="nc" id="L337">    }</span>
+
+    private void doubleTalismanDrops(BlockDropItemEvent e, SlimefunItemStack talismanItemStack, SlimefunTag tag, Material type, ItemMeta meta) {
+<span class="nc bnc" id="L340" title="All 2 branches missed.">        if (tag.isTagged(type)) {</span>
+<span class="nc" id="L341">            Collection&lt;Item&gt; drops = e.getItems();</span>
+
+<span class="nc bnc" id="L343" title="All 2 branches missed.">            if (Talisman.trigger(e, talismanItemStack, false)) {</span>
+<span class="nc" id="L344">                int dropAmount = getAmountWithFortune(type, meta.getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS));</span>
+
+                // Keep track of whether we actually doubled the drops or not
+<span class="nc" id="L347">                boolean doubledDrops = false;</span>
+
+                // Loop through all dropped items
+<span class="nc bnc" id="L350" title="All 2 branches missed.">                for (Item drop : drops) {</span>
+<span class="nc" id="L351">                    ItemStack droppedItem = drop.getItemStack();</span>
+
+                    // We do not want to dupe blocks
+<span class="nc bnc" id="L354" title="All 2 branches missed.">                    if (!droppedItem.getType().isBlock()) {</span>
+<span class="nc" id="L355">                        int amount = Math.max(1, (dropAmount * 2) - droppedItem.getAmount());</span>
+<span class="nc" id="L356">                        e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), new CustomItemStack(droppedItem, amount));</span>
+<span class="nc" id="L357">                        doubledDrops = true;</span>
+                    }
+<span class="nc" id="L359">                }</span>
+
+                // Fixes #2077
+<span class="nc bnc" id="L362" title="All 2 branches missed.">                if (doubledDrops) {</span>
+<span class="nc" id="L363">                    Talisman talisman = talismanItemStack.getItem(Talisman.class);</span>
+
+                    // Fixes #2818
+<span class="nc bnc" id="L366" title="All 2 branches missed.">                    if (talisman != null) {</span>
+<span class="nc" id="L367">                        talisman.sendMessage(e.getPlayer());</span>
+                    }
+                }
+            }
+        }
+<span class="nc" id="L372">    }</span>
+
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent e) {
+<span class="nc bnc" id="L376" title="All 2 branches missed.">        if (SlimefunTag.CAVEMAN_TALISMAN_TRIGGERS.isTagged(e.getBlock().getType())) {</span>
+<span class="nc" id="L377">            Talisman.trigger(e, SlimefunItems.TALISMAN_CAVEMAN);</span>
+        }
+<span class="nc" id="L379">    }</span>
+
+    private int getAmountWithFortune(@Nonnull Material type, int fortuneLevel) {
+<span class="nc bnc" id="L382" title="All 2 branches missed.">        if (fortuneLevel &gt; 0) {</span>
+<span class="nc" id="L383">            Random random = ThreadLocalRandom.current();</span>
+<span class="nc" id="L384">            int amount = random.nextInt(fortuneLevel + 2) - 1;</span>
+<span class="nc" id="L385">            amount = Math.max(amount, 1);</span>
+<span class="nc bnc" id="L386" title="All 2 branches missed.">            amount = (type == Material.LAPIS_ORE ? 4 + random.nextInt(5) : 1) * (amount + 1);</span>
+<span class="nc" id="L387">            return amount;</span>
+        } else {
+<span class="nc" id="L389">            return 1;</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: io.github.thebusybiscuit.slimefun4.core.networks.TestNetworkManager
+-------------------------------------------------------------------------------
+Tests run: 13, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.079 s - in io.github.thebusybiscuit.slimefun4.core.networks.TestNetworkManager

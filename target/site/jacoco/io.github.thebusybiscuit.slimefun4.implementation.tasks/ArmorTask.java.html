@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ArmorTask.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.tasks</a> &gt; <span class="el_source">ArmorTask.java</span></div><h1>ArmorTask.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.tasks;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.World.Environment;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+
+import io.github.thebusybiscuit.slimefun4.api.items.HashedArmorpiece;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.player.PlayerProfile;
+import io.github.thebusybiscuit.slimefun4.core.attributes.ProtectionType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.Radioactive;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.implementation.items.armor.SlimefunArmorPiece;
+import io.github.thebusybiscuit.slimefun4.implementation.items.electric.gadgets.SolarHelmet;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+import io.github.thebusybiscuit.slimefun4.utils.itemstack.ItemStackWrapper;
+
+/**
+ * The {@link ArmorTask} is responsible for handling {@link PotionEffect PotionEffects} for
+ * {@link Radioactive} items or any {@link SlimefunArmorPiece}.
+ * It also handles the prevention of radiation through a Hazmat Suit
+ * 
+ * @author TheBusyBiscuit
+ *
+ */
+public class ArmorTask implements Runnable {
+
+    private final Set&lt;PotionEffect&gt; radiationEffects;
+    private final boolean radioactiveFire;
+
+    /**
+     * This creates a new {@link ArmorTask}.
+     * 
+     * @param radioactiveFire
+     *            Whether radiation also causes a {@link Player} to burn
+     */
+<span class="fc" id="L52">    public ArmorTask(boolean radioactiveFire) {</span>
+<span class="fc" id="L53">        this.radioactiveFire = radioactiveFire;</span>
+
+<span class="fc" id="L55">        Set&lt;PotionEffect&gt; effects = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L56">        effects.add(new PotionEffect(PotionEffectType.WITHER, 400, 2));</span>
+<span class="fc" id="L57">        effects.add(new PotionEffect(PotionEffectType.BLINDNESS, 400, 3));</span>
+<span class="fc" id="L58">        effects.add(new PotionEffect(PotionEffectType.CONFUSION, 400, 3));</span>
+<span class="fc" id="L59">        effects.add(new PotionEffect(PotionEffectType.WEAKNESS, 400, 2));</span>
+<span class="fc" id="L60">        effects.add(new PotionEffect(PotionEffectType.SLOW, 400, 1));</span>
+<span class="fc" id="L61">        effects.add(new PotionEffect(PotionEffectType.SLOW_DIGGING, 400, 1));</span>
+<span class="fc" id="L62">        radiationEffects = Collections.unmodifiableSet(effects);</span>
+<span class="fc" id="L63">    }</span>
+
+    /**
+     * This returns a {@link Set} of {@link PotionEffect PotionEffects} which get applied to
+     * a {@link Player} when they are exposed to deadly radiation.
+     * 
+     * @return The {@link Set} of {@link PotionEffect PotionEffects} applied upon radioactive contact
+     */
+    @Nonnull
+    public Set&lt;PotionEffect&gt; getRadiationEffects() {
+<span class="fc" id="L73">        return radiationEffects;</span>
+    }
+
+    @Override
+    public void run() {
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        for (Player p : Bukkit.getOnlinePlayers()) {</span>
+<span class="pc bpc" id="L79" title="2 of 4 branches missed.">            if (!p.isValid() || p.isDead()) {</span>
+<span class="nc" id="L80">                continue;</span>
+            }
+
+<span class="fc" id="L83">            PlayerProfile.get(p, profile -&gt; {</span>
+<span class="fc" id="L84">                ItemStack[] armor = p.getInventory().getArmorContents();</span>
+<span class="fc" id="L85">                HashedArmorpiece[] cachedArmor = profile.getArmor();</span>
+
+<span class="fc" id="L87">                handleSlimefunArmor(p, armor, cachedArmor);</span>
+
+<span class="pc bpc" id="L89" title="1 of 2 branches missed.">                if (hasSunlight(p)) {</span>
+<span class="nc" id="L90">                    checkForSolarHelmet(p);</span>
+                }
+
+<span class="fc" id="L93">                checkForRadiation(p, profile);</span>
+<span class="fc" id="L94">            });</span>
+<span class="fc" id="L95">        }</span>
+<span class="fc" id="L96">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void handleSlimefunArmor(Player p, ItemStack[] armor, HashedArmorpiece[] cachedArmor) {
+<span class="fc bfc" id="L100" title="All 2 branches covered.">        for (int slot = 0; slot &lt; 4; slot++) {</span>
+<span class="fc" id="L101">            ItemStack item = armor[slot];</span>
+<span class="fc" id="L102">            HashedArmorpiece armorpiece = cachedArmor[slot];</span>
+
+<span class="fc bfc" id="L104" title="All 2 branches covered.">            if (armorpiece.hasDiverged(item)) {</span>
+<span class="fc" id="L105">                SlimefunItem sfItem = SlimefunItem.getByItem(item);</span>
+
+<span class="fc bfc" id="L107" title="All 2 branches covered.">                if (!(sfItem instanceof SlimefunArmorPiece)) {</span>
+                    // If it isn't actually Armor, then we won't care about it.
+<span class="fc" id="L109">                    sfItem = null;</span>
+                }
+
+<span class="fc" id="L112">                armorpiece.update(item, sfItem);</span>
+            }
+
+<span class="fc bfc" id="L115" title="All 4 branches covered.">            if (item != null &amp;&amp; armorpiece.getItem().isPresent()) {</span>
+<span class="fc" id="L116">                Slimefun.runSync(() -&gt; {</span>
+<span class="fc" id="L117">                    SlimefunArmorPiece slimefunArmor = armorpiece.getItem().get();</span>
+
+<span class="pc bpc" id="L119" title="1 of 2 branches missed.">                    if (slimefunArmor.canUse(p, true)) {</span>
+<span class="fc bfc" id="L120" title="All 2 branches covered.">                        for (PotionEffect effect : slimefunArmor.getPotionEffects()) {</span>
+<span class="fc" id="L121">                            p.removePotionEffect(effect.getType());</span>
+<span class="fc" id="L122">                            p.addPotionEffect(effect);</span>
+                        }
+                    }
+<span class="fc" id="L125">                });</span>
+            }
+        }
+<span class="fc" id="L128">    }</span>
+
+    private void checkForSolarHelmet(@Nonnull Player p) {
+<span class="nc" id="L131">        ItemStack helmet = p.getInventory().getHelmet();</span>
+
+<span class="nc bnc" id="L133" title="All 4 branches missed.">        if (Slimefun.getRegistry().isBackwardsCompatible() &amp;&amp; !SlimefunUtils.isItemSimilar(helmet, SlimefunItems.SOLAR_HELMET, true, false)) {</span>
+            // Performance saver for slow backwards-compatible versions of Slimefun
+<span class="nc" id="L135">            return;</span>
+        }
+
+<span class="nc" id="L138">        SlimefunItem item = SlimefunItem.getByItem(helmet);</span>
+
+<span class="nc bnc" id="L140" title="All 4 branches missed.">        if (item instanceof SolarHelmet solarHelmet &amp;&amp; item.canUse(p, true)) {</span>
+<span class="nc" id="L141">            solarHelmet.rechargeItems(p);</span>
+        }
+<span class="nc" id="L143">    }</span>
+
+    private boolean hasSunlight(@Nonnull Player p) {
+<span class="fc" id="L146">        World world = p.getWorld();</span>
+
+<span class="pc bpc" id="L148" title="1 of 2 branches missed.">        if (world.getEnvironment() != Environment.NORMAL) {</span>
+            // The End and Nether have no sunlight
+<span class="nc" id="L150">            return false;</span>
+        }
+
+<span class="pc bpc" id="L153" title="4 of 6 branches missed.">        return (world.getTime() &lt; 12300 || world.getTime() &gt; 23850) &amp;&amp; p.getEyeLocation().getBlock().getLightFromSky() == 15;</span>
+    }
+
+    private void checkForRadiation(@Nonnull Player p, @Nonnull PlayerProfile profile) {
+<span class="fc bfc" id="L157" title="All 2 branches covered.">        if (!profile.hasFullProtectionAgainst(ProtectionType.RADIATION)) {</span>
+<span class="fc bfc" id="L158" title="All 2 branches covered.">            for (ItemStack item : p.getInventory()) {</span>
+<span class="fc bfc" id="L159" title="All 2 branches covered.">                if (checkAndApplyRadiation(p, item)) {</span>
+<span class="fc" id="L160">                    break;</span>
+                }
+<span class="fc" id="L162">            }</span>
+        }
+<span class="fc" id="L164">    }</span>
+
+    private boolean checkAndApplyRadiation(@Nonnull Player p, @Nullable ItemStack item) {
+<span class="pc bpc" id="L167" title="2 of 4 branches missed.">        if (item == null || item.getType() == Material.AIR) {</span>
+<span class="nc" id="L168">            return false;</span>
+        }
+
+<span class="fc" id="L171">        Set&lt;SlimefunItem&gt; radioactiveItems = Slimefun.getRegistry().getRadioactiveItems();</span>
+<span class="fc" id="L172">        ItemStack itemStack = item;</span>
+
+<span class="fc bfc" id="L174" title="All 4 branches covered.">        if (!(item instanceof SlimefunItemStack) &amp;&amp; radioactiveItems.size() &gt; 1) {</span>
+            // Performance optimization to reduce ItemMeta calls
+<span class="fc" id="L176">            itemStack = ItemStackWrapper.wrap(item);</span>
+        }
+
+<span class="fc bfc" id="L179" title="All 2 branches covered.">        for (SlimefunItem radioactiveItem : radioactiveItems) {</span>
+<span class="pc bpc" id="L180" title="1 of 4 branches missed.">            if (radioactiveItem.isItem(itemStack) &amp;&amp; !radioactiveItem.isDisabledIn(p.getWorld())) {</span>
+                // If the item is enabled in the world, then make radioactivity do its job
+<span class="fc" id="L182">                Slimefun.getLocalization().sendMessage(p, &quot;messages.radiation&quot;);</span>
+
+<span class="fc" id="L184">                Slimefun.runSync(() -&gt; {</span>
+<span class="fc" id="L185">                    p.addPotionEffects(radiationEffects);</span>
+
+                    // if radioactive fire is enabled, set them on fire
+<span class="fc bfc" id="L188" title="All 2 branches covered.">                    if (radioactiveFire) {</span>
+<span class="fc" id="L189">                        p.setFireTicks(400);</span>
+                    }
+<span class="fc" id="L191">                });</span>
+
+<span class="fc" id="L193">                return true;</span>
+            }
+<span class="fc" id="L195">        }</span>
+
+<span class="fc" id="L197">        return false;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

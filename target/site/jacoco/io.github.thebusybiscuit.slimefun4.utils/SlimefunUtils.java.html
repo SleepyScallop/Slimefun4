@@ -1,0 +1,523 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SlimefunUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.utils</a> &gt; <span class="el_source">SlimefunUtils.java</span></div><h1>SlimefunUtils.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.utils;
+
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+import java.util.Optional;
+import java.util.OptionalInt;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.World;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
+
+import io.github.bakedlibs.dough.common.CommonPatterns;
+import io.github.bakedlibs.dough.items.ItemMetaSnapshot;
+import io.github.bakedlibs.dough.skins.PlayerHead;
+import io.github.bakedlibs.dough.skins.PlayerSkin;
+import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion;
+import io.github.thebusybiscuit.slimefun4.api.events.SlimefunItemSpawnEvent;
+import io.github.thebusybiscuit.slimefun4.api.exceptions.PrematureCodeException;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemSpawnReason;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.core.attributes.Radioactive;
+import io.github.thebusybiscuit.slimefun4.core.attributes.Soulbound;
+import io.github.thebusybiscuit.slimefun4.core.debug.Debug;
+import io.github.thebusybiscuit.slimefun4.core.debug.TestCase;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.items.altar.AncientPedestal;
+import io.github.thebusybiscuit.slimefun4.implementation.tasks.CapacitorTextureUpdateTask;
+import io.github.thebusybiscuit.slimefun4.utils.itemstack.ItemStackWrapper;
+
+/**
+ * This utility class holds method that are directly linked to Slimefun.
+ * It provides a very crucial method for {@link ItemStack} comparison, as well as a simple method
+ * to check if an {@link ItemStack} is {@link Soulbound} or not.
+ *
+ * @author TheBusyBiscuit
+ * @author Walshy
+ * @author Sfiguz7
+ */
+public final class SlimefunUtils {
+
+    private static final String NO_PICKUP_METADATA = &quot;no_pickup&quot;;
+<span class="fc" id="L61">    private static final String SOULBOUND_LORE = ChatColor.GRAY + &quot;Soulbound&quot;;</span>
+
+    private SlimefunUtils() {}
+
+    /**
+     * This method quickly returns whether an {@link Item} was marked as &quot;no_pickup&quot; by
+     * a Slimefun device.
+     *
+     * @param item
+     *            The {@link Item} to query
+     * @return Whether the {@link Item} is excluded from being picked up
+     */
+    public static boolean hasNoPickupFlag(@Nonnull Item item) {
+<span class="fc" id="L74">        return item.hasMetadata(NO_PICKUP_METADATA);</span>
+    }
+
+    /**
+     * This will prevent the given {@link Item} from being picked up.
+     * This is useful for display items which the {@link AncientPedestal} uses.
+     *
+     * @param item
+     *            The {@link Item} to prevent from being picked up
+     * @param context
+     *            The context in which this {@link Item} was flagged
+     */
+    public static void markAsNoPickup(@Nonnull Item item, @Nonnull String context) {
+<span class="fc" id="L87">        item.setMetadata(NO_PICKUP_METADATA, new FixedMetadataValue(Slimefun.instance(), context));</span>
+        /*
+         * Max the pickup delay - This makes it so no Player can pick up items ever without need for an event.
+         * It is also an indication used by third-party plugins to know if it's a custom item.
+         * Fixes #3203
+         */
+<span class="fc" id="L93">        item.setPickupDelay(Short.MAX_VALUE);</span>
+<span class="fc" id="L94">    }</span>
+
+    /**
+     * This method checks whether the given {@link ItemStack} is considered {@link Soulbound}.
+     *
+     * @param item
+     *            The {@link ItemStack} to check for
+     * @return Whether the given item is soulbound
+     */
+    public static boolean isSoulbound(@Nullable ItemStack item) {
+<span class="fc" id="L104">        return isSoulbound(item, null);</span>
+    }
+
+    /**
+     * This method checks whether the given {@link ItemStack} is considered {@link Soulbound}.
+     * If the provided item is a {@link SlimefunItem} then this method will also check that the item
+     * is enabled in the provided {@link World}.
+     *
+     * @param item
+     *            The {@link ItemStack} to check for
+     * @param world
+     *            The {@link World} to check if the {@link SlimefunItem} is enabled in if applicable.
+     *            If {@code null} then this will not do a world check.
+     * @return Whether the given item is soulbound
+     */
+    public static boolean isSoulbound(@Nullable ItemStack item, @Nullable World world) {
+<span class="fc bfc" id="L120" title="All 4 branches covered.">        if (item != null &amp;&amp; item.getType() != Material.AIR) {</span>
+<span class="pc bpc" id="L121" title="1 of 2 branches missed.">            ItemMeta meta = item.hasItemMeta() ? item.getItemMeta() : null;</span>
+
+<span class="fc bfc" id="L123" title="All 2 branches covered.">            if (hasSoulboundFlag(meta)) {</span>
+<span class="fc" id="L124">                return true;</span>
+            }
+
+<span class="fc" id="L127">            SlimefunItem sfItem = SlimefunItem.getByItem(item);</span>
+
+<span class="fc bfc" id="L129" title="All 2 branches covered.">            if (sfItem instanceof Soulbound) {</span>
+<span class="fc bfc" id="L130" title="All 2 branches covered.">                if (world != null) {</span>
+<span class="fc bfc" id="L131" title="All 2 branches covered.">                    return !sfItem.isDisabledIn(world);</span>
+                } else {
+<span class="pc bpc" id="L133" title="1 of 2 branches missed.">                    return !sfItem.isDisabled();</span>
+                }
+<span class="pc bpc" id="L135" title="1 of 2 branches missed.">            } else if (meta != null) {</span>
+<span class="pc bpc" id="L136" title="3 of 4 branches missed.">                return meta.hasLore() &amp;&amp; meta.getLore().contains(SOULBOUND_LORE);</span>
+            }
+
+        }
+<span class="fc" id="L140">        return false;</span>
+    }
+
+    private static boolean hasSoulboundFlag(@Nullable ItemMeta meta) {
+<span class="pc bpc" id="L144" title="1 of 2 branches missed.">        if (meta != null) {</span>
+<span class="fc" id="L145">            PersistentDataContainer container = meta.getPersistentDataContainer();</span>
+<span class="fc" id="L146">            NamespacedKey key = Slimefun.getRegistry().getSoulboundDataKey();</span>
+
+<span class="fc" id="L148">            return container.has(key, PersistentDataType.BYTE);</span>
+        }
+
+<span class="nc" id="L151">        return false;</span>
+    }
+
+    /**
+     * Toggles an {@link ItemStack} to be Soulbound.&lt;br&gt;
+     * If true is passed, this will add the {@link #SOULBOUND_LORE} and
+     * add a {@link NamespacedKey} to the item so it can be quickly identified
+     * by {@link #isSoulbound(ItemStack)}.&lt;br&gt;
+     * If false is passed, this property will be removed.
+     *
+     * @param item
+     *            The {@link ItemStack} you want to add/remove Soulbound from.
+     * @param makeSoulbound
+     *            If the item should be soulbound.
+     *
+     * @see #isSoulbound(ItemStack)
+     */
+    public static void setSoulbound(@Nullable ItemStack item, boolean makeSoulbound) {
+<span class="fc bfc" id="L169" title="All 4 branches covered.">        if (item == null || item.getType() == Material.AIR) {</span>
+<span class="fc" id="L170">            throw new IllegalArgumentException(&quot;A soulbound item cannot be null or air!&quot;);</span>
+        }
+
+<span class="fc" id="L173">        boolean isSoulbound = isSoulbound(item);</span>
+<span class="fc" id="L174">        ItemMeta meta = item.getItemMeta();</span>
+
+<span class="fc" id="L176">        PersistentDataContainer container = meta.getPersistentDataContainer();</span>
+<span class="fc" id="L177">        NamespacedKey key = Slimefun.getRegistry().getSoulboundDataKey();</span>
+
+<span class="fc bfc" id="L179" title="All 4 branches covered.">        if (makeSoulbound &amp;&amp; !isSoulbound) {</span>
+<span class="fc" id="L180">            container.set(key, PersistentDataType.BYTE, (byte) 1);</span>
+        }
+
+<span class="fc bfc" id="L183" title="All 4 branches covered.">        if (!makeSoulbound &amp;&amp; isSoulbound) {</span>
+<span class="fc" id="L184">            container.remove(key);</span>
+        }
+
+<span class="fc bfc" id="L187" title="All 2 branches covered.">        List&lt;String&gt; lore = meta.hasLore() ? meta.getLore() : new ArrayList&lt;&gt;();</span>
+
+<span class="fc bfc" id="L189" title="All 4 branches covered.">        if (makeSoulbound &amp;&amp; !isSoulbound) {</span>
+<span class="fc" id="L190">            lore.add(SOULBOUND_LORE);</span>
+        }
+
+<span class="fc bfc" id="L193" title="All 4 branches covered.">        if (!makeSoulbound &amp;&amp; isSoulbound) {</span>
+<span class="fc" id="L194">            lore.remove(SOULBOUND_LORE);</span>
+        }
+
+<span class="fc" id="L197">        meta.setLore(lore);</span>
+<span class="fc" id="L198">        item.setItemMeta(meta);</span>
+<span class="fc" id="L199">    }</span>
+
+    /**
+     * This method checks whether the given {@link ItemStack} is radioactive.
+     *
+     * @param item
+     *            The {@link ItemStack} to check
+     *
+     * @return Whether this {@link ItemStack} is radioactive or not
+     */
+    public static boolean isRadioactive(@Nullable ItemStack item) {
+<span class="nc" id="L210">        return SlimefunItem.getByItem(item) instanceof Radioactive;</span>
+    }
+
+    /**
+     * This method returns an {@link ItemStack} for the given texture.
+     * The result will be a Player Head with this texture.
+     *
+     * @param texture
+     *            The texture for this head (base64 or hash)
+     *
+     * @return An {@link ItemStack} with this Head texture
+     */
+    public static @Nonnull ItemStack getCustomHead(@Nonnull String texture) {
+<span class="fc" id="L223">        Validate.notNull(texture, &quot;The provided texture is null&quot;);</span>
+
+<span class="pc bpc" id="L225" title="1 of 2 branches missed.">        if (Slimefun.instance() == null) {</span>
+<span class="nc" id="L226">            throw new PrematureCodeException(&quot;You cannot instantiate a custom head before Slimefun was loaded.&quot;);</span>
+        }
+
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">        if (Slimefun.getMinecraftVersion() == MinecraftVersion.UNIT_TEST) {</span>
+            // com.mojang.authlib.GameProfile does not exist in a Test Environment
+<span class="fc" id="L231">            return new ItemStack(Material.PLAYER_HEAD);</span>
+        }
+
+<span class="nc" id="L234">        String base64 = texture;</span>
+
+<span class="nc bnc" id="L236" title="All 2 branches missed.">        if (CommonPatterns.HEXADECIMAL.matcher(texture).matches()) {</span>
+<span class="nc" id="L237">            base64 = Base64.getEncoder().encodeToString((&quot;{\&quot;textures\&quot;:{\&quot;SKIN\&quot;:{\&quot;url\&quot;:\&quot;http://textures.minecraft.net/texture/&quot; + texture + &quot;\&quot;}}}&quot;).getBytes(StandardCharsets.UTF_8));</span>
+        }
+
+<span class="nc" id="L240">        PlayerSkin skin = PlayerSkin.fromBase64(base64);</span>
+<span class="nc" id="L241">        return PlayerHead.getItemStack(skin);</span>
+    }
+
+    public static boolean containsSimilarItem(Inventory inventory, ItemStack item, boolean checkLore) {
+<span class="pc bpc" id="L245" title="2 of 4 branches missed.">        if (inventory == null || item == null) {</span>
+<span class="nc" id="L246">            return false;</span>
+        }
+
+        // Performance optimization
+<span class="fc bfc" id="L250" title="All 2 branches covered.">        if (!(item instanceof SlimefunItemStack)) {</span>
+<span class="fc" id="L251">            item = ItemStackWrapper.wrap(item);</span>
+        }
+
+<span class="fc bfc" id="L254" title="All 2 branches covered.">        for (ItemStack stack : inventory.getStorageContents()) {</span>
+<span class="pc bpc" id="L255" title="1 of 4 branches missed.">            if (stack == null || stack.getType() == Material.AIR) {</span>
+<span class="nc" id="L256">                continue;</span>
+            }
+
+<span class="pc bpc" id="L259" title="1 of 2 branches missed.">            if (isItemSimilar(stack, item, checkLore, false)) {</span>
+<span class="fc" id="L260">                return true;</span>
+            }
+        }
+
+<span class="fc" id="L264">        return false;</span>
+    }
+
+    public static boolean isItemSimilar(@Nullable ItemStack item, @Nullable ItemStack sfitem, boolean checkLore) {
+<span class="fc" id="L268">        return isItemSimilar(item, sfitem, checkLore, true);</span>
+    }
+
+    public static boolean isItemSimilar(@Nullable ItemStack item, @Nullable ItemStack sfitem, boolean checkLore, boolean checkAmount) {
+<span class="fc bfc" id="L272" title="All 2 branches covered.">        if (item == null) {</span>
+<span class="pc bpc" id="L273" title="1 of 2 branches missed.">            return sfitem == null;</span>
+<span class="pc bpc" id="L274" title="1 of 2 branches missed.">        } else if (sfitem == null) {</span>
+<span class="nc" id="L275">            return false;</span>
+<span class="fc bfc" id="L276" title="All 2 branches covered.">        } else if (item.getType() != sfitem.getType()) {</span>
+<span class="fc" id="L277">            return false;</span>
+<span class="pc bpc" id="L278" title="1 of 4 branches missed.">        } else if (checkAmount &amp;&amp; item.getAmount() &lt; sfitem.getAmount()) {</span>
+<span class="nc" id="L279">            return false;</span>
+<span class="fc bfc" id="L280" title="All 4 branches covered.">        } else if (sfitem instanceof SlimefunItemStack &amp;&amp; item instanceof SlimefunItemStack) {</span>
+<span class="fc" id="L281">            return ((SlimefunItemStack) item).getItemId().equals(((SlimefunItemStack) sfitem).getItemId());</span>
+<span class="fc bfc" id="L282" title="All 2 branches covered.">        } else if (item.hasItemMeta()) {</span>
+<span class="fc" id="L283">            Debug.log(TestCase.CARGO_INPUT_TESTING, &quot;SlimefunUtils#isItemSimilar - item.hasItemMeta()&quot;);</span>
+<span class="fc" id="L284">            ItemMeta itemMeta = item.getItemMeta();</span>
+
+<span class="fc bfc" id="L286" title="All 2 branches covered.">            if (sfitem instanceof SlimefunItemStack) {</span>
+<span class="fc" id="L287">                Optional&lt;String&gt; id = Slimefun.getItemDataService().getItemData(itemMeta);</span>
+
+<span class="pc bpc" id="L289" title="1 of 2 branches missed.">                if (id.isPresent()) {</span>
+<span class="nc" id="L290">                    return id.get().equals(((SlimefunItemStack) sfitem).getItemId());</span>
+                }
+
+<span class="fc" id="L293">                ItemMetaSnapshot meta = ((SlimefunItemStack) sfitem).getItemMetaSnapshot();</span>
+<span class="fc" id="L294">                return equalsItemMeta(itemMeta, meta, checkLore);</span>
+<span class="pc bpc" id="L295" title="1 of 4 branches missed.">            } else if (sfitem instanceof ItemStackWrapper &amp;&amp; sfitem.hasItemMeta()) {</span>
+<span class="fc" id="L296">                Debug.log(TestCase.CARGO_INPUT_TESTING, &quot;  is wrapper&quot;);</span>
+                /*
+                 * Cargo optimization (PR #3258)
+                 *
+                 * Slimefun items may be ItemStackWrapper's in the context of cargo
+                 * so let's try to do an ID comparison before meta comparison
+                 */
+<span class="fc" id="L303">                ItemMeta possibleSfItemMeta = sfitem.getItemMeta();</span>
+<span class="fc" id="L304">                Debug.log(TestCase.CARGO_INPUT_TESTING, &quot;  sfitem is ItemStackWrapper - possible SF Item: {}&quot;, sfitem);</span>
+
+                // Prioritize SlimefunItem id comparison over ItemMeta comparison
+<span class="pc bpc" id="L307" title="1 of 2 branches missed.">                if (Slimefun.getItemDataService().hasEqualItemData(possibleSfItemMeta, itemMeta)) {</span>
+<span class="nc" id="L308">                    Debug.log(TestCase.CARGO_INPUT_TESTING, &quot;  Item IDs matched!&quot;);</span>
+<span class="nc" id="L309">                    return true;</span>
+                } else {
+<span class="fc" id="L311">                    Debug.log(TestCase.CARGO_INPUT_TESTING, &quot;  Item IDs don't match, checking meta {} == {} (lore: {})&quot;, itemMeta, possibleSfItemMeta, checkLore);</span>
+<span class="fc" id="L312">                    return equalsItemMeta(itemMeta, possibleSfItemMeta, checkLore);</span>
+                }
+<span class="pc bpc" id="L314" title="1 of 2 branches missed.">            } else if (sfitem.hasItemMeta()) {</span>
+<span class="fc" id="L315">                ItemMeta sfItemMeta = sfitem.getItemMeta();</span>
+<span class="fc" id="L316">                Debug.log(TestCase.CARGO_INPUT_TESTING, &quot;  Comparing meta (vanilla items?) - {} == {} (lore: {})&quot;, itemMeta, sfItemMeta, checkLore);</span>
+<span class="fc" id="L317">                return equalsItemMeta(itemMeta, sfItemMeta, checkLore);</span>
+            } else {
+<span class="nc" id="L319">                return false;</span>
+            }
+        } else {
+<span class="fc bfc" id="L322" title="All 2 branches covered.">            return !sfitem.hasItemMeta();</span>
+        }
+    }
+
+    private static boolean equalsItemMeta(@Nonnull ItemMeta itemMeta, @Nonnull ItemMetaSnapshot itemMetaSnapshot, boolean checkLore) {
+<span class="fc" id="L327">        Optional&lt;String&gt; displayName = itemMetaSnapshot.getDisplayName();</span>
+
+<span class="pc bpc" id="L329" title="1 of 2 branches missed.">        if (itemMeta.hasDisplayName() != displayName.isPresent()) {</span>
+<span class="nc" id="L330">            return false;</span>
+<span class="pc bpc" id="L331" title="3 of 6 branches missed.">        } else if (itemMeta.hasDisplayName() &amp;&amp; displayName.isPresent() &amp;&amp; !itemMeta.getDisplayName().equals(displayName.get())) {</span>
+<span class="nc" id="L332">            return false;</span>
+<span class="pc bpc" id="L333" title="1 of 2 branches missed.">        } else if (checkLore) {</span>
+<span class="fc" id="L334">            Optional&lt;List&lt;String&gt;&gt; itemLore = itemMetaSnapshot.getLore();</span>
+
+<span class="pc bpc" id="L336" title="5 of 6 branches missed.">            if (itemMeta.hasLore() &amp;&amp; itemLore.isPresent() &amp;&amp; !equalsLore(itemMeta.getLore(), itemLore.get())) {</span>
+<span class="nc" id="L337">                return false;</span>
+<span class="pc bpc" id="L338" title="1 of 2 branches missed.">            } else if (itemMeta.hasLore() != itemLore.isPresent()) {</span>
+<span class="nc" id="L339">                return false;</span>
+            }
+        }
+
+        // Fixes #3133: name and lore are not enough
+<span class="fc" id="L344">        OptionalInt itemCustomModelData = itemMetaSnapshot.getCustomModelData();</span>
+<span class="pc bpc" id="L345" title="5 of 6 branches missed.">        if (itemMeta.hasCustomModelData() &amp;&amp; itemCustomModelData.isPresent() &amp;&amp; itemMeta.getCustomModelData() != itemCustomModelData.getAsInt()) {</span>
+<span class="nc" id="L346">            return false;</span>
+        } else {
+<span class="pc bpc" id="L348" title="1 of 2 branches missed.">            return itemMeta.hasCustomModelData() == itemCustomModelData.isPresent();</span>
+        }
+    }
+
+    private static boolean equalsItemMeta(@Nonnull ItemMeta itemMeta, @Nonnull ItemMeta sfitemMeta, boolean checkLore) {
+<span class="pc bpc" id="L353" title="1 of 2 branches missed.">        if (itemMeta.hasDisplayName() != sfitemMeta.hasDisplayName()) {</span>
+<span class="nc" id="L354">            return false;</span>
+<span class="pc bpc" id="L355" title="2 of 6 branches missed.">        } else if (itemMeta.hasDisplayName() &amp;&amp; sfitemMeta.hasDisplayName() &amp;&amp; !itemMeta.getDisplayName().equals(sfitemMeta.getDisplayName())) {</span>
+<span class="fc" id="L356">            return false;</span>
+<span class="pc bpc" id="L357" title="1 of 2 branches missed.">        } else if (checkLore) {</span>
+<span class="fc" id="L358">            boolean hasItemMetaLore = itemMeta.hasLore();</span>
+<span class="fc" id="L359">            boolean hasSfItemMetaLore = sfitemMeta.hasLore();</span>
+
+<span class="pc bpc" id="L361" title="2 of 4 branches missed.">            if (hasItemMetaLore &amp;&amp; hasSfItemMetaLore) {</span>
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">                if (!equalsLore(itemMeta.getLore(), sfitemMeta.getLore())) {</span>
+<span class="nc" id="L363">                    return false;</span>
+                }
+<span class="nc bnc" id="L365" title="All 2 branches missed.">            } else if (hasItemMetaLore != hasSfItemMetaLore) {</span>
+<span class="nc" id="L366">                return false;</span>
+            }
+        }
+
+        // Fixes #3133: name and lore are not enough
+<span class="fc" id="L371">        boolean hasItemMetaCustomModelData = itemMeta.hasCustomModelData();</span>
+<span class="fc" id="L372">        boolean hasSfItemMetaCustomModelData = sfitemMeta.hasCustomModelData();</span>
+<span class="pc bpc" id="L373" title="5 of 6 branches missed.">        if (hasItemMetaCustomModelData &amp;&amp; hasSfItemMetaCustomModelData &amp;&amp; itemMeta.getCustomModelData() != sfitemMeta.getCustomModelData()) {</span>
+<span class="nc" id="L374">            return false;</span>
+<span class="pc bpc" id="L375" title="1 of 2 branches missed.">        } else if (hasItemMetaCustomModelData != hasSfItemMetaCustomModelData) {</span>
+<span class="nc" id="L376">            return false;</span>
+        }
+
+<span class="pc bpc" id="L379" title="3 of 4 branches missed.">        if (itemMeta instanceof PotionMeta &amp;&amp; sfitemMeta instanceof PotionMeta) {</span>
+<span class="nc" id="L380">            return ((PotionMeta) itemMeta).getBasePotionData().equals(((PotionMeta) sfitemMeta).getBasePotionData());</span>
+        }
+
+<span class="fc" id="L383">        return true;</span>
+    }
+
+    /**
+     * This checks if the two provided lores are equal.
+     * This method will ignore any lines such as the soulbound one.
+     *
+     * @param lore1
+     *            The first lore
+     * @param lore2
+     *            The second lore
+     *
+     * @return Whether the two lores are equal
+     */
+    public static boolean equalsLore(@Nonnull List&lt;String&gt; lore1, @Nonnull List&lt;String&gt; lore2) {
+<span class="fc" id="L398">        Validate.notNull(lore1, &quot;Cannot compare lore that is null!&quot;);</span>
+<span class="fc" id="L399">        Validate.notNull(lore2, &quot;Cannot compare lore that is null!&quot;);</span>
+
+<span class="fc bfc" id="L401" title="All 2 branches covered.">        List&lt;String&gt; longerList = lore1.size() &gt; lore2.size() ? lore1 : lore2;</span>
+<span class="fc bfc" id="L402" title="All 2 branches covered.">        List&lt;String&gt; shorterList = lore1.size() &gt; lore2.size() ? lore2 : lore1;</span>
+
+<span class="fc" id="L404">        int a = 0;</span>
+<span class="fc" id="L405">        int b = 0;</span>
+
+<span class="fc bfc" id="L407" title="All 2 branches covered.">        for (; a &lt; longerList.size(); a++) {</span>
+<span class="fc bfc" id="L408" title="All 2 branches covered.">            if (isLineIgnored(longerList.get(a))) {</span>
+<span class="fc" id="L409">                continue;</span>
+            }
+
+<span class="fc bfc" id="L412" title="All 4 branches covered.">            while (shorterList.size() &gt; b &amp;&amp; isLineIgnored(shorterList.get(b))) {</span>
+<span class="fc" id="L413">                b++;</span>
+            }
+
+<span class="fc bfc" id="L416" title="All 2 branches covered.">            if (b &gt;= shorterList.size()) {</span>
+<span class="fc" id="L417">                return false;</span>
+<span class="fc bfc" id="L418" title="All 2 branches covered.">            } else if (longerList.get(a).equals(shorterList.get(b))) {</span>
+<span class="fc" id="L419">                b++;</span>
+            } else {
+<span class="fc" id="L421">                return false;</span>
+            }
+        }
+
+<span class="fc bfc" id="L425" title="All 4 branches covered.">        while (shorterList.size() &gt; b &amp;&amp; isLineIgnored(shorterList.get(b))) {</span>
+<span class="fc" id="L426">            b++;</span>
+        }
+
+<span class="fc bfc" id="L429" title="All 2 branches covered.">        return b == shorterList.size();</span>
+    }
+
+    private static boolean isLineIgnored(@Nonnull String line) {
+<span class="fc" id="L433">        return line.equals(SOULBOUND_LORE);</span>
+    }
+
+    public static void updateCapacitorTexture(@Nonnull Location l, int charge, int capacity) {
+<span class="nc" id="L437">        Validate.notNull(l, &quot;Cannot update a texture for null&quot;);</span>
+<span class="nc bnc" id="L438" title="All 2 branches missed.">        Validate.isTrue(capacity &gt; 0, &quot;Capacity must be greater than zero!&quot;);</span>
+
+<span class="nc" id="L440">        Slimefun.runSync(new CapacitorTextureUpdateTask(l, charge, capacity));</span>
+<span class="nc" id="L441">    }</span>
+
+    /**
+     * This checks whether the {@link Player} is able to use the given {@link ItemStack}.
+     * It will always return &lt;code&gt;true&lt;/code&gt; for non-Slimefun items.
+     * &lt;p&gt;
+     * If you already have an instance of {@link SlimefunItem}, please use {@link SlimefunItem#canUse(Player, boolean)}.
+     *
+     * @param p
+     *            The {@link Player}
+     * @param item
+     *            The {@link ItemStack} to check
+     * @param sendMessage
+     *            Whether to send a message response to the {@link Player}
+     *
+     * @return Whether the {@link Player} is able to use that item.
+     */
+    public static boolean canPlayerUseItem(@Nonnull Player p, @Nullable ItemStack item, boolean sendMessage) {
+<span class="nc" id="L459">        Validate.notNull(p, &quot;The player cannot be null&quot;);</span>
+
+<span class="nc" id="L461">        SlimefunItem sfItem = SlimefunItem.getByItem(item);</span>
+
+<span class="nc bnc" id="L463" title="All 2 branches missed.">        if (sfItem != null) {</span>
+<span class="nc" id="L464">            return sfItem.canUse(p, sendMessage);</span>
+        } else {
+<span class="nc" id="L466">            return true;</span>
+        }
+    }
+
+    /**
+     * Helper method to spawn an {@link ItemStack}.
+     * This method automatically calls a {@link SlimefunItemSpawnEvent} to allow
+     * other plugins to catch the item being dropped.
+     *
+     * @param loc
+     *            The {@link Location} where to drop the item
+     * @param item
+     *            The {@link ItemStack} to drop
+     * @param reason
+     *            The {@link ItemSpawnReason} why the item is being dropped
+     * @param addRandomOffset
+     *            Whether a random offset should be added (see {@link World#dropItemNaturally(Location, ItemStack)})
+     *
+     * @return The dropped {@link Item} (or null if the {@link SlimefunItemSpawnEvent} was cancelled)
+     */
+    @ParametersAreNonnullByDefault
+    public static @Nullable Item spawnItem(Location loc, ItemStack item, ItemSpawnReason reason, boolean addRandomOffset) {
+<span class="nc" id="L488">        SlimefunItemSpawnEvent event = new SlimefunItemSpawnEvent(loc, item, reason);</span>
+<span class="nc" id="L489">        Slimefun.instance().getServer().getPluginManager().callEvent(event);</span>
+
+<span class="nc bnc" id="L491" title="All 2 branches missed.">        if (!event.isCancelled()) {</span>
+<span class="nc" id="L492">            World world = event.getLocation().getWorld();</span>
+
+<span class="nc bnc" id="L494" title="All 2 branches missed.">            if (addRandomOffset) {</span>
+<span class="nc" id="L495">                return world.dropItemNaturally(event.getLocation(), event.getItemStack());</span>
+            } else {
+<span class="nc" id="L497">                return world.dropItem(event.getLocation(), event.getItemStack());</span>
+            }
+        } else {
+<span class="nc" id="L500">            return null;</span>
+        }
+    }
+
+    /**
+     * Helper method to spawn an {@link ItemStack}.
+     * This method automatically calls a {@link SlimefunItemSpawnEvent} to allow
+     * other plugins to catch the item being dropped.
+     *
+     * @param loc
+     *            The {@link Location} where to drop the item
+     * @param item
+     *            The {@link ItemStack} to drop
+     * @param reason
+     *            The {@link ItemSpawnReason} why the item is being dropped
+     *
+     * @return The dropped {@link Item} (or null if the {@link SlimefunItemSpawnEvent} was cancelled)
+     */
+    @ParametersAreNonnullByDefault
+    public static @Nullable Item spawnItem(Location loc, ItemStack item, ItemSpawnReason reason) {
+<span class="nc" id="L520">        return spawnItem(loc, item, reason, false);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

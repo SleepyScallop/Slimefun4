@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UpdaterService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.core.services</a> &gt; <span class="el_source">UpdaterService.java</span></div><h1>UpdaterService.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.core.services;
+
+import java.io.File;
+import java.util.logging.Level;
+
+import javax.annotation.Nonnull;
+
+import org.bukkit.plugin.Plugin;
+
+import io.github.bakedlibs.dough.config.Config;
+import io.github.bakedlibs.dough.updater.GitHubBuildsUpdater;
+import io.github.bakedlibs.dough.updater.PluginUpdater;
+import io.github.bakedlibs.dough.versions.PrefixedVersion;
+import io.github.thebusybiscuit.slimefun4.api.SlimefunBranch;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+
+/**
+ * This Class represents our {@link PluginUpdater} Service.
+ * If enabled, it will automatically connect to https://thebusybiscuit.github.io/builds/
+ * to check for updates and to download them automatically.
+ *
+ * @author TheBusyBiscuit
+ *
+ */
+public class UpdaterService {
+
+    /**
+     * Our {@link Slimefun} instance.
+     */
+    private final Slimefun plugin;
+
+    /**
+     * Our {@link PluginUpdater} implementation.
+     */
+    private final PluginUpdater&lt;PrefixedVersion&gt; updater;
+
+    /**
+     * The {@link SlimefunBranch} we are currently on.
+     * If this is an official {@link SlimefunBranch}, auto updates will be enabled.
+     */
+    private final SlimefunBranch branch;
+
+    /**
+     * This will create a new {@link UpdaterService} for the given {@link Slimefun}.
+     * The {@link File} should be the result of the getFile() operation of that {@link Plugin}.
+     *
+     * @param plugin
+     *            The instance of Slimefun
+     * @param version
+     *            The current version of Slimefun
+     * @param file
+     *            The {@link File} of this {@link Plugin}
+     */
+<span class="fc" id="L54">    public UpdaterService(@Nonnull Slimefun plugin, @Nonnull String version, @Nonnull File file) {</span>
+<span class="fc" id="L55">        this.plugin = plugin;</span>
+<span class="fc" id="L56">        GitHubBuildsUpdater autoUpdater = null;</span>
+
+<span class="fc bfc" id="L58" title="All 2 branches covered.">        if (version.contains(&quot;UNOFFICIAL&quot;)) {</span>
+            // This Server is using a modified build that is not a public release.
+<span class="fc" id="L60">            branch = SlimefunBranch.UNOFFICIAL;</span>
+<span class="fc bfc" id="L61" title="All 2 branches covered.">        } else if (version.startsWith(&quot;DEV - &quot;)) {</span>
+            // If we are using a development build, we want to switch to our custom
+            try {
+<span class="nc" id="L64">                autoUpdater = new GitHubBuildsUpdater(plugin, file, &quot;TheBusyBiscuit/Slimefun4/master&quot;);</span>
+<span class="fc" id="L65">            } catch (Exception x) {</span>
+<span class="fc" id="L66">                plugin.getLogger().log(Level.SEVERE, &quot;Failed to create AutoUpdater&quot;, x);</span>
+<span class="nc" id="L67">            }</span>
+
+<span class="fc" id="L69">            branch = SlimefunBranch.DEVELOPMENT;</span>
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        } else if (version.startsWith(&quot;RC - &quot;)) {</span>
+            // If we are using a &quot;stable&quot; build, we want to switch to our custom
+            try {
+<span class="nc" id="L73">                autoUpdater = new GitHubBuildsUpdater(plugin, file, &quot;TheBusyBiscuit/Slimefun4/stable&quot;, &quot;RC - &quot;);</span>
+<span class="fc" id="L74">            } catch (Exception x) {</span>
+<span class="fc" id="L75">                plugin.getLogger().log(Level.SEVERE, &quot;Failed to create AutoUpdater&quot;, x);</span>
+<span class="nc" id="L76">            }</span>
+
+<span class="fc" id="L78">            branch = SlimefunBranch.STABLE;</span>
+        } else {
+<span class="fc" id="L80">            branch = SlimefunBranch.UNKNOWN;</span>
+        }
+
+<span class="fc" id="L83">        this.updater = autoUpdater;</span>
+<span class="fc" id="L84">    }</span>
+
+    /**
+     * This method returns the branch the current build of Slimefun is running on.
+     * This can be used to determine whether we are dealing with an official build
+     * or a build that was unofficially modified.
+     *
+     * @return The branch this build of Slimefun is on.
+     */
+    public @Nonnull SlimefunBranch getBranch() {
+<span class="fc" id="L94">        return branch;</span>
+    }
+
+    /**
+     * This method returns the build number that this is running on (or -1 if unofficial).
+     * You should combine the usage with {@link #getBranch()} in order to properly see if this is
+     * a development or stable build number.
+     *
+     * @return The build number of this Slimefun.
+     */
+    public int getBuildNumber() {
+<span class="pc bpc" id="L105" title="1 of 2 branches missed.">        if (updater != null) {</span>
+<span class="nc" id="L106">            PrefixedVersion version = updater.getCurrentVersion();</span>
+<span class="nc" id="L107">            return version.getVersionNumber();</span>
+        }
+
+<span class="fc" id="L110">        return -1;</span>
+    }
+
+    /**
+     * This will start the {@link UpdaterService} and check for updates.
+     * If it can find an update it will automatically be installed.
+     */
+    public void start() {
+<span class="nc bnc" id="L118" title="All 2 branches missed.">        if (updater != null) {</span>
+<span class="nc" id="L119">            updater.start();</span>
+        } else {
+<span class="nc" id="L121">            printBorder();</span>
+<span class="nc" id="L122">            plugin.getLogger().log(Level.WARNING, &quot;It looks like you are using an unofficially modified build of Slimefun!&quot;);</span>
+<span class="nc" id="L123">            plugin.getLogger().log(Level.WARNING, &quot;Auto-Updates have been disabled, this build is not considered safe.&quot;);</span>
+<span class="nc" id="L124">            plugin.getLogger().log(Level.WARNING, &quot;Do not report bugs encountered in this Version of Slimefun to any official sources.&quot;);</span>
+<span class="nc" id="L125">            printBorder();</span>
+        }
+<span class="nc" id="L127">    }</span>
+
+    /**
+     * This returns whether the {@link PluginUpdater} is enabled or not.
+     * This includes the {@link Config} setting but also whether or not we are running an
+     * official or unofficial build.
+     *
+     * @return Whether the {@link PluginUpdater} is enabled
+     */
+    public boolean isEnabled() {
+<span class="nc bnc" id="L137" title="All 4 branches missed.">        return Slimefun.getCfg().getBoolean(&quot;options.auto-update&quot;) &amp;&amp; updater != null;</span>
+    }
+
+    /**
+     * This method is called when the {@link UpdaterService} was disabled.
+     */
+    public void disable() {
+<span class="nc" id="L144">        printBorder();</span>
+<span class="nc" id="L145">        plugin.getLogger().log(Level.WARNING, &quot;It looks like you have disabled auto-updates for Slimefun!&quot;);</span>
+<span class="nc" id="L146">        plugin.getLogger().log(Level.WARNING, &quot;Auto-Updates keep your server safe, performant and bug-free.&quot;);</span>
+<span class="nc" id="L147">        plugin.getLogger().log(Level.WARNING, &quot;We respect your decision.&quot;);</span>
+
+<span class="nc bnc" id="L149" title="All 2 branches missed.">        if (branch != SlimefunBranch.STABLE) {</span>
+<span class="nc" id="L150">            plugin.getLogger().log(Level.WARNING, &quot;If you are just scared of Slimefun breaking, then please consider using a \&quot;stable\&quot; build instead of disabling auto-updates.&quot;);</span>
+        }
+
+<span class="nc" id="L153">        printBorder();</span>
+<span class="nc" id="L154">    }</span>
+
+    private void printBorder() {
+<span class="nc" id="L157">        plugin.getLogger().log(Level.WARNING, &quot;#######################################################&quot;);</span>
+<span class="nc" id="L158">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

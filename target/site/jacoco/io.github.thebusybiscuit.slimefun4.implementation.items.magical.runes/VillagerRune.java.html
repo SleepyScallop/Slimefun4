@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>VillagerRune.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.magical.runes</a> &gt; <span class="el_source">VillagerRune.java</span></div><h1>VillagerRune.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.magical.runes;
+
+import java.util.concurrent.ThreadLocalRandom;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.GameMode;
+import org.bukkit.Particle;
+import org.bukkit.Sound;
+import org.bukkit.entity.Villager;
+import org.bukkit.entity.Villager.Profession;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.bakedlibs.dough.items.ItemUtils;
+import io.github.bakedlibs.dough.protection.Interaction;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.handlers.EntityInteractHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.items.SimpleSlimefunItem;
+
+/**
+ * This {@link SlimefunItem} allows you to reset a {@link Villager} profession.
+ * Useful to reset a villager who does not have desirable trades.
+ *
+ * @author dNiym
+ *
+ */
+public class VillagerRune extends SimpleSlimefunItem&lt;EntityInteractHandler&gt; {
+
+    @ParametersAreNonnullByDefault
+    public VillagerRune(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, ItemStack recipeOutput) {
+<span class="fc" id="L35">        super(itemGroup, item, recipeType, recipe, recipeOutput);</span>
+<span class="fc" id="L36">    }</span>
+
+    @Override
+    public EntityInteractHandler getItemHandler() {
+<span class="fc" id="L40">        return (e, item, offhand) -&gt; {</span>
+<span class="nc bnc" id="L41" title="All 4 branches missed.">            if (e.isCancelled() || !Slimefun.getProtectionManager().hasPermission(e.getPlayer(), e.getRightClicked().getLocation(), Interaction.INTERACT_ENTITY)) {</span>
+                // They don't have permission to use it in this area
+<span class="nc" id="L43">                return;</span>
+            }
+
+<span class="nc bnc" id="L46" title="All 2 branches missed.">            if (e.getRightClicked() instanceof Villager villager) {</span>
+<span class="nc bnc" id="L47" title="All 4 branches missed.">                if (villager.getProfession() == Profession.NONE || villager.getProfession() == Profession.NITWIT) {</span>
+<span class="nc" id="L48">                    return;</span>
+                }
+
+<span class="nc bnc" id="L51" title="All 2 branches missed.">                if (e.getPlayer().getGameMode() != GameMode.CREATIVE) {</span>
+<span class="nc" id="L52">                    ItemUtils.consumeItem(item, false);</span>
+                }
+
+                // Reset Villager
+<span class="nc" id="L56">                villager.setVillagerExperience(0);</span>
+<span class="nc" id="L57">                villager.setVillagerLevel(1);</span>
+<span class="nc" id="L58">                villager.setProfession(Profession.NONE);</span>
+<span class="nc" id="L59">                e.setCancelled(true);</span>
+
+<span class="nc" id="L61">                double offset = ThreadLocalRandom.current().nextDouble(0.5);</span>
+
+<span class="nc" id="L63">                villager.getWorld().playSound(villager.getLocation(), Sound.ENTITY_VILLAGER_CELEBRATE, 1, 1.4F);</span>
+<span class="nc" id="L64">                villager.getWorld().spawnParticle(Particle.CRIMSON_SPORE, villager.getLocation(), 10, 0, offset / 2, 0, 0);</span>
+<span class="nc" id="L65">                villager.getWorld().spawnParticle(Particle.ENCHANTMENT_TABLE, villager.getLocation(), 5, 0.04, 1, 0.04);</span>
+            }
+<span class="nc" id="L67">        };</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

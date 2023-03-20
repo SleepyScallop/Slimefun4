@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AutoBrewer.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines</a> &gt; <span class="el_source">AutoBrewer.java</span></div><h1>AutoBrewer.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines;
+
+import java.util.EnumMap;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
+import org.bukkit.potion.PotionType;
+
+import io.github.bakedlibs.dough.inventory.InvUtils;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.NotHopperable;
+
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+
+/**
+ *
+ * The {@link AutoBrewer} machine with most if not all potion recipes.
+ *
+ * @author Linox
+ *
+ */
+public class AutoBrewer extends AContainer implements NotHopperable {
+
+<span class="fc" id="L35">    private static final Map&lt;Material, PotionType&gt; potionRecipes = new EnumMap&lt;&gt;(Material.class);</span>
+<span class="fc" id="L36">    private static final Map&lt;PotionType, PotionType&gt; fermentations = new EnumMap&lt;&gt;(PotionType.class);</span>
+
+    static {
+<span class="fc" id="L39">        potionRecipes.put(Material.SUGAR, PotionType.SPEED);</span>
+<span class="fc" id="L40">        potionRecipes.put(Material.RABBIT_FOOT, PotionType.JUMP);</span>
+<span class="fc" id="L41">        potionRecipes.put(Material.BLAZE_POWDER, PotionType.STRENGTH);</span>
+<span class="fc" id="L42">        potionRecipes.put(Material.GLISTERING_MELON_SLICE, PotionType.INSTANT_HEAL);</span>
+<span class="fc" id="L43">        potionRecipes.put(Material.SPIDER_EYE, PotionType.POISON);</span>
+<span class="fc" id="L44">        potionRecipes.put(Material.GHAST_TEAR, PotionType.REGEN);</span>
+<span class="fc" id="L45">        potionRecipes.put(Material.MAGMA_CREAM, PotionType.FIRE_RESISTANCE);</span>
+<span class="fc" id="L46">        potionRecipes.put(Material.PUFFERFISH, PotionType.WATER_BREATHING);</span>
+<span class="fc" id="L47">        potionRecipes.put(Material.GOLDEN_CARROT, PotionType.NIGHT_VISION);</span>
+<span class="fc" id="L48">        potionRecipes.put(Material.TURTLE_HELMET, PotionType.TURTLE_MASTER);</span>
+<span class="fc" id="L49">        potionRecipes.put(Material.PHANTOM_MEMBRANE, PotionType.SLOW_FALLING);</span>
+
+<span class="fc" id="L51">        fermentations.put(PotionType.SPEED, PotionType.SLOWNESS);</span>
+<span class="fc" id="L52">        fermentations.put(PotionType.JUMP, PotionType.SLOWNESS);</span>
+<span class="fc" id="L53">        fermentations.put(PotionType.INSTANT_HEAL, PotionType.INSTANT_DAMAGE);</span>
+<span class="fc" id="L54">        fermentations.put(PotionType.POISON, PotionType.INSTANT_DAMAGE);</span>
+<span class="fc" id="L55">        fermentations.put(PotionType.NIGHT_VISION, PotionType.INVISIBILITY);</span>
+<span class="fc" id="L56">    }</span>
+
+    @ParametersAreNonnullByDefault
+    public AutoBrewer(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+<span class="fc" id="L60">        super(itemGroup, item, recipeType, recipe);</span>
+<span class="fc" id="L61">    }</span>
+
+    @Override
+    protected @Nullable MachineRecipe findNextRecipe(BlockMenu menu) {
+<span class="nc" id="L65">        ItemStack input1 = menu.getItemInSlot(getInputSlots()[0]);</span>
+<span class="nc" id="L66">        ItemStack input2 = menu.getItemInSlot(getInputSlots()[1]);</span>
+
+<span class="nc bnc" id="L68" title="All 4 branches missed.">        if (input1 == null || input2 == null) {</span>
+<span class="nc" id="L69">            return null;</span>
+        }
+
+<span class="nc bnc" id="L72" title="All 4 branches missed.">        if (isPotion(input1.getType()) || isPotion(input2.getType())) {</span>
+<span class="nc" id="L73">            boolean isPotionInFirstSlot = isPotion(input1.getType());</span>
+<span class="nc bnc" id="L74" title="All 2 branches missed.">            ItemStack ingredient = isPotionInFirstSlot ? input2 : input1;</span>
+
+            // Reject any named items
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if (ingredient.hasItemMeta()) {</span>
+<span class="nc" id="L78">                return null;</span>
+            }
+
+<span class="nc bnc" id="L81" title="All 2 branches missed.">            ItemStack potionItem = isPotionInFirstSlot ? input1 : input2;</span>
+<span class="nc" id="L82">            PotionMeta potion = (PotionMeta) potionItem.getItemMeta();</span>
+<span class="nc" id="L83">            ItemStack output = brew(ingredient.getType(), potionItem.getType(), potion);</span>
+
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            if (output == null) {</span>
+<span class="nc" id="L86">                return null;</span>
+            }
+
+<span class="nc" id="L89">            output.setItemMeta(potion);</span>
+
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (!InvUtils.fits(menu.toInventory(), output, getOutputSlots())) {</span>
+<span class="nc" id="L92">                return null;</span>
+            }
+
+<span class="nc bnc" id="L95" title="All 2 branches missed.">            for (int slot : getInputSlots()) {</span>
+<span class="nc" id="L96">                menu.consumeItem(slot);</span>
+            }
+
+<span class="nc" id="L99">            return new MachineRecipe(30, new ItemStack[] { input1, input2 }, new ItemStack[] { output });</span>
+        } else {
+<span class="nc" id="L101">            return null;</span>
+        }
+    }
+
+    @ParametersAreNonnullByDefault
+    private @Nullable ItemStack brew(Material input, Material potionType, PotionMeta potion) {
+<span class="nc" id="L107">        PotionData data = potion.getBasePotionData();</span>
+
+<span class="nc" id="L109">        PotionType type = data.getType();</span>
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (type == PotionType.WATER) {</span>
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            if (input == Material.FERMENTED_SPIDER_EYE) {</span>
+<span class="nc" id="L112">                potion.setBasePotionData(new PotionData(PotionType.WEAKNESS, false, false));</span>
+<span class="nc" id="L113">                return new ItemStack(potionType);</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">            } else if (input == Material.NETHER_WART) {</span>
+<span class="nc" id="L115">                potion.setBasePotionData(new PotionData(PotionType.AWKWARD, false, false));</span>
+<span class="nc" id="L116">                return new ItemStack(potionType);</span>
+<span class="nc bnc" id="L117" title="All 4 branches missed.">            } else if (potionType == Material.POTION &amp;&amp; input == Material.GUNPOWDER) {</span>
+<span class="nc" id="L118">                return new ItemStack(Material.SPLASH_POTION);</span>
+<span class="nc bnc" id="L119" title="All 4 branches missed.">            } else if (potionType == Material.SPLASH_POTION &amp;&amp; input == Material.DRAGON_BREATH) {</span>
+<span class="nc" id="L120">                return new ItemStack(Material.LINGERING_POTION);</span>
+            }
+<span class="nc bnc" id="L122" title="All 2 branches missed.">        } else if (input == Material.FERMENTED_SPIDER_EYE) {</span>
+<span class="nc" id="L123">            PotionType fermented = fermentations.get(type);</span>
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">            if (fermented != null) {</span>
+<span class="nc" id="L126">                potion.setBasePotionData(new PotionData(fermented, data.isExtended(), data.isUpgraded()));</span>
+<span class="nc" id="L127">                return new ItemStack(potionType);</span>
+            }
+<span class="nc bnc" id="L129" title="All 6 branches missed.">        } else if (input == Material.REDSTONE &amp;&amp; type.isExtendable() &amp;&amp; !data.isUpgraded()) {</span>
+            // Fixes #3390 - Potions can only be either extended or upgraded. Not both.
+<span class="nc" id="L131">            potion.setBasePotionData(new PotionData(type, true, false));</span>
+<span class="nc" id="L132">            return new ItemStack(potionType);</span>
+<span class="nc bnc" id="L133" title="All 6 branches missed.">        } else if (input == Material.GLOWSTONE_DUST &amp;&amp; type.isUpgradeable() &amp;&amp; !data.isExtended()) {</span>
+            // Fixes #3390 - Potions can only be either extended or upgraded. Not both.
+<span class="nc" id="L135">            potion.setBasePotionData(new PotionData(type, false, true));</span>
+<span class="nc" id="L136">            return new ItemStack(potionType);</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">        } else if (type == PotionType.AWKWARD) {</span>
+<span class="nc" id="L138">            PotionType potionRecipe = potionRecipes.get(input);</span>
+
+<span class="nc bnc" id="L140" title="All 2 branches missed.">            if (potionRecipe != null) {</span>
+<span class="nc" id="L141">                potion.setBasePotionData(new PotionData(potionRecipe, false, false));</span>
+<span class="nc" id="L142">                return new ItemStack(potionType);</span>
+            }
+        }
+
+<span class="nc" id="L146">        return null;</span>
+    }
+
+    /**
+     * Checks whether a given {@link Material} is a valid Potion material.
+     * 
+     * @param mat
+     *            The {@link Material} to check
+     * 
+     * @return Whether this {@link Material} is a valid potion
+     */
+    private boolean isPotion(@Nonnull Material mat) {
+<span class="nc bnc" id="L158" title="All 6 branches missed.">        return mat == Material.POTION || mat == Material.SPLASH_POTION || mat == Material.LINGERING_POTION;</span>
+    }
+
+    @Override
+    public @Nonnull ItemStack getProgressBar() {
+<span class="fc" id="L163">        return new ItemStack(Material.FISHING_ROD);</span>
+    }
+
+    @Override
+    public @Nonnull String getMachineIdentifier() {
+<span class="nc" id="L168">        return &quot;AUTO_BREWER&quot;;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

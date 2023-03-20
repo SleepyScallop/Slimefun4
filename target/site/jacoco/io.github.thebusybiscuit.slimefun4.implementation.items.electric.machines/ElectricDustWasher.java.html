@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElectricDustWasher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines</a> &gt; <span class="el_source">ElectricDustWasher.java</span></div><h1>ElectricDustWasher.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks.OreWasher;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+
+/**
+ * The {@link ElectricDustWasher} serves as an electrical {@link OreWasher}.
+ * 
+ * @author TheBusyBiscuit
+ * 
+ * @see OreWasher
+ *
+ */
+public class ElectricDustWasher extends AContainer {
+
+<span class="fc" id="L30">    private final OreWasher oreWasher = SlimefunItems.ORE_WASHER.getItem(OreWasher.class);</span>
+    private final boolean legacyMode;
+
+    @ParametersAreNonnullByDefault
+    public ElectricDustWasher(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+<span class="fc" id="L35">        super(itemGroup, item, recipeType, recipe);</span>
+
+<span class="fc" id="L37">        legacyMode = Slimefun.getCfg().getBoolean(&quot;options.legacy-dust-washer&quot;);</span>
+<span class="fc" id="L38">    }</span>
+
+    @Override
+    public ItemStack getProgressBar() {
+<span class="fc" id="L42">        return new ItemStack(Material.GOLDEN_SHOVEL);</span>
+    }
+
+    @Override
+    protected MachineRecipe findNextRecipe(BlockMenu menu) {
+<span class="nc bnc" id="L47" title="All 2 branches missed.">        for (int slot : getInputSlots()) {</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">            if (SlimefunUtils.isItemSimilar(menu.getItemInSlot(slot), SlimefunItems.SIFTED_ORE, true, false)) {</span>
+<span class="nc bnc" id="L49" title="All 4 branches missed.">                if (!legacyMode &amp;&amp; !hasFreeSlot(menu)) {</span>
+<span class="nc" id="L50">                    return null;</span>
+                }
+
+<span class="nc" id="L53">                ItemStack dust = oreWasher.getRandomDust();</span>
+<span class="nc" id="L54">                MachineRecipe recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { SlimefunItems.SIFTED_ORE }, new ItemStack[] { dust });</span>
+
+<span class="nc bnc" id="L56" title="All 4 branches missed.">                if (!legacyMode || menu.fits(recipe.getOutput()[0], getOutputSlots())) {</span>
+<span class="nc" id="L57">                    menu.consumeItem(slot);</span>
+<span class="nc" id="L58">                    return recipe;</span>
+                }
+<span class="nc bnc" id="L60" title="All 2 branches missed.">            } else if (SlimefunUtils.isItemSimilar(menu.getItemInSlot(slot), SlimefunItems.PULVERIZED_ORE, true)) {</span>
+<span class="nc" id="L61">                MachineRecipe recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { SlimefunItems.PULVERIZED_ORE }, new ItemStack[] { SlimefunItems.PURE_ORE_CLUSTER });</span>
+
+<span class="nc bnc" id="L63" title="All 2 branches missed.">                if (menu.fits(recipe.getOutput()[0], getOutputSlots())) {</span>
+<span class="nc" id="L64">                    menu.consumeItem(slot);</span>
+<span class="nc" id="L65">                    return recipe;</span>
+                }
+            }
+        }
+
+<span class="nc" id="L70">        return null;</span>
+    }
+
+    private boolean hasFreeSlot(BlockMenu menu) {
+<span class="nc bnc" id="L74" title="All 2 branches missed.">        for (int slot : getOutputSlots()) {</span>
+<span class="nc" id="L75">            ItemStack item = menu.getItemInSlot(slot);</span>
+
+<span class="nc bnc" id="L77" title="All 4 branches missed.">            if (item == null || item.getType() == Material.AIR) {</span>
+<span class="nc" id="L78">                return true;</span>
+            }
+        }
+
+<span class="nc" id="L82">        return false;</span>
+    }
+
+    @Override
+    public String getMachineIdentifier() {
+<span class="nc" id="L87">        return &quot;ELECTRIC_DUST_WASHER&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

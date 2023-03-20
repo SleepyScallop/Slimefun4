@@ -1,0 +1,1212 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SlimefunItem.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.api.items</a> &gt; <span class="el_source">SlimefunItem.java</span></div><h1>SlimefunItem.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.api.items;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.Material;
+import org.bukkit.World;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.Permission;
+
+import io.github.bakedlibs.dough.collections.OptionalMap;
+import io.github.bakedlibs.dough.items.ItemUtils;
+import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion;
+import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
+import io.github.thebusybiscuit.slimefun4.api.SlimefunBranch;
+import io.github.thebusybiscuit.slimefun4.api.exceptions.IdConflictException;
+import io.github.thebusybiscuit.slimefun4.api.exceptions.IncompatibleItemHandlerException;
+import io.github.thebusybiscuit.slimefun4.api.exceptions.MissingDependencyException;
+import io.github.thebusybiscuit.slimefun4.api.exceptions.UnregisteredItemException;
+import io.github.thebusybiscuit.slimefun4.api.exceptions.WrongItemStackException;
+import io.github.thebusybiscuit.slimefun4.api.player.PlayerProfile;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.api.researches.Research;
+import io.github.thebusybiscuit.slimefun4.core.SlimefunRegistry;
+import io.github.thebusybiscuit.slimefun4.core.attributes.NotConfigurable;
+import io.github.thebusybiscuit.slimefun4.core.attributes.Placeable;
+import io.github.thebusybiscuit.slimefun4.core.attributes.Radioactive;
+import io.github.thebusybiscuit.slimefun4.core.attributes.Rechargeable;
+import io.github.thebusybiscuit.slimefun4.core.guide.SlimefunGuide;
+import io.github.thebusybiscuit.slimefun4.core.handlers.GlobalItemHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.items.VanillaItem;
+import io.github.thebusybiscuit.slimefun4.implementation.items.backpacks.SlimefunBackpack;
+import io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.enchanting.AutoDisenchanter;
+import io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.enchanting.AutoEnchanter;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+import io.github.thebusybiscuit.slimefun4.utils.itemstack.ItemStackWrapper;
+
+import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
+
+/**
+ * A {@link SlimefunItem} is a custom item registered by a {@link SlimefunAddon}.
+ * This class defines the behaviours of the item, you can assign an {@link ItemHandler}
+ * to give the item functionality.
+ * In contrast to that the {@link SlimefunItemStack} defines the look and feel of the item.
+ * 
+ * Remember to call {@link #register(SlimefunAddon)} on your {@link SlimefunItem} for it
+ * to appear in the {@link SlimefunGuide}.
+ * 
+ * @author TheBusyBiscuit
+ * @author Poslovitch
+ * 
+ * @see SlimefunItemStack
+ * @see SlimefunAddon
+ *
+ */
+public class SlimefunItem implements Placeable {
+
+    /**
+     * This is our item id.
+     */
+    private final String id;
+
+    /**
+     * This is the original {@link ItemStack} that represents this item.
+     * It is immutable and should always be cloned, never used directly.
+     */
+    private final ItemStack itemStackTemplate;
+
+    /**
+     * This is a reference to the {@link SlimefunAddon} that registered this
+     * {@link SlimefunItem}, if the item has not been registered yet, it will be null.
+     */
+    protected SlimefunAddon addon;
+
+    /**
+     * This is the state of this {@link SlimefunItem}.
+     */
+<span class="fc" id="L93">    private ItemState state = ItemState.UNREGISTERED;</span>
+
+    /**
+     * This is the {@link ItemGroup} in which this {@link SlimefunItem} can be found.
+     */
+    private ItemGroup itemGroup;
+
+    /**
+     * This is a reference to the associated {@link Research}, can be null.
+     */
+    private Research research;
+
+    private ItemStack[] recipe;
+    private RecipeType recipeType;
+    protected ItemStack recipeOutput;
+
+<span class="fc" id="L109">    protected boolean enchantable = true;</span>
+<span class="fc" id="L110">    protected boolean disenchantable = true;</span>
+<span class="fc" id="L111">    protected boolean hidden = false;</span>
+<span class="fc" id="L112">    protected boolean useableInWorkbench = false;</span>
+
+<span class="fc" id="L114">    private Optional&lt;String&gt; wikiURL = Optional.empty();</span>
+
+<span class="fc" id="L116">    private final OptionalMap&lt;Class&lt;? extends ItemHandler&gt;, ItemHandler&gt; itemhandlers = new OptionalMap&lt;&gt;(HashMap::new);</span>
+<span class="fc" id="L117">    private final Set&lt;ItemSetting&lt;?&gt;&gt; itemSettings = new HashSet&lt;&gt;();</span>
+
+<span class="fc" id="L119">    private boolean ticking = false;</span>
+    private BlockTicker blockTicker;
+
+    /**
+     * This creates a new {@link SlimefunItem} from the given arguments.
+     * 
+     * @param itemGroup
+     *            The {@link ItemGroup} this {@link SlimefunItem} belongs to
+     * @param item
+     *            The {@link SlimefunItemStack} that describes the visual features of our {@link SlimefunItem}
+     * @param recipeType
+     *            the {@link RecipeType} that determines how this {@link SlimefunItem} is crafted
+     * @param recipe
+     *            An Array representing the recipe of this {@link SlimefunItem}
+     */
+    @ParametersAreNonnullByDefault
+    public SlimefunItem(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+<span class="fc" id="L136">        this(itemGroup, item, recipeType, recipe, null);</span>
+<span class="fc" id="L137">    }</span>
+
+    /**
+     * This creates a new {@link SlimefunItem} from the given arguments.
+     * 
+     * @param itemGroup
+     *            The {@link ItemGroup} this {@link SlimefunItem} belongs to
+     * @param item
+     *            The {@link SlimefunItemStack} that describes the visual features of our {@link SlimefunItem}
+     * @param recipeType
+     *            the {@link RecipeType} that determines how this {@link SlimefunItem} is crafted
+     * @param recipe
+     *            An Array representing the recipe of this {@link SlimefunItem}
+     * @param recipeOutput
+     *            The result of crafting this item
+     */
+    @ParametersAreNonnullByDefault
+<span class="fc" id="L154">    public SlimefunItem(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, @Nullable ItemStack recipeOutput) {</span>
+<span class="fc" id="L155">        Validate.notNull(itemGroup, &quot;'itemGroup' is not allowed to be null!&quot;);</span>
+<span class="fc" id="L156">        Validate.notNull(item, &quot;'item' is not allowed to be null!&quot;);</span>
+<span class="fc" id="L157">        Validate.notNull(recipeType, &quot;'recipeType' is not allowed to be null!&quot;);</span>
+
+<span class="fc" id="L159">        this.itemGroup = itemGroup;</span>
+<span class="fc" id="L160">        this.itemStackTemplate = item;</span>
+<span class="fc" id="L161">        this.id = item.getItemId();</span>
+<span class="fc" id="L162">        this.recipeType = recipeType;</span>
+<span class="fc" id="L163">        this.recipe = recipe;</span>
+<span class="fc" id="L164">        this.recipeOutput = recipeOutput;</span>
+<span class="fc" id="L165">    }</span>
+
+    // Previously deprecated constructor, now only for internal purposes
+    @ParametersAreNonnullByDefault
+<span class="fc" id="L169">    protected SlimefunItem(ItemGroup itemGroup, ItemStack item, String id, RecipeType recipeType, ItemStack[] recipe) {</span>
+<span class="fc" id="L170">        Validate.notNull(itemGroup, &quot;'itemGroup' is not allowed to be null!&quot;);</span>
+<span class="fc" id="L171">        Validate.notNull(item, &quot;'item' is not allowed to be null!&quot;);</span>
+<span class="fc" id="L172">        Validate.notNull(id, &quot;'id' is not allowed to be null!&quot;);</span>
+<span class="fc" id="L173">        Validate.notNull(recipeType, &quot;'recipeType' is not allowed to be null!&quot;);</span>
+
+<span class="fc" id="L175">        this.itemGroup = itemGroup;</span>
+<span class="fc" id="L176">        this.itemStackTemplate = item;</span>
+<span class="fc" id="L177">        this.id = id;</span>
+<span class="fc" id="L178">        this.recipeType = recipeType;</span>
+<span class="fc" id="L179">        this.recipe = recipe;</span>
+<span class="fc" id="L180">    }</span>
+
+    /**
+     * Returns the identifier of this {@link SlimefunItem}.
+     *
+     * @return the identifier of this {@link SlimefunItem}
+     */
+    public final @Nonnull String getId() {
+<span class="fc" id="L188">        return id;</span>
+    }
+
+    /**
+     * This method returns the {@link ItemState} this {@link SlimefunItem}
+     * is currently in. This can be used to determine whether a {@link SlimefunItem}
+     * is enabled or disabled.
+     * 
+     * {@link VanillaItem} represents a special case here.
+     * 
+     * @return The {@link ItemState} of this {@link SlimefunItem}
+     */
+    public @Nonnull ItemState getState() {
+<span class="fc" id="L201">        return state;</span>
+    }
+
+    /**
+     * This returns the {@link ItemStack} of this {@link SlimefunItem}.
+     * The {@link ItemStack} describes the look and feel of this {@link SlimefunItem}.
+     * 
+     * @return The {@link ItemStack} that this {@link SlimefunItem} represents
+     */
+    public @Nonnull ItemStack getItem() {
+<span class="fc" id="L211">        return itemStackTemplate;</span>
+    }
+
+    /**
+     * This returns the {@link ItemGroup} of our {@link SlimefunItem}, every {@link SlimefunItem}
+     * is associated with exactly one {@link ItemGroup}.
+     * 
+     * @return The {@link ItemGroup} that this {@link SlimefunItem} belongs to
+     */
+    public @Nonnull ItemGroup getItemGroup() {
+<span class="fc" id="L221">        return itemGroup;</span>
+    }
+
+    /**
+     * Retrieve the recipe for this {@link SlimefunItem}.
+     *
+     * @return An {@link ItemStack} array of 9 which represents the recipe for this {@link SlimefunItem}
+     */
+    public @Nonnull ItemStack[] getRecipe() {
+<span class="fc" id="L230">        return recipe;</span>
+    }
+
+    /**
+     * This method returns the {@link RecipeType}.
+     * The {@link RecipeType} determines how this {@link SlimefunItem} is crafted.
+     * 
+     * @return The {@link RecipeType} of this {@link SlimefunItem}
+     */
+    public @Nonnull RecipeType getRecipeType() {
+<span class="fc" id="L240">        return recipeType;</span>
+    }
+
+    /**
+     * This method returns the result of crafting this {@link SlimefunItem}
+     * 
+     * @return The recipe output of this {@link SlimefunItem}
+     */
+    public @Nonnull ItemStack getRecipeOutput() {
+<span class="fc bfc" id="L249" title="All 2 branches covered.">        return recipeOutput != null ? recipeOutput.clone() : itemStackTemplate.clone();</span>
+    }
+
+    /**
+     * This method returns the {@link Research} this {@link SlimefunItem} is linked to.
+     * This will be null if the item is not linked to any {@link Research}
+     * 
+     * @return The linked {@link Research} or null
+     */
+    public final @Nullable Research getResearch() {
+<span class="fc" id="L259">        return research;</span>
+    }
+
+    /**
+     * This returns whether this {@link SlimefunItem} has a {@link Research}
+     * assigned to it.
+     * It is equivalent to a null check performed on {@link #getResearch()}.
+     * 
+     * @return Whether this {@link SlimefunItem} has a {@link Research}
+     */
+    public final boolean hasResearch() {
+<span class="fc bfc" id="L270" title="All 2 branches covered.">        return research != null;</span>
+    }
+
+    /**
+     * This returns a {@link Set} containing all instances of {@link ItemSetting} for this {@link SlimefunItem}.
+     * 
+     * @return A {@link Set} of every {@link ItemSetting} for this {@link SlimefunItem}
+     */
+    public @Nonnull Set&lt;ItemSetting&lt;?&gt;&gt; getItemSettings() {
+<span class="fc" id="L279">        return itemSettings;</span>
+    }
+
+    /**
+     * This method returns an {@link Optional} holding an {@link ItemSetting} with the given
+     * key and data type. Or an empty {@link Optional} if this {@link SlimefunItem} has no such {@link ItemSetting}.
+     * 
+     * @param &lt;T&gt;
+     *            The Type of value stored in this {@link ItemSetting}
+     * @param key
+     *            The key of this {@link ItemSetting}
+     * @param c
+     *            The {@link Class} of the type of value stored by this setting
+     * 
+     * @return An {@link Optional} describing the result
+     */
+    @SuppressWarnings(&quot;unchecked&quot;)
+    public @Nonnull &lt;T&gt; Optional&lt;ItemSetting&lt;T&gt;&gt; getItemSetting(@Nonnull String key, @Nonnull Class&lt;T&gt; c) {
+<span class="fc bfc" id="L297" title="All 2 branches covered.">        for (ItemSetting&lt;?&gt; setting : itemSettings) {</span>
+<span class="fc bfc" id="L298" title="All 4 branches covered.">            if (setting.getKey().equals(key) &amp;&amp; setting.isType(c)) {</span>
+<span class="fc" id="L299">                return Optional.of((ItemSetting&lt;T&gt;) setting);</span>
+            }
+<span class="fc" id="L301">        }</span>
+
+<span class="fc" id="L303">        return Optional.empty();</span>
+    }
+
+    /**
+     * This returns whether or not this {@link SlimefunItem} is allowed to be used in
+     * an {@link AutoEnchanter}.
+     * 
+     * @return Whether this {@link SlimefunItem} can be enchanted.
+     */
+    public boolean isEnchantable() {
+<span class="nc" id="L313">        return enchantable;</span>
+    }
+
+    /**
+     * This returns whether or not this {@link SlimefunItem} is allowed to be used in
+     * an {@link AutoDisenchanter}.
+     * 
+     * @return Whether this {@link SlimefunItem} can be disenchanted.
+     */
+    public boolean isDisenchantable() {
+<span class="nc" id="L323">        return disenchantable;</span>
+    }
+
+    /**
+     * This method returns whether this {@link SlimefunItem} was hidden from the
+     * {@link SlimefunGuide}.
+     * 
+     * @return Whether this {@link SlimefunItem} is hidden.
+     */
+    public final boolean isHidden() {
+<span class="fc" id="L333">        return hidden;</span>
+    }
+
+    /**
+     * This method will forcefully hide this {@link SlimefunItem} from the {@link SlimefunGuide}.
+     * 
+     * @param hidden
+     *            Whether to hide this {@link SlimefunItem} or not
+     */
+    public void setHidden(boolean hidden) {
+<span class="fc bfc" id="L343" title="All 2 branches covered.">        if (this.hidden != hidden) {</span>
+<span class="fc" id="L344">            this.hidden = hidden;</span>
+
+<span class="fc bfc" id="L346" title="All 2 branches covered.">            if (state == ItemState.ENABLED) {</span>
+<span class="fc bfc" id="L347" title="All 2 branches covered.">                if (hidden) {</span>
+<span class="fc" id="L348">                    itemGroup.remove(this);</span>
+                } else {
+<span class="fc" id="L350">                    itemGroup.add(this);</span>
+                }
+            }
+        }
+<span class="fc" id="L354">    }</span>
+
+    /**
+     * This method returns whether this {@link SlimefunItem} is disabled.
+     * 
+     * @return Whether this {@link SlimefunItem} is disabled.
+     */
+    public boolean isDisabled() {
+<span class="pc bpc" id="L362" title="1 of 2 branches missed.">        if (state == ItemState.UNREGISTERED) {</span>
+<span class="nc" id="L363">            error(&quot;isDisabled() cannot be called before registering the item&quot;, new UnregisteredItemException(this));</span>
+<span class="nc" id="L364">            return false;</span>
+        }
+
+<span class="fc bfc" id="L367" title="All 2 branches covered.">        return state != ItemState.ENABLED;</span>
+    }
+
+    /**
+     * This method returns whether this {@link SlimefunItem} is disabled
+     * for that specific {@link World}.
+     * Note that if the item is disabled globally, this method will still return false.
+     * 
+     * @param world
+     *            The {@link World} to check
+     * 
+     * @return Whether this {@link SlimefunItem} is disabled in that world (or in general).
+     */
+    public boolean isDisabledIn(@Nonnull World world) {
+<span class="pc bpc" id="L381" title="1 of 2 branches missed.">        if (state == ItemState.UNREGISTERED) {</span>
+<span class="nc" id="L382">            error(&quot;isDisabled(World) cannot be called before registering the item&quot;, new UnregisteredItemException(this));</span>
+<span class="nc" id="L383">            return false;</span>
+        }
+
+        // Check if the Item is disabled globally or in this specific world
+<span class="fc bfc" id="L387" title="All 4 branches covered.">        return isDisabled() || !Slimefun.getWorldSettingsService().isEnabled(world, this);</span>
+    }
+
+    /**
+     * This method returns the {@link SlimefunAddon} that registered this
+     * {@link SlimefunItem}. If this Item is from Slimefun itself, the current
+     * instance of {@link Slimefun} will be returned.
+     * Use an instanceof check to account for that.
+     * 
+     * @return The {@link SlimefunAddon} that registered this {@link SlimefunItem}
+     */
+    public final @Nonnull SlimefunAddon getAddon() {
+<span class="fc bfc" id="L399" title="All 2 branches covered.">        if (addon == null) {</span>
+<span class="fc" id="L400">            throw new UnregisteredItemException(this);</span>
+        }
+
+<span class="fc" id="L403">        return addon;</span>
+    }
+
+    public BlockTicker getBlockTicker() {
+<span class="nc" id="L407">        return blockTicker;</span>
+    }
+
+    /**
+     * This method registers this {@link SlimefunItem}.
+     * Always call this method after your {@link SlimefunItem} has been initialized.
+     * Never call it more than once!
+     * 
+     * @param addon
+     *            The {@link SlimefunAddon} that this {@link SlimefunItem} belongs to.
+     */
+    public void register(@Nonnull SlimefunAddon addon) {
+<span class="fc" id="L419">        Validate.notNull(addon, &quot;A SlimefunAddon cannot be null!&quot;);</span>
+<span class="fc" id="L420">        Validate.notNull(addon.getJavaPlugin(), &quot;SlimefunAddon#getJavaPlugin() is not allowed to return null!&quot;);</span>
+
+<span class="fc" id="L422">        this.addon = addon;</span>
+
+        try {
+<span class="fc" id="L425">            checkDependencies(addon);</span>
+<span class="fc" id="L426">            checkForConflicts();</span>
+
+<span class="fc" id="L428">            preRegister();</span>
+
+<span class="pc bpc" id="L430" title="1 of 2 branches missed.">            if (recipe == null) {</span>
+<span class="nc" id="L431">                recipe = new ItemStack[9];</span>
+<span class="pc bpc" id="L432" title="1 of 2 branches missed.">            } else if (recipe.length &lt; 9) {</span>
+<span class="nc" id="L433">                recipe = Arrays.copyOf(recipe, 9);</span>
+            }
+
+<span class="fc" id="L436">            Slimefun.getRegistry().getAllSlimefunItems().add(this);</span>
+<span class="fc" id="L437">            Slimefun.getRegistry().getSlimefunItemIds().put(id, this);</span>
+
+            // Items that are &quot;not-configurable&quot; cannot be configured.
+<span class="fc bfc" id="L440" title="All 2 branches covered.">            if (!(this instanceof NotConfigurable)) {</span>
+<span class="fc" id="L441">                Slimefun.getItemCfg().setDefaultValue(id + &quot;.enabled&quot;, true);</span>
+<span class="fc" id="L442">                Slimefun.getItemCfg().setDefaultValue(id + &quot;.can-be-used-in-workbenches&quot;, useableInWorkbench);</span>
+<span class="fc" id="L443">                Slimefun.getItemCfg().setDefaultValue(id + &quot;.hide-in-guide&quot;, hidden);</span>
+<span class="fc" id="L444">                Slimefun.getItemCfg().setDefaultValue(id + &quot;.allow-enchanting&quot;, enchantable);</span>
+<span class="fc" id="L445">                Slimefun.getItemCfg().setDefaultValue(id + &quot;.allow-disenchanting&quot;, disenchantable);</span>
+
+                // Load all item settings
+<span class="fc bfc" id="L448" title="All 2 branches covered.">                for (ItemSetting&lt;?&gt; setting : itemSettings) {</span>
+<span class="fc" id="L449">                    setting.reload();</span>
+<span class="fc" id="L450">                }</span>
+            }
+
+<span class="pc bpc" id="L453" title="1 of 4 branches missed.">            if (ticking &amp;&amp; !Slimefun.getCfg().getBoolean(&quot;URID.enable-tickers&quot;)) {</span>
+<span class="fc" id="L454">                state = ItemState.DISABLED;</span>
+<span class="fc" id="L455">                return;</span>
+            }
+
+<span class="fc bfc" id="L458" title="All 2 branches covered.">            if (this instanceof NotConfigurable) {</span>
+                /*
+                 * Not-configurable items will be enabled.
+                 * Any other settings will remain as default.
+                 */
+<span class="fc" id="L463">                state = ItemState.ENABLED;</span>
+<span class="fc bfc" id="L464" title="All 2 branches covered.">            } else if (Slimefun.getItemCfg().getBoolean(id + &quot;.enabled&quot;)) {</span>
+                // The item has been enabled.
+<span class="fc" id="L466">                state = ItemState.ENABLED;</span>
+<span class="fc" id="L467">                useableInWorkbench = Slimefun.getItemCfg().getBoolean(id + &quot;.can-be-used-in-workbenches&quot;);</span>
+<span class="fc" id="L468">                hidden = Slimefun.getItemCfg().getBoolean(id + &quot;.hide-in-guide&quot;);</span>
+<span class="fc" id="L469">                enchantable = Slimefun.getItemCfg().getBoolean(id + &quot;.allow-enchanting&quot;);</span>
+<span class="fc" id="L470">                disenchantable = Slimefun.getItemCfg().getBoolean(id + &quot;.allow-disenchanting&quot;);</span>
+<span class="fc bfc" id="L471" title="All 2 branches covered.">            } else if (this instanceof VanillaItem) {</span>
+                // This item is a vanilla &quot;mock&quot; but was disabled.
+<span class="fc" id="L473">                state = ItemState.VANILLA_FALLBACK;</span>
+            } else {
+                // The item has been disabled.
+<span class="fc" id="L476">                state = ItemState.DISABLED;</span>
+            }
+
+            // Now we can be certain this item should be enabled
+<span class="fc bfc" id="L480" title="All 2 branches covered.">            if (state == ItemState.ENABLED) {</span>
+<span class="fc" id="L481">                onEnable();</span>
+            }
+
+            // Lock the SlimefunItemStack from any accidental manipulations
+<span class="pc bpc" id="L485" title="1 of 4 branches missed.">            if (itemStackTemplate instanceof SlimefunItemStack stack &amp;&amp; isItemStackImmutable()) {</span>
+<span class="fc" id="L486">                stack.lock();</span>
+            }
+
+<span class="fc" id="L489">            postRegister();</span>
+
+            // handle runtime-registrations / auto-loading
+<span class="pc bpc" id="L492" title="3 of 4 branches missed.">            if (Slimefun.getRegistry().isAutoLoadingEnabled() &amp;&amp; state == ItemState.ENABLED) {</span>
+<span class="nc" id="L493">                info(&quot;Item was registered during runtime.&quot;);</span>
+<span class="nc" id="L494">                load();</span>
+            }
+<span class="fc" id="L496">        } catch (Exception x) {</span>
+<span class="nc" id="L497">            error(&quot;Registering &quot; + toString() + &quot; has failed!&quot;, x);</span>
+<span class="fc" id="L498">        }</span>
+<span class="fc" id="L499">    }</span>
+
+    /**
+     * This method is called when this {@link SlimefunItem} is currently being registered
+     * and we are certain that it will be enabled.
+     * 
+     * &lt;strong&gt;This method is for internal purposes, like {@link ItemGroup} registration only&lt;/strong&gt;
+     */
+    private final void onEnable() {
+        // Register the ItemGroup too if it hasn't been registered yet
+<span class="fc bfc" id="L509" title="All 2 branches covered.">        if (!itemGroup.isRegistered()) {</span>
+<span class="fc" id="L510">            itemGroup.register(addon);</span>
+        }
+
+        // Send out deprecation warnings for any classes or interfaces
+<span class="fc" id="L514">        checkForDeprecations(getClass());</span>
+
+        // Check for an illegal stack size
+<span class="pc bpc" id="L517" title="1 of 2 branches missed.">        if (itemStackTemplate.getAmount() != 1) {</span>
+            // @formatter:off
+<span class="nc" id="L519">            warn(&quot;This item has an illegal stack size: &quot; + itemStackTemplate.getAmount()</span>
+<span class="nc" id="L520">                + &quot;. An Item size of 1 is recommended. Please inform the author(s) of &quot; + addon.getName()</span>
+                + &quot; to fix this. Crafting Results with amounts of higher should be handled&quot;
+                + &quot; via the recipeOutput parameter!&quot;);
+            // @formatter:on
+        }
+
+        // Add it to the list of enabled items
+<span class="fc" id="L527">        Slimefun.getRegistry().getEnabledSlimefunItems().add(this);</span>
+
+        // Load our Item Handlers
+<span class="fc" id="L530">        loadItemHandlers();</span>
+
+        // Properly mark this Item as radioactive
+<span class="fc bfc" id="L533" title="All 2 branches covered.">        if (this instanceof Radioactive) {</span>
+<span class="fc" id="L534">            Slimefun.getRegistry().getRadioactiveItems().add(this);</span>
+        }
+<span class="fc" id="L536">    }</span>
+
+    private void loadItemHandlers() {
+<span class="fc bfc" id="L539" title="All 2 branches covered.">        for (ItemHandler handler : itemhandlers.values()) {</span>
+<span class="fc" id="L540">            Optional&lt;IncompatibleItemHandlerException&gt; exception = handler.validate(this);</span>
+
+            // Check if the validation caused an exception.
+<span class="pc bpc" id="L543" title="1 of 2 branches missed.">            if (exception.isPresent()) {</span>
+<span class="nc" id="L544">                throw exception.get();</span>
+            } else {
+                /*
+                 * Make developers or at least Server admins aware that an Item
+                 * is using a deprecated ItemHandler
+                 */
+<span class="fc" id="L550">                checkForDeprecations(handler.getClass());</span>
+            }
+
+            /*
+             * If this ItemHandler is &quot;global&quot; (not bound to this SlimefunItem),
+             * we add it to the list of global Item handlers
+             */
+<span class="fc bfc" id="L557" title="All 2 branches covered.">            if (handler instanceof GlobalItemHandler) {</span>
+<span class="fc" id="L558">                SlimefunRegistry registry = Slimefun.getRegistry();</span>
+<span class="fc" id="L559">                registry.getGlobalItemHandlers(handler.getIdentifier()).add(handler);</span>
+            }
+<span class="fc" id="L561">        }</span>
+<span class="fc" id="L562">    }</span>
+
+    /**
+     * This method returns whether the original {@link SlimefunItemStack} of this
+     * {@link SlimefunItem} is immutable.
+     * 
+     * If &lt;code&gt;true&lt;/code&gt; is returned, then any changes to the original {@link SlimefunItemStack}
+     * will be rejected with a {@link WrongItemStackException}.
+     * This ensures integrity so developers don't accidentally damage the wrong {@link ItemStack}.
+     * 
+     * @return Whether the original {@link SlimefunItemStack} is immutable.
+     */
+    protected boolean isItemStackImmutable() {
+<span class="fc" id="L575">        return true;</span>
+    }
+
+    /**
+     * This method checks if the dependencies have been set up correctly.
+     * 
+     * @param addon
+     *            The {@link SlimefunAddon} trying to register this {@link SlimefunItem}
+     */
+    private void checkDependencies(@Nonnull SlimefunAddon addon) {
+<span class="pc bpc" id="L585" title="1 of 2 branches missed.">        if (!addon.hasDependency(&quot;Slimefun&quot;)) {</span>
+<span class="nc" id="L586">            throw new MissingDependencyException(addon, &quot;Slimefun&quot;);</span>
+        }
+<span class="fc" id="L588">    }</span>
+
+    /**
+     * This method checks for id conflicts.
+     */
+    private void checkForConflicts() {
+<span class="fc" id="L594">        SlimefunItem conflictingItem = getById(id);</span>
+
+<span class="fc bfc" id="L596" title="All 2 branches covered.">        if (conflictingItem != null) {</span>
+<span class="fc" id="L597">            throw new IdConflictException(this, conflictingItem);</span>
+        }
+<span class="fc" id="L599">    }</span>
+
+    /**
+     * This method checks recursively for all {@link Class} parents to look for any {@link Deprecated}
+     * elements.
+     * 
+     * If a {@link Deprecated} element was found, a warning message will be printed.
+     * 
+     * @param c
+     *            The {@link Class} from which to start this operation.
+     */
+    private void checkForDeprecations(@Nullable Class&lt;?&gt; c) {
+<span class="pc bpc" id="L611" title="1 of 2 branches missed.">        if (Slimefun.getUpdater().getBranch() == SlimefunBranch.DEVELOPMENT) {</span>
+            /*
+             * This method is currently way too spammy with all the restructuring going on...
+             * Since DEV builds are anyway under &quot;development&quot;, things may be relocated.
+             * So we fire these only for stable versions, since devs should update then, so
+             * it's the perfect moment to tell them to act.
+             */
+<span class="nc" id="L618">            return;</span>
+        }
+
+        /*
+         * We do not wanna throw an Exception here since this could also mean that.
+         * We have reached the end of the Class hierarchy
+         */
+<span class="fc bfc" id="L625" title="All 2 branches covered.">        if (c != null) {</span>
+            // Check if this Class is deprecated
+<span class="pc bpc" id="L627" title="1 of 2 branches missed.">            if (c.isAnnotationPresent(Deprecated.class)) {</span>
+<span class="nc" id="L628">                warn(&quot;The inherited Class \&quot;&quot; + c.getName() + &quot;\&quot; has been deprecated. Check the documentation for more details!&quot;);</span>
+            }
+
+<span class="fc bfc" id="L631" title="All 2 branches covered.">            for (Class&lt;?&gt; parent : c.getInterfaces()) {</span>
+                // Check if this Interface is deprecated
+<span class="pc bpc" id="L633" title="1 of 2 branches missed.">                if (parent.isAnnotationPresent(Deprecated.class)) {</span>
+<span class="nc" id="L634">                    warn(&quot;The implemented Interface \&quot;&quot; + parent.getName() + &quot;\&quot; has been deprecated. Check the documentation for more details!&quot;);</span>
+                }
+            }
+
+            // Recursively lookup the super class
+<span class="fc" id="L639">            checkForDeprecations(c.getSuperclass());</span>
+        }
+<span class="fc" id="L641">    }</span>
+
+    /**
+     * This method will set the {@link Research} of this {@link SlimefunItem}.
+     * You don't have to call this method if your {@link SlimefunItem} was linked to your {@link Research}
+     * using {@link Research#addItems(SlimefunItem...)}
+     * 
+     * @param research
+     *            The new {@link Research} for this {@link SlimefunItem}, or null
+     */
+    public void setResearch(@Nullable Research research) {
+<span class="fc bfc" id="L652" title="All 2 branches covered.">        if (this.research != null) {</span>
+<span class="fc" id="L653">            this.research.getAffectedItems().remove(this);</span>
+        }
+
+<span class="fc bfc" id="L656" title="All 2 branches covered.">        if (research != null) {</span>
+<span class="fc" id="L657">            research.getAffectedItems().add(this);</span>
+        }
+
+<span class="fc" id="L660">        this.research = research;</span>
+<span class="fc" id="L661">    }</span>
+
+    /**
+     * Sets the recipe for this {@link SlimefunItem}.
+     *
+     * @param recipe
+     *            The recipe for this {@link ItemStack}
+     */
+    public void setRecipe(@Nonnull ItemStack[] recipe) {
+<span class="fc bfc" id="L670" title="All 4 branches covered.">        if (recipe == null || recipe.length != 9) {</span>
+<span class="fc" id="L671">            throw new IllegalArgumentException(&quot;Recipes must be of length 9&quot;);</span>
+        }
+
+<span class="fc" id="L674">        this.recipe = recipe;</span>
+<span class="fc" id="L675">    }</span>
+
+    /**
+     * Sets the {@link RecipeType} for this {@link SlimefunItem}.
+     *
+     * @param type
+     *            The {@link RecipeType} for this {@link SlimefunItem}
+     */
+    public void setRecipeType(@Nonnull RecipeType type) {
+<span class="fc" id="L684">        Validate.notNull(type, &quot;The RecipeType is not allowed to be null!&quot;);</span>
+<span class="fc" id="L685">        this.recipeType = type;</span>
+<span class="fc" id="L686">    }</span>
+
+    /**
+     * This sets the {@link ItemGroup} in which this {@link SlimefunItem} will be displayed.
+     * 
+     * @param itemGroup
+     *            The new {@link ItemGroup}
+     */
+    public void setItemGroup(@Nonnull ItemGroup itemGroup) {
+<span class="fc" id="L695">        Validate.notNull(itemGroup, &quot;The ItemGroup is not allowed to be null!&quot;);</span>
+
+<span class="fc" id="L697">        this.itemGroup.remove(this);</span>
+<span class="fc" id="L698">        itemGroup.add(this);</span>
+
+<span class="fc" id="L700">        this.itemGroup = itemGroup;</span>
+<span class="fc" id="L701">    }</span>
+
+    /**
+     * This method will set the result of crafting this {@link SlimefunItem}.
+     * If null is passed, then it will use the default item as the recipe result.
+     * 
+     * @param output
+     *            The {@link ItemStack} that will be the result of crafting this {@link SlimefunItem}
+     */
+    public void setRecipeOutput(@Nullable ItemStack output) {
+<span class="fc" id="L711">        this.recipeOutput = output;</span>
+<span class="fc" id="L712">    }</span>
+
+    /**
+     * This method returns whether or not this {@link SlimefunItem} is allowed to
+     * be used in a Crafting Table.
+     * 
+     * Items of type {@link VanillaItem} may be used in workbenches for example.
+     * 
+     * @see #setUseableInWorkbench(boolean)
+     * 
+     * @return Whether this {@link SlimefunItem} may be used in a Workbench.
+     */
+    public boolean isUseableInWorkbench() {
+<span class="fc" id="L725">        return useableInWorkbench;</span>
+    }
+
+    /**
+     * This sets whether or not this {@link SlimefunItem} is allowed to be
+     * used in a normal Crafting Table.
+     * 
+     * @param useable
+     *            Whether this {@link SlimefunItem} should be useable in a workbench
+     * 
+     * @return This instance of {@link SlimefunItem}
+     */
+    public @Nonnull SlimefunItem setUseableInWorkbench(boolean useable) {
+<span class="fc" id="L738">        this.useableInWorkbench = useable;</span>
+
+<span class="fc" id="L740">        return this;</span>
+    }
+
+    /**
+     * This method checks whether the provided {@link ItemStack} represents
+     * this {@link SlimefunItem}.
+     * 
+     * @param item
+     *            The {@link ItemStack} to compare
+     * 
+     * @return Whether the given {@link ItemStack} represents this {@link SlimefunItem}
+     */
+    public boolean isItem(@Nullable ItemStack item) {
+<span class="fc bfc" id="L753" title="All 2 branches covered.">        if (item == null) {</span>
+<span class="fc" id="L754">            return false;</span>
+        }
+
+        // If the given item is a SlimefunitemStack, simply compare the id
+<span class="fc bfc" id="L758" title="All 2 branches covered.">        if (item instanceof SlimefunItemStack stack) {</span>
+<span class="fc" id="L759">            return getId().equals(stack.getItemId());</span>
+        }
+
+<span class="fc bfc" id="L762" title="All 2 branches covered.">        if (item.hasItemMeta()) {</span>
+<span class="fc" id="L763">            Optional&lt;String&gt; itemId = Slimefun.getItemDataService().getItemData(item);</span>
+
+<span class="fc bfc" id="L765" title="All 2 branches covered.">            if (itemId.isPresent()) {</span>
+<span class="fc" id="L766">                return getId().equals(itemId.get());</span>
+            }
+        }
+
+        // Backwards compatibility
+<span class="fc bfc" id="L771" title="All 2 branches covered.">        if (Slimefun.getRegistry().isBackwardsCompatible()) {</span>
+<span class="pc bpc" id="L772" title="4 of 8 branches missed.">            boolean loreInsensitive = this instanceof Rechargeable || this instanceof SlimefunBackpack || id.equals(&quot;BROKEN_SPAWNER&quot;) || id.equals(&quot;REINFORCED_SPAWNER&quot;);</span>
+<span class="pc bpc" id="L773" title="1 of 2 branches missed.">            return SlimefunUtils.isItemSimilar(item, this.itemStackTemplate, !loreInsensitive);</span>
+        } else {
+<span class="fc" id="L775">            return false;</span>
+        }
+    }
+
+    /**
+     * This method is used for internal purposes only.
+     */
+    public void load() {
+<span class="fc bfc" id="L783" title="All 2 branches covered.">        if (!hidden) {</span>
+<span class="fc" id="L784">            itemGroup.add(this);</span>
+        }
+
+<span class="fc" id="L787">        recipeType.register(recipe, getRecipeOutput());</span>
+<span class="fc" id="L788">    }</span>
+
+    /**
+     * This method will add any given {@link ItemHandler} to this {@link SlimefunItem}.
+     * Note that this will not work after the {@link SlimefunItem} was registered.
+     * 
+     * @param handlers
+     *            Any {@link ItemHandler} that should be added to this {@link SlimefunItem}
+     */
+    public final void addItemHandler(ItemHandler... handlers) {
+<span class="fc" id="L798">        Validate.notEmpty(handlers, &quot;You cannot add zero handlers...&quot;);</span>
+<span class="fc" id="L799">        Validate.noNullElements(handlers, &quot;You cannot add any 'null' ItemHandler!&quot;);</span>
+
+        // Make sure they are added before the item was registered.
+<span class="fc bfc" id="L802" title="All 2 branches covered.">        if (state != ItemState.UNREGISTERED) {</span>
+<span class="fc" id="L803">            throw new UnsupportedOperationException(&quot;You cannot add an ItemHandler after the SlimefunItem was registered.&quot;);</span>
+        }
+
+<span class="fc bfc" id="L806" title="All 2 branches covered.">        for (ItemHandler handler : handlers) {</span>
+<span class="fc" id="L807">            itemhandlers.put(handler.getIdentifier(), handler);</span>
+
+            // Tickers are a special case (at the moment at least)
+<span class="fc bfc" id="L810" title="All 2 branches covered.">            if (handler instanceof BlockTicker ticker) {</span>
+<span class="fc" id="L811">                ticking = true;</span>
+<span class="fc" id="L812">                Slimefun.getRegistry().getTickerBlocks().add(getId());</span>
+<span class="fc" id="L813">                blockTicker = ticker;</span>
+            }
+        }
+<span class="fc" id="L816">    }</span>
+
+    /**
+     * This method will add any given {@link ItemSetting} to this {@link SlimefunItem}.
+     * Note that this will not work after the {@link SlimefunItem} was registered.
+     * 
+     * @param settings
+     *            Any {@link ItemSetting} that should be added to this {@link SlimefunItem}
+     */
+    public final void addItemSetting(ItemSetting&lt;?&gt;... settings) {
+<span class="fc" id="L826">        Validate.notEmpty(settings, &quot;You cannot add zero settings...&quot;);</span>
+<span class="fc" id="L827">        Validate.noNullElements(settings, &quot;You cannot add any 'null' ItemSettings!&quot;);</span>
+
+<span class="fc bfc" id="L829" title="All 2 branches covered.">        if (state != ItemState.UNREGISTERED) {</span>
+<span class="fc" id="L830">            throw new UnsupportedOperationException(&quot;You cannot add an ItemSetting after the SlimefunItem was registered.&quot;);</span>
+        }
+
+<span class="pc bpc" id="L833" title="1 of 2 branches missed.">        if (this instanceof NotConfigurable) {</span>
+<span class="nc" id="L834">            throw new UnsupportedOperationException(&quot;This Item has been marked as NotConfigurable and cannot accept Item Settings!&quot;);</span>
+        }
+
+<span class="fc bfc" id="L837" title="All 2 branches covered.">        for (ItemSetting&lt;?&gt; setting : settings) {</span>
+<span class="pc bpc" id="L838" title="1 of 2 branches missed.">            if (setting != null) {</span>
+                // Prevent two Item Settings with the same key
+<span class="fc bfc" id="L840" title="All 2 branches covered.">                for (ItemSetting&lt;?&gt; existingSetting : itemSettings) {</span>
+<span class="fc bfc" id="L841" title="All 2 branches covered.">                    if (existingSetting.getKey().equals(setting.getKey())) {</span>
+<span class="fc" id="L842">                        throw new IllegalArgumentException(&quot;This Item has already an ItemSetting with this key: &quot; + setting.getKey());</span>
+                    }
+<span class="fc" id="L844">                }</span>
+
+<span class="fc" id="L846">                itemSettings.add(setting);</span>
+            }
+        }
+<span class="fc" id="L849">    }</span>
+
+    /**
+     * This method is called before {@link #register(SlimefunAddon)}.
+     * Override this method to add any additional setup, adding an {@link ItemHandler} for example.
+     */
+    public void preRegister() {
+        // Override this method to execute code before the Item has been registered
+        // Useful for calls to addItemHandler(...)
+<span class="fc" id="L858">    }</span>
+
+    /**
+     * This method is called after {@link #register(SlimefunAddon)}.
+     * Override this method to add any additional setup that needs to happen after
+     * the original registration of this {@link SlimefunItem}.
+     */
+    public void postRegister() {
+        // Override this method to execute code after the Item has been registered
+        // Useful for calls to Slimefun.getItemValue(...)
+<span class="fc" id="L868">    }</span>
+
+    /**
+     * This method will assign the given wiki page to this Item.
+     * Note that you only need to provide the page name itself,
+     * the URL to our wiki is prepended automatically.
+     * 
+     * @param page
+     *            The associated wiki page
+     */
+    public final void addOfficialWikipage(@Nonnull String page) {
+<span class="fc" id="L879">        Validate.notNull(page, &quot;Wiki page cannot be null.&quot;);</span>
+<span class="fc" id="L880">        wikiURL = Optional.of(&quot;https://github.com/Slimefun/Slimefun4/wiki/&quot; + page);</span>
+<span class="fc" id="L881">    }</span>
+
+    /**
+     * This method returns the wiki page that has been assigned to this item.
+     * It will return null, if no wiki page was found.
+     * 
+     * @see SlimefunItem#addOfficialWikipage(String)
+     * 
+     * @return This item's wiki page
+     */
+    public @Nonnull Optional&lt;String&gt; getWikipage() {
+<span class="fc" id="L892">        return wikiURL;</span>
+    }
+
+    /**
+     * This method will return this Item's Name (The name that is displayed when
+     * hovering over this {@link ItemStack} in an {@link Inventory}).
+     * 
+     * @return This item's name in {@link ItemStack} form
+     */
+    public final @Nonnull String getItemName() {
+<span class="pc bpc" id="L902" title="1 of 2 branches missed.">        if (itemStackTemplate instanceof SlimefunItemStack) {</span>
+<span class="fc" id="L903">            Optional&lt;String&gt; name = ((SlimefunItemStack) itemStackTemplate).getItemMetaSnapshot().getDisplayName();</span>
+
+<span class="pc bpc" id="L905" title="1 of 2 branches missed.">            if (name.isPresent()) {</span>
+<span class="fc" id="L906">                return name.get();</span>
+            }
+        }
+
+<span class="nc" id="L910">        return ItemUtils.getItemName(itemStackTemplate);</span>
+    }
+
+    /**
+     * This method returns a Set of item handlers associated with this Item.
+     * 
+     * @return The Set of item handlers
+     */
+    public @Nonnull Collection&lt;ItemHandler&gt; getHandlers() {
+<span class="fc" id="L919">        return itemhandlers.values();</span>
+    }
+
+    /**
+     * This method calls every {@link ItemHandler} of the given {@link Class}
+     * and performs the action as specified via the {@link Consumer}.
+     * 
+     * @param c
+     *            The {@link Class} of the {@link ItemHandler} to call.
+     * @param callable
+     *            A {@link Consumer} that is called for any found {@link ItemHandler}.
+     * @param &lt;T&gt;
+     *            The type of {@link ItemHandler} to call.
+     * 
+     * @return Whether or not an {@link ItemHandler} was found.
+     */
+    @ParametersAreNonnullByDefault
+    public &lt;T extends ItemHandler&gt; boolean callItemHandler(Class&lt;T&gt; c, Consumer&lt;T&gt; callable) {
+<span class="fc" id="L937">        Optional&lt;ItemHandler&gt; handler = itemhandlers.get(c);</span>
+
+<span class="fc bfc" id="L939" title="All 2 branches covered.">        if (handler.isPresent()) {</span>
+            try {
+<span class="fc" id="L941">                callable.accept(c.cast(handler.get()));</span>
+<span class="nc" id="L942">            } catch (Exception | LinkageError x) {</span>
+<span class="nc" id="L943">                error(&quot;Could not pass \&quot;&quot; + c.getSimpleName() + &quot;\&quot; for &quot; + toString(), x);</span>
+<span class="fc" id="L944">            }</span>
+
+<span class="fc" id="L946">            return true;</span>
+        }
+
+<span class="fc" id="L949">        return false;</span>
+    }
+
+    /**
+     * This returns whether or not we are scheduling a ticking task for this block.
+     * 
+     * @return Whether this {@link SlimefunItem} is a ticking block
+     */
+    public boolean isTicking() {
+<span class="nc" id="L958">        return ticking;</span>
+    }
+
+    @Override
+    public String toString() {
+<span class="fc bfc" id="L963" title="All 2 branches covered.">        if (addon == null) {</span>
+<span class="fc" id="L964">            return getClass().getSimpleName() + &quot; - '&quot; + id + &quot;'&quot;;</span>
+        } else {
+<span class="fc" id="L966">            return getClass().getSimpleName() + &quot; - '&quot; + id + &quot;' (&quot; + addon.getName() + &quot; v&quot; + addon.getPluginVersion() + ')';</span>
+        }
+    }
+
+    @Override
+    public @Nonnull Collection&lt;ItemStack&gt; getDrops() {
+<span class="nc" id="L972">        return Arrays.asList(itemStackTemplate.clone());</span>
+    }
+
+    @Override
+    public @Nonnull Collection&lt;ItemStack&gt; getDrops(Player p) {
+<span class="nc" id="L977">        return getDrops();</span>
+    }
+
+    /**
+     * This will send an info message to the console and signal that this message came
+     * from this {@link SlimefunItem}, the message will be sent using the {@link Logger}
+     * of the {@link SlimefunAddon} which registered this {@link SlimefunItem}.
+     * 
+     * @param message
+     *            The message to send
+     */
+    @ParametersAreNonnullByDefault
+    public void info(String message) {
+<span class="nc" id="L990">        Validate.notNull(addon, &quot;Cannot log a message for an unregistered item!&quot;);</span>
+
+<span class="nc" id="L992">        String msg = toString() + &quot;: &quot; + message;</span>
+<span class="nc" id="L993">        addon.getLogger().log(Level.INFO, msg);</span>
+<span class="nc" id="L994">    }</span>
+
+    /**
+     * This will send a warning to the console and signal that this warning came from
+     * this {@link SlimefunItem}, the warning will be sent using the {@link Logger}
+     * of the {@link SlimefunAddon} which registered this {@link SlimefunItem}.
+     * 
+     * @param message
+     *            The message to send
+     */
+    @ParametersAreNonnullByDefault
+    public void warn(String message) {
+<span class="nc" id="L1006">        Validate.notNull(addon, &quot;Cannot send a warning for an unregistered item!&quot;);</span>
+
+<span class="nc" id="L1008">        String msg = toString() + &quot;: &quot; + message;</span>
+<span class="nc" id="L1009">        addon.getLogger().log(Level.WARNING, msg);</span>
+
+<span class="nc bnc" id="L1011" title="All 2 branches missed.">        if (addon.getBugTrackerURL() != null) {</span>
+            // We can prompt the server operator to report it to the addon's bug tracker
+<span class="nc" id="L1013">            addon.getLogger().log(Level.WARNING, &quot;You can report this warning here: {0}&quot;, addon.getBugTrackerURL());</span>
+        }
+<span class="nc" id="L1015">    }</span>
+
+    /**
+     * This will throw a {@link Throwable} to the console and signal that
+     * this was caused by this {@link SlimefunItem}.
+     * 
+     * @param message
+     *            The message to display alongside this Stacktrace
+     * @param throwable
+     *            The {@link Throwable} to throw as a stacktrace.
+     */
+    @ParametersAreNonnullByDefault
+    public void error(String message, Throwable throwable) {
+<span class="fc" id="L1028">        Validate.notNull(addon, &quot;Cannot send an error for an unregistered item!&quot;);</span>
+<span class="fc" id="L1029">        addon.getLogger().log(Level.SEVERE, &quot;Item \&quot;{0}\&quot; from {1} v{2} has caused an Error!&quot;, new Object[] { id, addon.getName(), addon.getPluginVersion() });</span>
+
+<span class="pc bpc" id="L1031" title="1 of 2 branches missed.">        if (addon.getBugTrackerURL() != null) {</span>
+            // We can prompt the server operator to report it to the addon's bug tracker
+<span class="fc" id="L1033">            addon.getLogger().log(Level.SEVERE, &quot;You can report it here: {0}&quot;, addon.getBugTrackerURL());</span>
+        }
+
+<span class="fc" id="L1036">        addon.getLogger().log(Level.SEVERE, message, throwable);</span>
+
+        // We definitely want to re-throw them during Unit Tests
+<span class="pc bpc" id="L1039" title="2 of 4 branches missed.">        if (throwable instanceof RuntimeException e &amp;&amp; Slimefun.getMinecraftVersion() == MinecraftVersion.UNIT_TEST) {</span>
+<span class="fc" id="L1040">            throw e;</span>
+        }
+<span class="nc" id="L1042">    }</span>
+
+    /**
+     * This method informs the given {@link Player} that this {@link SlimefunItem}
+     * will be removed soon.
+     * 
+     * @param player
+     *            The {@link Player} to inform.
+     */
+    @ParametersAreNonnullByDefault
+    public void sendDeprecationWarning(Player player) {
+<span class="nc" id="L1053">        Validate.notNull(player, &quot;The Player must not be null.&quot;);</span>
+<span class="nc" id="L1054">        Slimefun.getLocalization().sendMessage(player, &quot;messages.deprecated-item&quot;);</span>
+<span class="nc" id="L1055">    }</span>
+
+    /**
+     * This method checks if the given {@link Player} is able to use this {@link SlimefunItem}.
+     * A {@link Player} can use it if the following conditions apply:
+     * 
+     * &lt;ul&gt;
+     * &lt;li&gt;The {@link SlimefunItem} is not disabled
+     * &lt;li&gt;The {@link SlimefunItem} was not disabled for that {@link Player}'s {@link World}.
+     * &lt;li&gt;The {@link Player} has the required {@link Permission} (if present)
+     * &lt;li&gt;The {@link Player} has unlocked the required {@link Research} (if present)
+     * &lt;/ul&gt;
+     * 
+     * If any of these conditions evaluate to &lt;code&gt;false&lt;/code&gt;, then an optional message will be
+     * sent to the {@link Player}.
+     * 
+     * @param p
+     *            The {@link Player} to check
+     * @param sendMessage
+     *            Whether to send that {@link Player} a message response.
+     * 
+     * @return Whether this {@link Player} is able to use this {@link SlimefunItem}.
+     */
+    public boolean canUse(@Nonnull Player p, boolean sendMessage) {
+<span class="fc" id="L1079">        Validate.notNull(p, &quot;The Player cannot be null!&quot;);</span>
+
+<span class="pc bpc" id="L1081" title="1 of 2 branches missed.">        if (getState() == ItemState.VANILLA_FALLBACK) {</span>
+            // Vanilla items (which fell back) can always be used.
+<span class="nc" id="L1083">            return true;</span>
+<span class="pc bpc" id="L1084" title="1 of 2 branches missed.">        } else if (isDisabled()) {</span>
+            // The Item has been disabled in the config
+<span class="nc bnc" id="L1086" title="All 2 branches missed.">            if (sendMessage) {</span>
+<span class="nc" id="L1087">                Slimefun.getLocalization().sendMessage(p, &quot;messages.disabled-item&quot;, true);</span>
+            }
+
+<span class="nc" id="L1090">            return false;</span>
+<span class="pc bpc" id="L1091" title="1 of 2 branches missed.">        } else if (!Slimefun.getWorldSettingsService().isEnabled(p.getWorld(), this)) {</span>
+            // The Item was disabled in the current World
+<span class="nc bnc" id="L1093" title="All 2 branches missed.">            if (sendMessage) {</span>
+<span class="nc" id="L1094">                Slimefun.getLocalization().sendMessage(p, &quot;messages.disabled-in-world&quot;, true);</span>
+            }
+
+<span class="nc" id="L1097">            return false;</span>
+<span class="pc bpc" id="L1098" title="1 of 2 branches missed.">        } else if (!Slimefun.getPermissionsService().hasPermission(p, this)) {</span>
+            // The Player does not have the required permission node
+<span class="nc bnc" id="L1100" title="All 2 branches missed.">            if (sendMessage) {</span>
+<span class="nc" id="L1101">                Slimefun.getLocalization().sendMessage(p, &quot;messages.no-permission&quot;, true);</span>
+            }
+
+<span class="nc" id="L1104">            return false;</span>
+<span class="pc bpc" id="L1105" title="1 of 2 branches missed.">        } else if (hasResearch()) {</span>
+<span class="nc" id="L1106">            Optional&lt;PlayerProfile&gt; profile = PlayerProfile.find(p);</span>
+
+<span class="nc bnc" id="L1108" title="All 2 branches missed.">            if (!profile.isPresent()) {</span>
+                /*
+                 * We will return false since we cannot know the answer yet.
+                 * But we will schedule the Profile for loading and not send
+                 * any message.
+                 */
+<span class="nc" id="L1114">                PlayerProfile.request(p);</span>
+<span class="nc" id="L1115">                return false;</span>
+<span class="nc bnc" id="L1116" title="All 2 branches missed.">            } else if (!profile.get().hasUnlocked(getResearch())) {</span>
+                /*
+                 * The Profile is loaded but Player has not unlocked the
+                 * required Research to use this SlimefunItem.
+                 */
+<span class="nc bnc" id="L1121" title="All 4 branches missed.">                if (sendMessage &amp;&amp; !(this instanceof VanillaItem)) {</span>
+<span class="nc" id="L1122">                    Slimefun.getLocalization().sendMessage(p, &quot;messages.not-researched&quot;, true, s -&gt; s.replace(&quot;%item%&quot;, getItemName()));</span>
+                }
+
+<span class="nc" id="L1125">                return false;</span>
+            } else {
+                /*
+                 * The PlayerProfile is loaded and the Player has unlocked
+                 * the required Research.
+                 */
+<span class="nc" id="L1131">                return true;</span>
+            }
+        } else {
+            // All checks have passed, the Player can use this item.
+<span class="fc" id="L1135">            return true;</span>
+        }
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+<span class="pc bpc" id="L1141" title="1 of 2 branches missed.">        if (obj instanceof SlimefunItem item) {</span>
+<span class="fc" id="L1142">            return item.getId().equals(this.getId());</span>
+        } else {
+<span class="nc" id="L1144">            return false;</span>
+        }
+    }
+
+    @Override
+    public final int hashCode() {
+<span class="fc" id="L1150">        return getId().hashCode();</span>
+    }
+
+    /**
+     * Retrieve a {@link SlimefunItem} by its id.
+     *
+     * @param id
+     *            The id of the {@link SlimefunItem}
+     * @return The {@link SlimefunItem} associated with that id. Null if non-existent
+     */
+    public static @Nullable SlimefunItem getById(@Nonnull String id) {
+<span class="fc" id="L1161">        return Slimefun.getRegistry().getSlimefunItemIds().get(id);</span>
+    }
+
+    /**
+     * Retrieve a {@link SlimefunItem} from an {@link ItemStack}.
+     *
+     * @param item
+     *            The {@link ItemStack} to check
+     * @return The {@link SlimefunItem} associated with this {@link ItemStack} if present, otherwise null
+     */
+    public static @Nullable SlimefunItem getByItem(@Nullable ItemStack item) {
+<span class="pc bpc" id="L1172" title="1 of 4 branches missed.">        if (item == null || item.getType() == Material.AIR) {</span>
+<span class="fc" id="L1173">            return null;</span>
+        }
+
+<span class="fc bfc" id="L1176" title="All 2 branches covered.">        if (item instanceof SlimefunItemStack stack) {</span>
+<span class="fc" id="L1177">            return getById(stack.getItemId());</span>
+        }
+
+<span class="fc" id="L1180">        Optional&lt;String&gt; itemID = Slimefun.getItemDataService().getItemData(item);</span>
+
+<span class="pc bpc" id="L1182" title="1 of 2 branches missed.">        if (itemID.isPresent()) {</span>
+<span class="nc" id="L1183">            return getById(itemID.get());</span>
+        }
+
+        // Backwards compatibility
+<span class="fc bfc" id="L1187" title="All 2 branches covered.">        if (Slimefun.getRegistry().isBackwardsCompatible()) {</span>
+            // This wrapper improves the heavy ItemStack#getItemMeta() call by caching it.
+<span class="fc" id="L1189">            ItemStackWrapper wrapper = ItemStackWrapper.wrap(item);</span>
+
+            /*
+             * Quite expensive performance-wise.
+             * But necessary for supporting legacy items
+             */
+<span class="fc bfc" id="L1195" title="All 2 branches covered.">            for (SlimefunItem sfi : Slimefun.getRegistry().getAllSlimefunItems()) {</span>
+<span class="fc bfc" id="L1196" title="All 2 branches covered.">                if (sfi.isItem(wrapper)) {</span>
+                    /*
+                     * If we have to loop all items for the given item, then at least
+                     * set the id via PersistentDataAPI for future performance boosts
+                     */
+<span class="fc" id="L1201">                    Slimefun.getItemDataService().setItemData(item, sfi.getId());</span>
+
+<span class="fc" id="L1203">                    return sfi;</span>
+                }
+<span class="fc" id="L1205">            }</span>
+        }
+
+<span class="fc" id="L1208">        return null;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

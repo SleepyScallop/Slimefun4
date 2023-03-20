@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElectricPress.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines</a> &gt; <span class="el_source">ElectricPress.java</span></div><h1>ElectricPress.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.RecipeDisplayItem;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
+
+/**
+ * The {@link ElectricPress} is a pretty simple electrical machine.
+ * It allows you to compact items into their block variant, e.g. 9 diamonds into a diamond block.
+ * 
+ * @author TheBusyBiscuit
+ *
+ */
+public class ElectricPress extends AContainer implements RecipeDisplayItem {
+
+    @ParametersAreNonnullByDefault
+    public ElectricPress(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+<span class="fc" id="L30">        super(itemGroup, item, recipeType, recipe);</span>
+<span class="fc" id="L31">    }</span>
+
+    @Override
+    protected void registerDefaultRecipes() {
+<span class="fc" id="L35">        addRecipe(4, new SlimefunItemStack(SlimefunItems.STONE_CHUNK, 3), new ItemStack(Material.COBBLESTONE));</span>
+<span class="fc" id="L36">        addRecipe(4, new ItemStack(Material.FLINT, 6), new ItemStack(Material.COBBLESTONE));</span>
+<span class="fc" id="L37">        addRecipe(5, new ItemStack(Material.GLASS), new ItemStack(Material.GLASS_PANE, 3));</span>
+<span class="fc" id="L38">        addRecipe(4, new ItemStack(Material.SNOWBALL, 4), new ItemStack(Material.SNOW_BLOCK));</span>
+<span class="fc" id="L39">        addRecipe(4, new ItemStack(Material.MAGMA_CREAM, 4), new ItemStack(Material.MAGMA_BLOCK));</span>
+<span class="fc" id="L40">        addRecipe(4, new ItemStack(Material.SLIME_BALL, 9), new ItemStack(Material.SLIME_BLOCK));</span>
+
+<span class="fc" id="L42">        addRecipe(3, new ItemStack(Material.DRIED_KELP, 9), new ItemStack(Material.DRIED_KELP_BLOCK));</span>
+<span class="fc" id="L43">        addRecipe(3, new ItemStack(Material.BONE_MEAL, 9), new ItemStack(Material.BONE_BLOCK));</span>
+<span class="fc" id="L44">        addRecipe(3, new ItemStack(Material.CLAY_BALL, 4), new ItemStack(Material.CLAY));</span>
+<span class="fc" id="L45">        addRecipe(3, new ItemStack(Material.BRICK, 4), new ItemStack(Material.BRICKS));</span>
+
+<span class="fc" id="L47">        addRecipe(6, SlimefunItems.COPPER_INGOT, new CustomItemStack(SlimefunItems.COPPER_WIRE, 3));</span>
+<span class="fc" id="L48">        addRecipe(16, new SlimefunItemStack(SlimefunItems.STEEL_INGOT, 8), SlimefunItems.STEEL_PLATE);</span>
+<span class="fc" id="L49">        addRecipe(18, new SlimefunItemStack(SlimefunItems.REINFORCED_ALLOY_INGOT, 8), SlimefunItems.REINFORCED_PLATE);</span>
+
+<span class="fc" id="L51">        addRecipe(8, new ItemStack(Material.NETHER_WART), new CustomItemStack(SlimefunItems.MAGIC_LUMP_1, 2));</span>
+<span class="fc" id="L52">        addRecipe(10, new SlimefunItemStack(SlimefunItems.MAGIC_LUMP_1, 4), SlimefunItems.MAGIC_LUMP_2);</span>
+<span class="fc" id="L53">        addRecipe(12, new SlimefunItemStack(SlimefunItems.MAGIC_LUMP_2, 4), SlimefunItems.MAGIC_LUMP_3);</span>
+
+<span class="fc" id="L55">        addRecipe(10, new ItemStack(Material.ENDER_EYE), new CustomItemStack(SlimefunItems.ENDER_LUMP_1, 2));</span>
+<span class="fc" id="L56">        addRecipe(12, new SlimefunItemStack(SlimefunItems.ENDER_LUMP_1, 4), SlimefunItems.ENDER_LUMP_2);</span>
+<span class="fc" id="L57">        addRecipe(14, new SlimefunItemStack(SlimefunItems.ENDER_LUMP_2, 4), SlimefunItems.ENDER_LUMP_3);</span>
+
+<span class="fc" id="L59">        addRecipe(18, new SlimefunItemStack(SlimefunItems.TINY_URANIUM, 9), SlimefunItems.SMALL_URANIUM);</span>
+<span class="fc" id="L60">        addRecipe(24, new SlimefunItemStack(SlimefunItems.SMALL_URANIUM, 4), SlimefunItems.URANIUM);</span>
+
+<span class="fc" id="L62">        addRecipe(4, new ItemStack(Material.QUARTZ, 4), new ItemStack(Material.QUARTZ_BLOCK));</span>
+<span class="fc" id="L63">        addRecipe(4, new ItemStack(Material.IRON_NUGGET, 9), new ItemStack(Material.IRON_INGOT));</span>
+<span class="fc" id="L64">        addRecipe(4, new ItemStack(Material.GOLD_NUGGET, 9), new ItemStack(Material.GOLD_INGOT));</span>
+<span class="fc" id="L65">        addRecipe(4, new ItemStack(Material.COAL, 9), new ItemStack(Material.COAL_BLOCK));</span>
+<span class="fc" id="L66">        addRecipe(4, new ItemStack(Material.SAND, 4), new ItemStack(Material.SANDSTONE));</span>
+<span class="fc" id="L67">        addRecipe(4, new ItemStack(Material.RED_SAND, 4), new ItemStack(Material.RED_SANDSTONE));</span>
+
+<span class="fc" id="L69">        addRecipe(5, new ItemStack(Material.IRON_INGOT, 9), new ItemStack(Material.IRON_BLOCK));</span>
+<span class="fc" id="L70">        addRecipe(5, new ItemStack(Material.GOLD_INGOT, 9), new ItemStack(Material.GOLD_BLOCK));</span>
+
+<span class="fc" id="L72">        addRecipe(6, new ItemStack(Material.REDSTONE, 9), new ItemStack(Material.REDSTONE_BLOCK));</span>
+<span class="fc" id="L73">        addRecipe(6, new ItemStack(Material.LAPIS_LAZULI, 9), new ItemStack(Material.LAPIS_BLOCK));</span>
+
+<span class="fc" id="L75">        addRecipe(8, new ItemStack(Material.EMERALD, 9), new ItemStack(Material.EMERALD_BLOCK));</span>
+<span class="fc" id="L76">        addRecipe(8, new ItemStack(Material.DIAMOND, 9), new ItemStack(Material.DIAMOND_BLOCK));</span>
+
+<span class="fc" id="L78">        addRecipe(16, new ItemStack(Material.NETHERITE_INGOT, 9), new ItemStack(Material.NETHERITE_BLOCK));</span>
+
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {</span>
+<span class="fc" id="L81">            addRecipe(4, new ItemStack(Material.AMETHYST_SHARD, 4), new ItemStack(Material.AMETHYST_BLOCK));</span>
+
+<span class="fc" id="L83">            addRecipe(5, new ItemStack(Material.COPPER_INGOT, 9), new ItemStack(Material.COPPER_BLOCK));</span>
+<span class="fc" id="L84">            addRecipe(5, new ItemStack(Material.RAW_IRON, 9), new ItemStack(Material.RAW_IRON_BLOCK));</span>
+<span class="fc" id="L85">            addRecipe(5, new ItemStack(Material.RAW_GOLD, 9), new ItemStack(Material.RAW_GOLD_BLOCK));</span>
+<span class="fc" id="L86">            addRecipe(5, new ItemStack(Material.RAW_COPPER, 9), new ItemStack(Material.RAW_COPPER_BLOCK));</span>
+        }
+<span class="fc" id="L88">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void addRecipe(int seconds, ItemStack input, ItemStack output) {
+<span class="fc" id="L92">        registerRecipe(seconds, new ItemStack[] { input }, new ItemStack[] { output });</span>
+<span class="fc" id="L93">    }</span>
+
+    @Override
+    public ItemStack getProgressBar() {
+<span class="fc" id="L97">        return new ItemStack(Material.IRON_HOE);</span>
+
+    }
+
+    @Override
+    public String getMachineIdentifier() {
+<span class="nc" id="L103">        return &quot;ELECTRIC_PRESS&quot;;</span>
+
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

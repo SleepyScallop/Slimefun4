@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GitHubConnector.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.core.services.github</a> &gt; <span class="el_source">GitHubConnector.java</span></div><h1>GitHubConnector.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.core.services.github;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.logging.Level;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+
+import kong.unirest.HttpResponse;
+import kong.unirest.JsonNode;
+import kong.unirest.Unirest;
+import kong.unirest.UnirestException;
+import kong.unirest.json.JSONException;
+
+/**
+ * The {@link GitHubConnector} is used to connect to the GitHub API service.
+ * It can be extended by subclasses, this just serves as an abstract super class for
+ * other connectors.
+ * 
+ * @author TheBusyBiscuit
+ * @author Walshy
+ */
+abstract class GitHubConnector {
+
+    private static final String API_URL = &quot;https://api.github.com/&quot;;
+    private static final String USER_AGENT = &quot;Slimefun4 (https://github.com/Slimefun)&quot;;
+
+    protected final GitHubService github;
+    private final String url;
+    private File file;
+
+    /**
+     * This creates a new {@link GitHubConnector} for the given repository.
+     * 
+     * @param github
+     *            Our instance of {@link GitHubService}
+     * @param repository
+     *            The repository we want to connect to
+     */
+<span class="nc" id="L50">    GitHubConnector(@Nonnull GitHubService github, @Nonnull String repository) {</span>
+<span class="nc" id="L51">        this.github = github;</span>
+<span class="nc" id="L52">        this.url = API_URL + &quot;repos/&quot; + repository + getEndpoint();</span>
+<span class="nc" id="L53">    }</span>
+
+    /**
+     * This returns the name of our cache {@link File}.
+     * 
+     * @return The cache {@link File} name
+     */
+    @Nonnull
+    public abstract String getFileName();
+
+    /**
+     * This is our {@link URL} endpoint.
+     * It is the suffix of the {@link URL} we want to connect to.
+     * 
+     * @return Our endpoint
+     */
+    @Nonnull
+    public abstract String getEndpoint();
+
+    /**
+     * This {@link Map} contains the query parameters for our {@link URL}.
+     * 
+     * @return A {@link Map} with our query parameters
+     */
+    @Nonnull
+    public abstract Map&lt;String, Object&gt; getParameters();
+
+    /**
+     * This method is called when the connection finished successfully.
+     * 
+     * @param response
+     *            The response
+     */
+    public abstract void onSuccess(@Nonnull JsonNode response);
+
+    /**
+     * This method is called when the connection has failed.
+     */
+    public void onFailure() {
+        // Don't do anything by default
+<span class="nc" id="L93">    }</span>
+
+    /**
+     * This method will connect to GitHub and store the received data inside a local
+     * cache {@link File}.
+     * Make sure to call this method asynchronously!
+     */
+    void download() {
+<span class="nc" id="L101">        file = new File(&quot;plugins/Slimefun/cache/github/&quot; + getFileName() + &quot;.json&quot;);</span>
+
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (github.isLoggingEnabled()) {</span>
+<span class="nc" id="L104">            Slimefun.logger().log(Level.INFO, &quot;Retrieving {0}.json from GitHub...&quot;, getFileName());</span>
+        }
+
+        try {
+            // @formatter:off
+<span class="nc" id="L109">            HttpResponse&lt;JsonNode&gt; response = Unirest.get(url)</span>
+<span class="nc" id="L110">                    .queryString(getParameters())</span>
+<span class="nc" id="L111">                    .header(&quot;User-Agent&quot;, USER_AGENT)</span>
+<span class="nc" id="L112">                    .asJson();</span>
+            // @formatter:on
+
+<span class="nc bnc" id="L115" title="All 2 branches missed.">            if (response.isSuccess()) {</span>
+<span class="nc" id="L116">                onSuccess(response.getBody());</span>
+<span class="nc" id="L117">                writeCacheFile(response.getBody());</span>
+            } else {
+<span class="nc bnc" id="L119" title="All 2 branches missed.">                if (github.isLoggingEnabled()) {</span>
+<span class="nc" id="L120">                    Slimefun.logger().log(Level.WARNING, &quot;Failed to fetch {0}: {1} - {2}&quot;, new Object[] { url, response.getStatus(), response.getBody() });</span>
+                }
+
+                // It has the cached file, let's just read that then
+<span class="nc bnc" id="L124" title="All 2 branches missed.">                if (file.exists()) {</span>
+<span class="nc" id="L125">                    JsonNode cache = readCacheFile();</span>
+
+<span class="nc bnc" id="L127" title="All 2 branches missed.">                    if (cache != null) {</span>
+<span class="nc" id="L128">                        onSuccess(cache);</span>
+                    }
+                }
+            }
+<span class="nc" id="L132">        } catch (UnirestException e) {</span>
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            if (github.isLoggingEnabled()) {</span>
+<span class="nc" id="L134">                Slimefun.logger().log(Level.WARNING, &quot;Could not connect to GitHub in time.&quot;, e);</span>
+            }
+
+            // It has the cached file, let's just read that then
+<span class="nc bnc" id="L138" title="All 2 branches missed.">            if (file.exists()) {</span>
+<span class="nc" id="L139">                JsonNode cache = readCacheFile();</span>
+
+<span class="nc bnc" id="L141" title="All 2 branches missed.">                if (cache != null) {</span>
+<span class="nc" id="L142">                    onSuccess(cache);</span>
+<span class="nc" id="L143">                    return;</span>
+                }
+            }
+
+            // If the request failed and it failed to read the cache then call onFailure.
+<span class="nc" id="L148">            onFailure();</span>
+<span class="nc" id="L149">        }</span>
+<span class="nc" id="L150">    }</span>
+
+    @Nullable
+    private JsonNode readCacheFile() {
+<span class="nc" id="L154">        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8))) {</span>
+<span class="nc" id="L155">            return new JsonNode(reader.readLine());</span>
+<span class="nc" id="L156">        } catch (IOException | JSONException e) {</span>
+<span class="nc" id="L157">            Slimefun.logger().log(Level.WARNING, &quot;Failed to read Github cache file: {0} - {1}: {2}&quot;, new Object[] { file.getName(), e.getClass().getSimpleName(), e.getMessage() });</span>
+<span class="nc" id="L158">            return null;</span>
+        }
+    }
+
+    private void writeCacheFile(@Nonnull JsonNode node) {
+<span class="nc" id="L163">        try (FileOutputStream output = new FileOutputStream(file)) {</span>
+<span class="nc" id="L164">            output.write(node.toString().getBytes(StandardCharsets.UTF_8));</span>
+<span class="nc" id="L165">        } catch (IOException e) {</span>
+<span class="nc" id="L166">            Slimefun.logger().log(Level.WARNING, &quot;Failed to populate GitHub cache: {0} - {1}&quot;, new Object[] { e.getClass().getSimpleName(), e.getMessage() });</span>
+<span class="nc" id="L167">        }</span>
+<span class="nc" id="L168">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

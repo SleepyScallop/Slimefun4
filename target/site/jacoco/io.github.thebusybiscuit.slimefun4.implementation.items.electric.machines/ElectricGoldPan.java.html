@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ElectricGoldPan.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines</a> &gt; <span class="el_source">ElectricGoldPan.java</span></div><h1>ElectricGoldPan.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.RecipeDisplayItem;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.implementation.items.tools.GoldPan;
+import io.github.thebusybiscuit.slimefun4.implementation.items.tools.NetherGoldPan;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.AContainer;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineRecipe;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+
+/**
+ * The {@link ElectricGoldPan} is an electric machine based on the {@link GoldPan}.
+ * It also serves as a {@link NetherGoldPan}.
+ * 
+ * @author TheBusyBiscuit
+ * 
+ * @see GoldPan
+ * @see NetherGoldPan
+ *
+ */
+public class ElectricGoldPan extends AContainer implements RecipeDisplayItem {
+
+<span class="fc" id="L38">    private final ItemSetting&lt;Boolean&gt; overrideOutputLimit = new ItemSetting&lt;&gt;(this, &quot;override-output-limit&quot;, false);</span>
+
+<span class="fc" id="L40">    private final GoldPan goldPan = SlimefunItems.GOLD_PAN.getItem(GoldPan.class);</span>
+<span class="fc" id="L41">    private final GoldPan netherGoldPan = SlimefunItems.NETHER_GOLD_PAN.getItem(GoldPan.class);</span>
+
+<span class="fc" id="L43">    private final ItemStack gravel = new ItemStack(Material.GRAVEL);</span>
+<span class="fc" id="L44">    private final ItemStack soulSand = new ItemStack(Material.SOUL_SAND);</span>
+
+    @ParametersAreNonnullByDefault
+    public ElectricGoldPan(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+<span class="fc" id="L48">        super(itemGroup, item, recipeType, recipe);</span>
+<span class="fc" id="L49">        addItemSetting(overrideOutputLimit);</span>
+<span class="fc" id="L50">    }</span>
+
+    /**
+     * This returns whether the {@link ElectricGoldPan} will stop proccessing inputs
+     * if both output slots contain items or if that default behavior should be
+     * overriden and allow the {@link ElectricGoldPan} to continue processing inputs
+     * even if both output slots are occupied. Note this option will allow players
+     * to force specific outputs from the {@link ElectricGoldPan} but can be
+     * necessary when a server has disabled cargo networks.
+     * 
+     * @return If output limits are overriden
+     */
+    public boolean isOutputLimitOverriden() {
+<span class="nc" id="L63">        return overrideOutputLimit.getValue();</span>
+    }
+
+    @Override
+    public List&lt;ItemStack&gt; getDisplayRecipes() {
+<span class="nc" id="L68">        List&lt;ItemStack&gt; recipes = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L70">        recipes.addAll(goldPan.getDisplayRecipes());</span>
+<span class="nc" id="L71">        recipes.addAll(netherGoldPan.getDisplayRecipes());</span>
+
+<span class="nc" id="L73">        return recipes;</span>
+    }
+
+    @Override
+    public ItemStack getProgressBar() {
+<span class="fc" id="L78">        return new ItemStack(Material.DIAMOND_SHOVEL);</span>
+    }
+
+    @Override
+    protected MachineRecipe findNextRecipe(BlockMenu menu) {
+<span class="nc bnc" id="L83" title="All 4 branches missed.">        if (!isOutputLimitOverriden() &amp;&amp; !hasFreeSlot(menu)) {</span>
+<span class="nc" id="L84">            return null;</span>
+        }
+
+<span class="nc bnc" id="L87" title="All 2 branches missed.">        for (int slot : getInputSlots()) {</span>
+<span class="nc" id="L88">            ItemStack item = menu.getItemInSlot(slot);</span>
+
+<span class="nc bnc" id="L90" title="All 2 branches missed.">            if (SlimefunUtils.isItemSimilar(item, gravel, true, false)) {</span>
+<span class="nc" id="L91">                ItemStack output = goldPan.getRandomOutput();</span>
+<span class="nc" id="L92">                MachineRecipe recipe = new MachineRecipe(3 / getSpeed(), new ItemStack[] { gravel }, new ItemStack[] { output });</span>
+
+<span class="nc bnc" id="L94" title="All 4 branches missed.">                if (output.getType() != Material.AIR &amp;&amp; menu.fits(output, getOutputSlots())) {</span>
+<span class="nc" id="L95">                    menu.consumeItem(slot);</span>
+<span class="nc" id="L96">                    return recipe;</span>
+                }
+<span class="nc bnc" id="L98" title="All 2 branches missed.">            } else if (SlimefunUtils.isItemSimilar(item, soulSand, true, false)) {</span>
+<span class="nc" id="L99">                ItemStack output = netherGoldPan.getRandomOutput();</span>
+<span class="nc" id="L100">                MachineRecipe recipe = new MachineRecipe(4 / getSpeed(), new ItemStack[] { soulSand }, new ItemStack[] { output });</span>
+
+<span class="nc bnc" id="L102" title="All 4 branches missed.">                if (output.getType() != Material.AIR &amp;&amp; menu.fits(output, getOutputSlots())) {</span>
+<span class="nc" id="L103">                    menu.consumeItem(slot);</span>
+<span class="nc" id="L104">                    return recipe;</span>
+                }
+
+            }
+        }
+
+<span class="nc" id="L110">        return null;</span>
+    }
+
+    private boolean hasFreeSlot(@Nonnull BlockMenu menu) {
+<span class="nc bnc" id="L114" title="All 2 branches missed.">        for (int slot : getOutputSlots()) {</span>
+<span class="nc bnc" id="L115" title="All 2 branches missed.">            if (menu.getItemInSlot(slot) == null) {</span>
+<span class="nc" id="L116">                return true;</span>
+            }
+        }
+
+<span class="nc" id="L120">        return false;</span>
+    }
+
+    @Override
+    public String getMachineIdentifier() {
+<span class="nc" id="L125">        return &quot;ELECTRIC_GOLD_PAN&quot;;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

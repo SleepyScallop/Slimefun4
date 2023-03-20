@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AncientPedestal.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.altar</a> &gt; <span class="el_source">AncientPedestal.java</span></div><h1>AncientPedestal.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.altar;
+
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.util.Vector;
+
+import io.github.bakedlibs.dough.common.ChatColors;
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.bakedlibs.dough.items.ItemUtils;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemSpawnReason;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockDispenseHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.handlers.SimpleBlockBreakHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.items.SimpleSlimefunItem;
+import io.github.thebusybiscuit.slimefun4.implementation.listeners.AncientAltarListener;
+import io.github.thebusybiscuit.slimefun4.implementation.tasks.AncientAltarTask;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+
+/**
+ * The {@link AncientPedestal} is a part of the {@link AncientAltar}.
+ * You can place any {@link ItemStack} onto the {@link AncientPedestal} to provide it to
+ * the altar as a crafting ingredient.
+ * 
+ * @author Redemption198
+ * @author TheBusyBiscuit
+ * 
+ * @see AncientAltar
+ * @see AncientAltarListener
+ * @see AncientAltarTask
+ *
+ */
+public class AncientPedestal extends SimpleSlimefunItem&lt;BlockDispenseHandler&gt; {
+
+<span class="fc" id="L51">    public static final String ITEM_PREFIX = ChatColors.color(&quot;&amp;dALTAR &amp;3Probe - &amp;e&quot;);</span>
+
+    @ParametersAreNonnullByDefault
+    public AncientPedestal(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, ItemStack recipeOutput) {
+<span class="fc" id="L55">        super(itemGroup, item, recipeType, recipe, recipeOutput);</span>
+
+<span class="fc" id="L57">        addItemHandler(onBreak());</span>
+<span class="fc" id="L58">    }</span>
+
+    private @Nonnull BlockBreakHandler onBreak() {
+<span class="fc" id="L61">        return new SimpleBlockBreakHandler() {</span>
+
+            @Override
+            public void onBlockBreak(@Nonnull Block b) {
+<span class="nc" id="L65">                Optional&lt;Item&gt; entity = getPlacedItem(b);</span>
+
+<span class="nc bnc" id="L67" title="All 2 branches missed.">                if (entity.isPresent()) {</span>
+<span class="nc" id="L68">                    Item stack = entity.get();</span>
+
+<span class="nc bnc" id="L70" title="All 2 branches missed.">                    if (stack.isValid()) {</span>
+<span class="nc" id="L71">                        stack.removeMetadata(&quot;no_pickup&quot;, Slimefun.instance());</span>
+<span class="nc" id="L72">                        b.getWorld().dropItem(b.getLocation(), getOriginalItemStack(stack));</span>
+<span class="nc" id="L73">                        stack.remove();</span>
+                    }
+                }
+<span class="nc" id="L76">            }</span>
+        };
+    }
+
+    @Override
+    public @Nonnull BlockDispenseHandler getItemHandler() {
+<span class="pc" id="L82">        return (e, d, block, machine) -&gt; e.setCancelled(true);</span>
+    }
+
+    public @Nonnull Optional&lt;Item&gt; getPlacedItem(@Nonnull Block pedestal) {
+<span class="nc" id="L86">        Location l = pedestal.getLocation().add(0.5, 1.2, 0.5);</span>
+
+<span class="nc bnc" id="L88" title="All 2 branches missed.">        for (Entity n : l.getWorld().getNearbyEntities(l, 0.5, 0.5, 0.5, this::testItem)) {</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">            if (n instanceof Item item) {</span>
+<span class="nc" id="L90">                return Optional.of(item);</span>
+            }
+<span class="nc" id="L92">        }</span>
+
+<span class="nc" id="L94">        return Optional.empty();</span>
+    }
+
+    private boolean testItem(@Nullable Entity n) {
+<span class="nc bnc" id="L98" title="All 4 branches missed.">        if (n instanceof Item item &amp;&amp; n.isValid()) {</span>
+<span class="nc" id="L99">            ItemMeta meta = item.getItemStack().getItemMeta();</span>
+
+<span class="nc bnc" id="L101" title="All 4 branches missed.">            return meta.hasDisplayName() &amp;&amp; meta.getDisplayName().startsWith(ITEM_PREFIX);</span>
+        } else {
+<span class="nc" id="L103">            return false;</span>
+        }
+    }
+
+    public @Nonnull ItemStack getOriginalItemStack(@Nonnull Item item) {
+<span class="nc" id="L108">        ItemStack stack = item.getItemStack().clone();</span>
+<span class="nc" id="L109">        String customName = item.getCustomName();</span>
+
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (customName.equals(ItemUtils.getItemName(new ItemStack(stack.getType())))) {</span>
+<span class="nc" id="L112">            ItemMeta im = stack.getItemMeta();</span>
+<span class="nc" id="L113">            im.setDisplayName(null);</span>
+<span class="nc" id="L114">            stack.setItemMeta(im);</span>
+<span class="nc" id="L115">        } else {</span>
+<span class="nc" id="L116">            ItemMeta im = stack.getItemMeta();</span>
+<span class="nc" id="L117">            im.setDisplayName(customName);</span>
+<span class="nc" id="L118">            stack.setItemMeta(im);</span>
+        }
+
+<span class="nc" id="L121">        return stack;</span>
+    }
+
+    public void placeItem(@Nonnull Player p, @Nonnull Block b) {
+<span class="nc" id="L125">        ItemStack hand = p.getInventory().getItemInMainHand();</span>
+<span class="nc" id="L126">        ItemStack displayItem = new CustomItemStack(hand, ITEM_PREFIX + System.nanoTime());</span>
+<span class="nc" id="L127">        displayItem.setAmount(1);</span>
+
+        // Get the display name of the original Item in the Player's hand
+<span class="nc" id="L130">        String nametag = ItemUtils.getItemName(hand);</span>
+
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        if (p.getGameMode() != GameMode.CREATIVE) {</span>
+<span class="nc" id="L133">            ItemUtils.consumeItem(hand, false);</span>
+        }
+
+<span class="nc" id="L136">        Item entity = SlimefunUtils.spawnItem(b.getLocation().add(0.5, 1.2, 0.5), displayItem, ItemSpawnReason.ANCIENT_PEDESTAL_PLACE_ITEM);</span>
+
+<span class="nc bnc" id="L138" title="All 2 branches missed.">        if (entity != null) {</span>
+<span class="nc" id="L139">            entity.setVelocity(new Vector(0, 0.1, 0));</span>
+<span class="nc" id="L140">            entity.setCustomNameVisible(true);</span>
+<span class="nc" id="L141">            entity.setCustomName(nametag);</span>
+<span class="nc" id="L142">            SlimefunUtils.markAsNoPickup(entity, &quot;altar_item&quot;);</span>
+<span class="nc" id="L143">            p.playSound(b.getLocation(), Sound.ENTITY_ITEM_PICKUP, 0.3F, 0.3F);</span>
+        }
+<span class="nc" id="L145">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TickerTask.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.tasks</a> &gt; <span class="el_source">TickerTask.java</span></div><h1>TickerTask.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.tasks;
+
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.scheduler.BukkitScheduler;
+
+import io.github.bakedlibs.dough.blocks.BlockPosition;
+import io.github.bakedlibs.dough.blocks.ChunkPosition;
+import io.github.thebusybiscuit.slimefun4.api.ErrorReport;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+
+import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
+import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
+
+/**
+ * The {@link TickerTask} is responsible for ticking every {@link BlockTicker},
+ * synchronous or not.
+ * 
+ * @author TheBusyBiscuit
+ * 
+ * @see BlockTicker
+ *
+ */
+<span class="fc" id="L41">public class TickerTask implements Runnable {</span>
+
+    /**
+     * This Map holds all currently actively ticking locations.
+     */
+<span class="fc" id="L46">    private final Map&lt;ChunkPosition, Set&lt;Location&gt;&gt; tickingLocations = new ConcurrentHashMap&lt;&gt;();</span>
+
+    // These are &quot;Queues&quot; of blocks that need to be removed or moved
+<span class="fc" id="L49">    private final Map&lt;Location, Location&gt; movingQueue = new ConcurrentHashMap&lt;&gt;();</span>
+<span class="fc" id="L50">    private final Map&lt;Location, Boolean&gt; deletionQueue = new ConcurrentHashMap&lt;&gt;();</span>
+
+    /**
+     * This Map tracks how many bugs have occurred in a given Location .
+     * If too many bugs happen, we delete that Location.
+     */
+<span class="fc" id="L56">    private final Map&lt;BlockPosition, Integer&gt; bugs = new ConcurrentHashMap&lt;&gt;();</span>
+
+    private int tickRate;
+<span class="fc" id="L59">    private boolean halted = false;</span>
+<span class="fc" id="L60">    private boolean running = false;</span>
+
+    /**
+     * This method starts the {@link TickerTask} on an asynchronous schedule.
+     * 
+     * @param plugin
+     *            The instance of our {@link Slimefun}
+     */
+    public void start(@Nonnull Slimefun plugin) {
+<span class="nc" id="L69">        this.tickRate = Slimefun.getCfg().getInt(&quot;URID.custom-ticker-delay&quot;);</span>
+
+<span class="nc" id="L71">        BukkitScheduler scheduler = plugin.getServer().getScheduler();</span>
+<span class="nc" id="L72">        scheduler.runTaskTimerAsynchronously(plugin, this, 100L, tickRate);</span>
+<span class="nc" id="L73">    }</span>
+
+    /**
+     * This method resets this {@link TickerTask} to run again.
+     */
+    private void reset() {
+<span class="nc" id="L79">        running = false;</span>
+<span class="nc" id="L80">    }</span>
+
+    @Override
+    public void run() {
+        try {
+            // If this method is actually still running... DON'T
+<span class="nc bnc" id="L86" title="All 2 branches missed.">            if (running) {</span>
+<span class="nc" id="L87">                return;</span>
+            }
+
+<span class="nc" id="L90">            running = true;</span>
+<span class="nc" id="L91">            Slimefun.getProfiler().start();</span>
+<span class="nc" id="L92">            Set&lt;BlockTicker&gt; tickers = new HashSet&lt;&gt;();</span>
+
+            // Remove any deleted blocks
+<span class="nc" id="L95">            Iterator&lt;Map.Entry&lt;Location, Boolean&gt;&gt; removals = deletionQueue.entrySet().iterator();</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">            while (removals.hasNext()) {</span>
+<span class="nc" id="L97">                Map.Entry&lt;Location, Boolean&gt; entry = removals.next();</span>
+<span class="nc" id="L98">                BlockStorage.deleteLocationInfoUnsafely(entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L99">                removals.remove();</span>
+<span class="nc" id="L100">            }</span>
+
+            // Fixes #2576 - Remove any deleted instances of BlockStorage
+<span class="nc" id="L103">            Iterator&lt;BlockStorage&gt; worlds = Slimefun.getRegistry().getWorlds().values().iterator();</span>
+<span class="nc bnc" id="L104" title="All 2 branches missed.">            while (worlds.hasNext()) {</span>
+<span class="nc" id="L105">                BlockStorage storage = worlds.next();</span>
+
+<span class="nc bnc" id="L107" title="All 2 branches missed.">                if (storage.isMarkedForRemoval()) {</span>
+<span class="nc" id="L108">                    worlds.remove();</span>
+                }
+<span class="nc" id="L110">            }</span>
+
+            // Run our ticker code
+<span class="nc bnc" id="L113" title="All 2 branches missed.">            if (!halted) {</span>
+<span class="nc bnc" id="L114" title="All 2 branches missed.">                for (Map.Entry&lt;ChunkPosition, Set&lt;Location&gt;&gt; entry : tickingLocations.entrySet()) {</span>
+<span class="nc" id="L115">                    tickChunk(entry.getKey(), tickers, entry.getValue());</span>
+<span class="nc" id="L116">                }</span>
+            }
+
+            // Move any moved block data
+<span class="nc" id="L120">            Iterator&lt;Map.Entry&lt;Location, Location&gt;&gt; moves = movingQueue.entrySet().iterator();</span>
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            while (moves.hasNext()) {</span>
+<span class="nc" id="L122">                Map.Entry&lt;Location, Location&gt; entry = moves.next();</span>
+<span class="nc" id="L123">                BlockStorage.moveLocationInfoUnsafely(entry.getKey(), entry.getValue());</span>
+<span class="nc" id="L124">                moves.remove();</span>
+<span class="nc" id="L125">            }</span>
+
+            // Start a new tick cycle for every BlockTicker
+<span class="nc bnc" id="L128" title="All 2 branches missed.">            for (BlockTicker ticker : tickers) {</span>
+<span class="nc" id="L129">                ticker.startNewTick();</span>
+<span class="nc" id="L130">            }</span>
+
+<span class="nc" id="L132">            reset();</span>
+<span class="nc" id="L133">            Slimefun.getProfiler().stop();</span>
+<span class="nc" id="L134">        } catch (Exception | LinkageError x) {</span>
+<span class="nc" id="L135">            Slimefun.logger().log(Level.SEVERE, x, () -&gt; &quot;An Exception was caught while ticking the Block Tickers Task for Slimefun v&quot; + Slimefun.getVersion());</span>
+<span class="nc" id="L136">            reset();</span>
+<span class="nc" id="L137">        }</span>
+<span class="nc" id="L138">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void tickChunk(ChunkPosition chunk, Set&lt;BlockTicker&gt; tickers, Set&lt;Location&gt; locations) {
+        try {
+            // Only continue if the Chunk is actually loaded
+<span class="nc bnc" id="L144" title="All 2 branches missed.">            if (chunk.isLoaded()) {</span>
+<span class="nc bnc" id="L145" title="All 2 branches missed.">                for (Location l : locations) {</span>
+<span class="nc" id="L146">                    tickLocation(tickers, l);</span>
+<span class="nc" id="L147">                }</span>
+            }
+<span class="nc" id="L149">        } catch (ArrayIndexOutOfBoundsException | NumberFormatException x) {</span>
+<span class="nc" id="L150">            Slimefun.logger().log(Level.SEVERE, x, () -&gt; &quot;An Exception has occurred while trying to resolve Chunk: &quot; + chunk);</span>
+<span class="nc" id="L151">        }</span>
+<span class="nc" id="L152">    }</span>
+
+    private void tickLocation(@Nonnull Set&lt;BlockTicker&gt; tickers, @Nonnull Location l) {
+<span class="nc" id="L155">        Config data = BlockStorage.getLocationInfo(l);</span>
+<span class="nc" id="L156">        SlimefunItem item = SlimefunItem.getById(data.getString(&quot;id&quot;));</span>
+
+<span class="nc bnc" id="L158" title="All 4 branches missed.">        if (item != null &amp;&amp; item.getBlockTicker() != null) {</span>
+            try {
+<span class="nc bnc" id="L160" title="All 2 branches missed.">                if (item.getBlockTicker().isSynchronized()) {</span>
+<span class="nc" id="L161">                    Slimefun.getProfiler().scheduleEntries(1);</span>
+<span class="nc" id="L162">                    item.getBlockTicker().update();</span>
+
+                    /**
+                     * We are inserting a new timestamp because synchronized actions
+                     * are always ran with a 50ms delay (1 game tick)
+                     */
+<span class="nc" id="L168">                    Slimefun.runSync(() -&gt; {</span>
+<span class="nc" id="L169">                        Block b = l.getBlock();</span>
+<span class="nc" id="L170">                        tickBlock(l, b, item, data, System.nanoTime());</span>
+<span class="nc" id="L171">                    });</span>
+                } else {
+<span class="nc" id="L173">                    long timestamp = Slimefun.getProfiler().newEntry();</span>
+<span class="nc" id="L174">                    item.getBlockTicker().update();</span>
+<span class="nc" id="L175">                    Block b = l.getBlock();</span>
+<span class="nc" id="L176">                    tickBlock(l, b, item, data, timestamp);</span>
+                }
+
+<span class="nc" id="L179">                tickers.add(item.getBlockTicker());</span>
+<span class="nc" id="L180">            } catch (Exception x) {</span>
+<span class="nc" id="L181">                reportErrors(l, item, x);</span>
+<span class="nc" id="L182">            }</span>
+        }
+<span class="nc" id="L184">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void tickBlock(Location l, Block b, SlimefunItem item, Config data, long timestamp) {
+        try {
+<span class="nc" id="L189">            item.getBlockTicker().tick(b, item, data);</span>
+<span class="nc" id="L190">        } catch (Exception | LinkageError x) {</span>
+<span class="nc" id="L191">            reportErrors(l, item, x);</span>
+        } finally {
+<span class="nc" id="L193">            Slimefun.getProfiler().closeEntry(l, item, timestamp);</span>
+        }
+<span class="nc" id="L195">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void reportErrors(Location l, SlimefunItem item, Throwable x) {
+<span class="nc" id="L199">        BlockPosition position = new BlockPosition(l);</span>
+<span class="nc" id="L200">        int errors = bugs.getOrDefault(position, 0) + 1;</span>
+
+<span class="nc bnc" id="L202" title="All 2 branches missed.">        if (errors == 1) {</span>
+            // Generate a new Error-Report
+<span class="nc" id="L204">            new ErrorReport&lt;&gt;(x, l, item);</span>
+<span class="nc" id="L205">            bugs.put(position, errors);</span>
+<span class="nc bnc" id="L206" title="All 2 branches missed.">        } else if (errors == 4) {</span>
+<span class="nc" id="L207">            Slimefun.logger().log(Level.SEVERE, &quot;X: {0} Y: {1} Z: {2} ({3})&quot;, new Object[] { l.getBlockX(), l.getBlockY(), l.getBlockZ(), item.getId() });</span>
+<span class="nc" id="L208">            Slimefun.logger().log(Level.SEVERE, &quot;has thrown 4 error messages in the last 4 Ticks, the Block has been terminated.&quot;);</span>
+<span class="nc" id="L209">            Slimefun.logger().log(Level.SEVERE, &quot;Check your /plugins/Slimefun/error-reports/ folder for details.&quot;);</span>
+<span class="nc" id="L210">            Slimefun.logger().log(Level.SEVERE, &quot; &quot;);</span>
+<span class="nc" id="L211">            bugs.remove(position);</span>
+
+<span class="nc" id="L213">            BlockStorage.deleteLocationInfoUnsafely(l, true);</span>
+<span class="nc" id="L214">            Bukkit.getScheduler().scheduleSyncDelayedTask(Slimefun.instance(), () -&gt; l.getBlock().setType(Material.AIR));</span>
+        } else {
+<span class="nc" id="L216">            bugs.put(position, errors);</span>
+        }
+<span class="nc" id="L218">    }</span>
+
+    public boolean isHalted() {
+<span class="nc" id="L221">        return halted;</span>
+    }
+
+    public void halt() {
+<span class="nc" id="L225">        halted = true;</span>
+<span class="nc" id="L226">    }</span>
+
+    @ParametersAreNonnullByDefault
+    public void queueMove(Location from, Location to) {
+<span class="nc" id="L230">        Validate.notNull(from, &quot;Source Location cannot be null!&quot;);</span>
+<span class="nc" id="L231">        Validate.notNull(to, &quot;Target Location cannot be null!&quot;);</span>
+
+<span class="nc" id="L233">        movingQueue.put(from, to);</span>
+<span class="nc" id="L234">    }</span>
+
+    @ParametersAreNonnullByDefault
+    public void queueDelete(Location l, boolean destroy) {
+<span class="nc" id="L238">        Validate.notNull(l, &quot;Location must not be null!&quot;);</span>
+
+<span class="nc" id="L240">        deletionQueue.put(l, destroy);</span>
+<span class="nc" id="L241">    }</span>
+
+    /**
+     * This method checks if the given {@link Location} has been reserved
+     * by this {@link TickerTask}.
+     * A reserved {@link Location} does not currently hold any data but will
+     * be occupied upon the next tick.
+     * Checking this ensures that our {@link Location} does not get treated like a normal
+     * {@link Location} as it is theoretically &quot;moving&quot;.
+     * 
+     * @param l
+     *            The {@link Location} to check
+     * 
+     * @return Whether this {@link Location} has been reserved and will be filled upon the next tick
+     */
+    public boolean isOccupiedSoon(@Nonnull Location l) {
+<span class="nc" id="L257">        Validate.notNull(l, &quot;Null is not a valid Location!&quot;);</span>
+
+<span class="nc" id="L259">        return movingQueue.containsValue(l);</span>
+    }
+
+    /**
+     * This method checks if a given {@link Location} will be deleted on the next tick.
+     * 
+     * @param l
+     *            The {@link Location} to check
+     * 
+     * @return Whether this {@link Location} will be deleted on the next tick
+     */
+    public boolean isDeletedSoon(@Nonnull Location l) {
+<span class="nc" id="L271">        Validate.notNull(l, &quot;Null is not a valid Location!&quot;);</span>
+
+<span class="nc" id="L273">        return deletionQueue.containsKey(l);</span>
+    }
+
+    /**
+     * This returns the delay between ticks
+     * 
+     * @return The tick delay
+     */
+    public int getTickRate() {
+<span class="nc" id="L282">        return tickRate;</span>
+    }
+
+    /**
+     * This method returns a &lt;strong&gt;read-only&lt;/strong&gt; {@link Map}
+     * representation of every {@link ChunkPosition} and its corresponding
+     * {@link Set} of ticking {@link Location Locations}.
+     * 
+     * This does include any {@link Location} from an unloaded {@link Chunk} too!
+     * 
+     * @return A {@link Map} representation of all ticking {@link Location Locations}
+     */
+    @Nonnull
+    public Map&lt;ChunkPosition, Set&lt;Location&gt;&gt; getLocations() {
+<span class="nc" id="L296">        return Collections.unmodifiableMap(tickingLocations);</span>
+    }
+
+    /**
+     * This method returns a &lt;strong&gt;read-only&lt;/strong&gt; {@link Set}
+     * of all ticking {@link Location Locations} in a given {@link Chunk}.
+     * The {@link Chunk} does not have to be loaded.
+     * If no {@link Location} is present, the returned {@link Set} will be empty.
+     * 
+     * @param chunk
+     *            The {@link Chunk}
+     * 
+     * @return A {@link Set} of all ticking {@link Location Locations}
+     */
+    @Nonnull
+    public Set&lt;Location&gt; getLocations(@Nonnull Chunk chunk) {
+<span class="nc" id="L312">        Validate.notNull(chunk, &quot;The Chunk cannot be null!&quot;);</span>
+
+<span class="nc" id="L314">        Set&lt;Location&gt; locations = tickingLocations.getOrDefault(new ChunkPosition(chunk), new HashSet&lt;&gt;());</span>
+<span class="nc" id="L315">        return Collections.unmodifiableSet(locations);</span>
+    }
+
+    /**
+     * This enables the ticker at the given {@link Location} and adds it to our &quot;queue&quot;.
+     * 
+     * @param l
+     *            The {@link Location} to activate
+     */
+    public void enableTicker(@Nonnull Location l) {
+<span class="nc" id="L325">        Validate.notNull(l, &quot;Location cannot be null!&quot;);</span>
+
+<span class="nc" id="L327">        ChunkPosition chunk = new ChunkPosition(l.getWorld(), l.getBlockX() &gt;&gt; 4, l.getBlockZ() &gt;&gt; 4);</span>
+<span class="nc" id="L328">        Set&lt;Location&gt; newValue = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L329">        Set&lt;Location&gt; oldValue = tickingLocations.putIfAbsent(chunk, newValue);</span>
+
+        /**
+         * This is faster than doing computeIfAbsent(...)
+         * on a ConcurrentHashMap because it won't block the Thread for too long
+         */
+<span class="nc bnc" id="L335" title="All 2 branches missed.">        if (oldValue != null) {</span>
+<span class="nc" id="L336">            oldValue.add(l);</span>
+        } else {
+<span class="nc" id="L338">            newValue.add(l);</span>
+        }
+<span class="nc" id="L340">    }</span>
+
+    /**
+     * This method disables the ticker at the given {@link Location} and removes it from our internal
+     * &quot;queue&quot;.
+     * 
+     * @param l
+     *            The {@link Location} to remove
+     */
+    public void disableTicker(@Nonnull Location l) {
+<span class="nc" id="L350">        Validate.notNull(l, &quot;Location cannot be null!&quot;);</span>
+
+<span class="nc" id="L352">        ChunkPosition chunk = new ChunkPosition(l.getWorld(), l.getBlockX() &gt;&gt; 4, l.getBlockZ() &gt;&gt; 4);</span>
+<span class="nc" id="L353">        Set&lt;Location&gt; locations = tickingLocations.get(chunk);</span>
+
+<span class="nc bnc" id="L355" title="All 2 branches missed.">        if (locations != null) {</span>
+<span class="nc" id="L356">            locations.remove(l);</span>
+
+<span class="nc bnc" id="L358" title="All 2 branches missed.">            if (locations.isEmpty()) {</span>
+<span class="nc" id="L359">                tickingLocations.remove(chunk);</span>
+            }
+        }
+<span class="nc" id="L362">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

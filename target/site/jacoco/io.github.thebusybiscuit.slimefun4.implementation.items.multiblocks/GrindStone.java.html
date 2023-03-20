@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GrindStone.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks</a> &gt; <span class="el_source">GrindStone.java</span></div><h1>GrindStone.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Dispenser;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.multiblocks.MultiBlockMachine;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+import io.papermc.lib.PaperLib;
+
+public class GrindStone extends MultiBlockMachine {
+
+    @ParametersAreNonnullByDefault
+    public GrindStone(ItemGroup itemGroup, SlimefunItemStack item) {
+<span class="fc" id="L34">        super(itemGroup, item, new ItemStack[] { null, null, null, null, new ItemStack(Material.OAK_FENCE), null, null, new CustomItemStack(Material.DISPENSER, &quot;Dispenser (Facing up)&quot;), null }, BlockFace.SELF);</span>
+<span class="fc" id="L35">    }</span>
+
+    @Override
+    protected void registerDefaultRecipes(@Nonnull List&lt;ItemStack&gt; recipes) {
+<span class="fc" id="L39">        recipes.add(new ItemStack(Material.BLAZE_ROD));</span>
+<span class="fc" id="L40">        recipes.add(new ItemStack(Material.BLAZE_POWDER, 4));</span>
+
+<span class="fc" id="L42">        recipes.add(new ItemStack(Material.BONE));</span>
+<span class="fc" id="L43">        recipes.add(new ItemStack(Material.BONE_MEAL, 4));</span>
+
+<span class="fc" id="L45">        recipes.add(new ItemStack(Material.BONE_BLOCK));</span>
+<span class="fc" id="L46">        recipes.add(new ItemStack(Material.BONE_MEAL, 9));</span>
+
+<span class="fc" id="L48">        recipes.add(new ItemStack(Material.COBBLESTONE));</span>
+<span class="fc" id="L49">        recipes.add(new ItemStack(Material.GRAVEL));</span>
+
+<span class="fc" id="L51">        recipes.add(new ItemStack(Material.ANDESITE));</span>
+<span class="fc" id="L52">        recipes.add(new ItemStack(Material.GRAVEL));</span>
+
+<span class="fc" id="L54">        recipes.add(new ItemStack(Material.DIORITE));</span>
+<span class="fc" id="L55">        recipes.add(new ItemStack(Material.GRAVEL));</span>
+
+<span class="fc" id="L57">        recipes.add(new ItemStack(Material.GRANITE));</span>
+<span class="fc" id="L58">        recipes.add(new ItemStack(Material.GRAVEL));</span>
+
+<span class="fc" id="L60">        recipes.add(new ItemStack(Material.DIRT));</span>
+<span class="fc" id="L61">        recipes.add(SlimefunItems.STONE_CHUNK);</span>
+
+<span class="fc" id="L63">        recipes.add(new ItemStack(Material.SANDSTONE));</span>
+<span class="fc" id="L64">        recipes.add(new ItemStack(Material.SAND, 4));</span>
+
+<span class="fc" id="L66">        recipes.add(new ItemStack(Material.RED_SANDSTONE));</span>
+<span class="fc" id="L67">        recipes.add(new ItemStack(Material.RED_SAND, 4));</span>
+
+<span class="fc" id="L69">        recipes.add(new ItemStack(Material.PRISMARINE_BRICKS));</span>
+<span class="fc" id="L70">        recipes.add(new ItemStack(Material.PRISMARINE, 2));</span>
+
+<span class="fc" id="L72">        recipes.add(new ItemStack(Material.PRISMARINE));</span>
+<span class="fc" id="L73">        recipes.add(new ItemStack(Material.PRISMARINE_SHARD, 4));</span>
+
+<span class="fc" id="L75">        recipes.add(new ItemStack(Material.NETHER_WART_BLOCK));</span>
+<span class="fc" id="L76">        recipes.add(new ItemStack(Material.NETHER_WART, 9));</span>
+
+<span class="fc" id="L78">        recipes.add(new ItemStack(Material.QUARTZ_BLOCK));</span>
+<span class="fc" id="L79">        recipes.add(new ItemStack(Material.QUARTZ, 4));</span>
+
+<span class="pc bpc" id="L81" title="1 of 2 branches missed.">        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {</span>
+<span class="fc" id="L82">            recipes.add(new ItemStack(Material.AMETHYST_BLOCK));</span>
+<span class="fc" id="L83">            recipes.add(new ItemStack(Material.AMETHYST_SHARD, 4));</span>
+
+<span class="fc" id="L85">            recipes.add(new ItemStack(Material.COBBLED_DEEPSLATE));</span>
+<span class="fc" id="L86">            recipes.add(new ItemStack(Material.GRAVEL));</span>
+        }
+
+<span class="fc" id="L89">        recipes.add(SlimefunItems.MAGIC_LUMP_2);</span>
+<span class="fc" id="L90">        recipes.add(new SlimefunItemStack(SlimefunItems.MAGIC_LUMP_1, 4));</span>
+
+<span class="fc" id="L92">        recipes.add(SlimefunItems.MAGIC_LUMP_3);</span>
+<span class="fc" id="L93">        recipes.add(new SlimefunItemStack(SlimefunItems.MAGIC_LUMP_2, 4));</span>
+
+<span class="fc" id="L95">        recipes.add(SlimefunItems.ENDER_LUMP_2);</span>
+<span class="fc" id="L96">        recipes.add(new SlimefunItemStack(SlimefunItems.ENDER_LUMP_1, 4));</span>
+
+<span class="fc" id="L98">        recipes.add(SlimefunItems.ENDER_LUMP_3);</span>
+<span class="fc" id="L99">        recipes.add(new SlimefunItemStack(SlimefunItems.ENDER_LUMP_2, 4));</span>
+
+<span class="fc" id="L101">        recipes.add(new ItemStack(Material.DIAMOND));</span>
+<span class="fc" id="L102">        recipes.add(new SlimefunItemStack(SlimefunItems.CARBON, 4));</span>
+<span class="fc" id="L103">    }</span>
+
+    @Override
+    public List&lt;ItemStack&gt; getDisplayRecipes() {
+<span class="nc" id="L107">        return recipes.stream().map(items -&gt; items[0]).collect(Collectors.toList());</span>
+    }
+
+    @Override
+    public void onInteract(Player p, Block b) {
+<span class="nc" id="L112">        Block possibleDispenser = b.getRelative(BlockFace.DOWN);</span>
+<span class="nc" id="L113">        BlockState state = PaperLib.getBlockState(possibleDispenser, false).getState();</span>
+
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (state instanceof Dispenser dispenser) {</span>
+<span class="nc" id="L116">            Inventory inv = dispenser.getInventory();</span>
+
+<span class="nc bnc" id="L118" title="All 2 branches missed.">            for (ItemStack current : inv.getContents()) {</span>
+<span class="nc bnc" id="L119" title="All 2 branches missed.">                for (ItemStack convert : RecipeType.getRecipeInputs(this)) {</span>
+<span class="nc bnc" id="L120" title="All 4 branches missed.">                    if (convert != null &amp;&amp; SlimefunUtils.isItemSimilar(current, convert, true)) {</span>
+<span class="nc" id="L121">                        ItemStack output = RecipeType.getRecipeOutput(this, convert);</span>
+<span class="nc" id="L122">                        Inventory outputInv = findOutputInventory(output, possibleDispenser, inv);</span>
+
+<span class="nc bnc" id="L124" title="All 2 branches missed.">                        if (outputInv != null) {</span>
+<span class="nc" id="L125">                            ItemStack removing = current.clone();</span>
+<span class="nc" id="L126">                            removing.setAmount(1);</span>
+<span class="nc" id="L127">                            inv.removeItem(removing);</span>
+<span class="nc" id="L128">                            outputInv.addItem(output);</span>
+<span class="nc" id="L129">                            p.getWorld().playSound(p.getLocation(), Sound.BLOCK_WOODEN_BUTTON_CLICK_ON, 1, 1);</span>
+<span class="nc" id="L130">                        } else {</span>
+<span class="nc" id="L131">                            Slimefun.getLocalization().sendMessage(p, &quot;machines.full-inventory&quot;, true);</span>
+                        }
+
+<span class="nc" id="L134">                        return;</span>
+                    }
+<span class="nc" id="L136">                }</span>
+            }
+
+<span class="nc" id="L139">            Slimefun.getLocalization().sendMessage(p, &quot;machines.unknown-material&quot;, true);</span>
+        }
+<span class="nc" id="L141">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

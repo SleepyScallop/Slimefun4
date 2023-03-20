@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OreCrusher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks</a> &gt; <span class="el_source">OreCrusher.java</span></div><h1>OreCrusher.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Effect;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Dispenser;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.thebusybiscuit.slimefun4.api.MinecraftVersion;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemSetting;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.multiblocks.MultiBlockMachine;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+import io.papermc.lib.PaperLib;
+
+/**
+ * The {@link OreCrusher} is a {@link MultiBlockMachine} which allows you to double ores
+ * and crush some other {@link Material Materials} into various resources.
+ * 
+ * @author TheBusyBiscuit
+ *
+ */
+public class OreCrusher extends MultiBlockMachine {
+
+<span class="fc" id="L42">    private final DoubleOreSetting doubleOres = new DoubleOreSetting(this);</span>
+
+    @ParametersAreNonnullByDefault
+    public OreCrusher(ItemGroup itemGroup, SlimefunItemStack item) {
+<span class="fc" id="L46">        super(itemGroup, item, new ItemStack[] { null, null, null, null, new ItemStack(Material.NETHER_BRICK_FENCE), null, new ItemStack(Material.IRON_BARS), new CustomItemStack(Material.DISPENSER, &quot;Dispenser (Facing up)&quot;), new ItemStack(Material.IRON_BARS) }, BlockFace.SELF);</span>
+
+<span class="fc" id="L48">        addItemSetting(doubleOres);</span>
+<span class="fc" id="L49">    }</span>
+
+    @Override
+    protected void registerDefaultRecipes(List&lt;ItemStack&gt; recipes) {
+<span class="fc" id="L53">        recipes.add(new ItemStack(Material.COBBLESTONE, 8));</span>
+<span class="fc" id="L54">        recipes.add(new ItemStack(Material.SAND, 1));</span>
+
+<span class="fc" id="L56">        recipes.add(SlimefunItems.GOLD_4K);</span>
+<span class="fc" id="L57">        recipes.add(SlimefunItems.GOLD_DUST);</span>
+
+<span class="fc" id="L59">        recipes.add(SlimefunItems.GOLD_6K);</span>
+<span class="fc" id="L60">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 2));</span>
+
+<span class="fc" id="L62">        recipes.add(SlimefunItems.GOLD_8K);</span>
+<span class="fc" id="L63">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 2));</span>
+
+<span class="fc" id="L65">        recipes.add(SlimefunItems.GOLD_10K);</span>
+<span class="fc" id="L66">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 3));</span>
+
+<span class="fc" id="L68">        recipes.add(SlimefunItems.GOLD_12K);</span>
+<span class="fc" id="L69">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 3));</span>
+
+<span class="fc" id="L71">        recipes.add(SlimefunItems.GOLD_14K);</span>
+<span class="fc" id="L72">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 4));</span>
+
+<span class="fc" id="L74">        recipes.add(SlimefunItems.GOLD_16K);</span>
+<span class="fc" id="L75">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 4));</span>
+
+<span class="fc" id="L77">        recipes.add(SlimefunItems.GOLD_18K);</span>
+<span class="fc" id="L78">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 5));</span>
+
+<span class="fc" id="L80">        recipes.add(SlimefunItems.GOLD_20K);</span>
+<span class="fc" id="L81">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 5));</span>
+
+<span class="fc" id="L83">        recipes.add(SlimefunItems.GOLD_22K);</span>
+<span class="fc" id="L84">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 6));</span>
+
+<span class="fc" id="L86">        recipes.add(SlimefunItems.GOLD_24K);</span>
+<span class="fc" id="L87">        recipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, 6));</span>
+
+<span class="fc" id="L89">        recipes.add(new ItemStack(Material.GRAVEL));</span>
+<span class="fc" id="L90">        recipes.add(new ItemStack(Material.SAND));</span>
+
+<span class="fc" id="L92">        recipes.add(new ItemStack(Material.MAGMA_BLOCK));</span>
+<span class="fc" id="L93">        recipes.add(SlimefunItems.SULFATE);</span>
+
+<span class="fc" id="L95">        recipes.add(SlimefunItems.CARBON);</span>
+<span class="fc" id="L96">        recipes.add(new ItemStack(Material.COAL, 8));</span>
+
+<span class="fc" id="L98">        recipes.add(SlimefunItems.COMPRESSED_CARBON);</span>
+<span class="fc" id="L99">        recipes.add(new SlimefunItemStack(SlimefunItems.CARBON, 4));</span>
+
+<span class="pc bpc" id="L101" title="1 of 2 branches missed.">        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {</span>
+<span class="fc" id="L102">            recipes.add(new ItemStack(Material.COBBLED_DEEPSLATE, 8));</span>
+<span class="fc" id="L103">            recipes.add(new ItemStack(Material.SAND, 1));</span>
+        }
+<span class="fc" id="L105">    }</span>
+
+    public boolean isOreDoublingEnabled() {
+<span class="fc" id="L108">        return doubleOres.getValue();</span>
+    }
+
+    @Override
+    public void postRegister() {
+<span class="fc" id="L113">        super.postRegister();</span>
+
+        // @formatter:off
+<span class="fc" id="L116">        displayRecipes.addAll(Arrays.asList(</span>
+<span class="fc" id="L117">            new ItemStack(Material.COAL_ORE), doubleOres.getCoal(),</span>
+<span class="fc" id="L118">            new ItemStack(Material.LAPIS_ORE), doubleOres.getLapisLazuli(),</span>
+<span class="fc" id="L119">            new ItemStack(Material.REDSTONE_ORE), doubleOres.getRedstone(),</span>
+<span class="fc" id="L120">            new ItemStack(Material.DIAMOND_ORE), doubleOres.getDiamond(),</span>
+<span class="fc" id="L121">            new ItemStack(Material.EMERALD_ORE), doubleOres.getEmerald(),</span>
+<span class="fc" id="L122">            new ItemStack(Material.NETHER_QUARTZ_ORE), doubleOres.getNetherQuartz()</span>
+        ));
+        // @formatter:on
+
+        // Gold ore variants (1.16+)
+<span class="fc" id="L127">        displayRecipes.add(new ItemStack(Material.NETHER_GOLD_ORE));</span>
+<span class="fc" id="L128">        displayRecipes.add(doubleOres.getGoldNuggets());</span>
+
+<span class="fc" id="L130">        displayRecipes.add(new ItemStack(Material.GILDED_BLACKSTONE));</span>
+<span class="fc" id="L131">        displayRecipes.add(doubleOres.getGoldNuggets());</span>
+
+        // Raw metal ores (1.17+)
+<span class="pc bpc" id="L134" title="1 of 2 branches missed.">        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {</span>
+<span class="fc" id="L135">            displayRecipes.add(new ItemStack(Material.RAW_IRON));</span>
+<span class="fc" id="L136">            displayRecipes.add(SlimefunItems.IRON_DUST);</span>
+
+<span class="fc" id="L138">            displayRecipes.add(new ItemStack(Material.RAW_COPPER));</span>
+<span class="fc" id="L139">            displayRecipes.add(SlimefunItems.COPPER_DUST);</span>
+
+<span class="fc" id="L141">            displayRecipes.add(new ItemStack(Material.RAW_GOLD));</span>
+<span class="fc" id="L142">            displayRecipes.add(SlimefunItems.GOLD_DUST);</span>
+        }
+
+        // Deepslate Ores (1.17+)
+<span class="pc bpc" id="L146" title="1 of 2 branches missed.">        if (Slimefun.getMinecraftVersion().isAtLeast(MinecraftVersion.MINECRAFT_1_17)) {</span>
+            // @formatter:off
+<span class="fc" id="L148">            displayRecipes.addAll(Arrays.asList(</span>
+<span class="fc" id="L149">                new ItemStack(Material.DEEPSLATE_COAL_ORE), doubleOres.getCoal(),</span>
+<span class="fc" id="L150">                new ItemStack(Material.DEEPSLATE_LAPIS_ORE), doubleOres.getLapisLazuli(),</span>
+<span class="fc" id="L151">                new ItemStack(Material.DEEPSLATE_REDSTONE_ORE), doubleOres.getRedstone(),</span>
+<span class="fc" id="L152">                new ItemStack(Material.DEEPSLATE_DIAMOND_ORE), doubleOres.getDiamond(),</span>
+<span class="fc" id="L153">                new ItemStack(Material.DEEPSLATE_EMERALD_ORE), doubleOres.getEmerald()</span>
+            ));
+            // @formatter:on
+
+            // More deepslate ores and copper ore
+<span class="fc" id="L158">            displayRecipes.add(new ItemStack(Material.DEEPSLATE_IRON_ORE));</span>
+<span class="pc bpc" id="L159" title="1 of 2 branches missed.">            displayRecipes.add(new SlimefunItemStack(SlimefunItems.IRON_DUST, isOreDoublingEnabled() ? 2 : 1));</span>
+
+<span class="fc" id="L161">            displayRecipes.add(new ItemStack(Material.DEEPSLATE_GOLD_ORE));</span>
+<span class="pc bpc" id="L162" title="1 of 2 branches missed.">            displayRecipes.add(new SlimefunItemStack(SlimefunItems.GOLD_DUST, isOreDoublingEnabled() ? 2 : 1));</span>
+
+<span class="fc" id="L164">            displayRecipes.add(new ItemStack(Material.DEEPSLATE_COPPER_ORE));</span>
+<span class="pc bpc" id="L165" title="1 of 2 branches missed.">            displayRecipes.add(new SlimefunItemStack(SlimefunItems.COPPER_DUST, isOreDoublingEnabled() ? 2 : 1));</span>
+
+<span class="fc" id="L167">            displayRecipes.add(new ItemStack(Material.COPPER_ORE));</span>
+<span class="pc bpc" id="L168" title="1 of 2 branches missed.">            displayRecipes.add(new SlimefunItemStack(SlimefunItems.COPPER_DUST, isOreDoublingEnabled() ? 2 : 1));</span>
+        }
+<span class="fc" id="L170">    }</span>
+
+    @Override
+    public List&lt;ItemStack&gt; getDisplayRecipes() {
+<span class="nc" id="L174">        return recipes.stream().map(items -&gt; items[0]).collect(Collectors.toList());</span>
+    }
+
+    @Override
+    public void onInteract(Player p, Block b) {
+<span class="nc" id="L179">        Block possibleDispenser = b.getRelative(BlockFace.DOWN);</span>
+<span class="nc" id="L180">        BlockState state = PaperLib.getBlockState(possibleDispenser, false).getState();</span>
+
+<span class="nc bnc" id="L182" title="All 2 branches missed.">        if (state instanceof Dispenser dispenser) {</span>
+<span class="nc" id="L183">            Inventory inv = dispenser.getInventory();</span>
+
+<span class="nc bnc" id="L185" title="All 2 branches missed.">            for (ItemStack current : inv.getContents()) {</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">                for (ItemStack convert : RecipeType.getRecipeInputs(this)) {</span>
+<span class="nc bnc" id="L187" title="All 4 branches missed.">                    if (convert != null &amp;&amp; SlimefunUtils.isItemSimilar(current, convert, true)) {</span>
+<span class="nc" id="L188">                        ItemStack adding = RecipeType.getRecipeOutput(this, convert);</span>
+<span class="nc" id="L189">                        Inventory outputInv = findOutputInventory(adding, possibleDispenser, inv);</span>
+
+<span class="nc bnc" id="L191" title="All 2 branches missed.">                        if (SlimefunUtils.canPlayerUseItem(p, adding, true)) {</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">                            if (outputInv != null) {</span>
+<span class="nc" id="L193">                                ItemStack removing = current.clone();</span>
+<span class="nc" id="L194">                                removing.setAmount(convert.getAmount());</span>
+<span class="nc" id="L195">                                inv.removeItem(removing);</span>
+<span class="nc" id="L196">                                outputInv.addItem(adding);</span>
+<span class="nc" id="L197">                                p.getWorld().playEffect(b.getLocation(), Effect.STEP_SOUND, 1);</span>
+<span class="nc" id="L198">                            } else {</span>
+<span class="nc" id="L199">                                Slimefun.getLocalization().sendMessage(p, &quot;machines.full-inventory&quot;, true);</span>
+                            }
+                        }
+
+<span class="nc" id="L203">                        return;</span>
+                    }
+<span class="nc" id="L205">                }</span>
+            }
+
+<span class="nc" id="L208">            Slimefun.getLocalization().sendMessage(p, &quot;machines.unknown-material&quot;, true);</span>
+        }
+<span class="nc" id="L210">    }</span>
+
+    private class DoubleOreSetting extends ItemSetting&lt;Boolean&gt; {
+
+<span class="fc" id="L214">        private final ItemStack coal = new ItemStack(Material.COAL, 1);</span>
+<span class="fc" id="L215">        private final ItemStack lapis = new ItemStack(Material.LAPIS_LAZULI, 7);</span>
+<span class="fc" id="L216">        private final ItemStack redstone = new ItemStack(Material.REDSTONE, 4);</span>
+<span class="fc" id="L217">        private final ItemStack diamond = new ItemStack(Material.DIAMOND, 1);</span>
+<span class="fc" id="L218">        private final ItemStack emerald = new ItemStack(Material.EMERALD, 1);</span>
+<span class="fc" id="L219">        private final ItemStack quartz = new ItemStack(Material.QUARTZ, 1);</span>
+<span class="fc" id="L220">        private final ItemStack goldNuggets = new ItemStack(Material.GOLD_NUGGET, 4);</span>
+
+<span class="fc" id="L222">        DoubleOreSetting(@Nonnull OreCrusher oreCrusher) {</span>
+<span class="fc" id="L223">            super(oreCrusher, &quot;double-ores&quot;, true);</span>
+<span class="fc" id="L224">        }</span>
+
+        private void apply(boolean value) {
+<span class="pc bpc" id="L227" title="1 of 2 branches missed.">            coal.setAmount(value ? 2 : 1);</span>
+<span class="pc bpc" id="L228" title="1 of 2 branches missed.">            lapis.setAmount(value ? 14 : 7);</span>
+<span class="pc bpc" id="L229" title="1 of 2 branches missed.">            redstone.setAmount(value ? 8 : 4);</span>
+<span class="pc bpc" id="L230" title="1 of 2 branches missed.">            diamond.setAmount(value ? 2 : 1);</span>
+<span class="pc bpc" id="L231" title="1 of 2 branches missed.">            emerald.setAmount(value ? 2 : 1);</span>
+<span class="pc bpc" id="L232" title="1 of 2 branches missed.">            quartz.setAmount(value ? 2 : 1);</span>
+<span class="pc bpc" id="L233" title="1 of 2 branches missed.">            goldNuggets.setAmount(value ? 8 : 4);</span>
+
+<span class="fc" id="L235">            SlimefunItem ironDust = SlimefunItem.getById(&quot;IRON_DUST&quot;);</span>
+<span class="pc bpc" id="L236" title="1 of 2 branches missed.">            if (ironDust != null) {</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">                ironDust.setRecipeOutput(new SlimefunItemStack(SlimefunItems.IRON_DUST, value ? 2 : 1));</span>
+            }
+
+<span class="fc" id="L240">            SlimefunItem goldDust = SlimefunItem.getById(&quot;GOLD_DUST&quot;);</span>
+<span class="pc bpc" id="L241" title="1 of 2 branches missed.">            if (goldDust != null) {</span>
+<span class="nc bnc" id="L242" title="All 2 branches missed.">                goldDust.setRecipeOutput(new SlimefunItemStack(SlimefunItems.GOLD_DUST, value ? 2 : 1));</span>
+            }
+<span class="fc" id="L244">        }</span>
+
+        @Override
+        public void update(Boolean newValue) {
+<span class="nc" id="L248">            super.update(newValue);</span>
+<span class="nc" id="L249">            apply(newValue);</span>
+<span class="nc" id="L250">        }</span>
+
+        @Override
+        public void reload() {
+<span class="fc" id="L254">            super.reload();</span>
+<span class="fc" id="L255">            apply(getValue());</span>
+<span class="fc" id="L256">        }</span>
+
+        public @Nonnull ItemStack getCoal() {
+<span class="fc" id="L259">            return coal;</span>
+        }
+
+        public @Nonnull ItemStack getLapisLazuli() {
+<span class="fc" id="L263">            return lapis;</span>
+        }
+
+        public @Nonnull ItemStack getRedstone() {
+<span class="fc" id="L267">            return redstone;</span>
+        }
+
+        public @Nonnull ItemStack getDiamond() {
+<span class="fc" id="L271">            return diamond;</span>
+        }
+
+        public @Nonnull ItemStack getEmerald() {
+<span class="fc" id="L275">            return emerald;</span>
+        }
+
+        public @Nonnull ItemStack getNetherQuartz() {
+<span class="fc" id="L279">            return quartz;</span>
+        }
+
+        public @Nonnull ItemStack getGoldNuggets() {
+<span class="fc" id="L283">            return goldNuggets;</span>
+        }
+
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WrongItemStackException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.api.exceptions</a> &gt; <span class="el_source">WrongItemStackException.java</span></div><h1>WrongItemStackException.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.api.exceptions;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.inventory.ItemStack;
+
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.core.attributes.DamageableItem;
+
+/**
+ * A {@link WrongItemStackException} is thrown when someone tries to alter an {@link ItemStack}
+ * but actually wanted to alter a different one.
+ * 
+ * If for example a {@link DamageableItem} accidentally damages the original {@link SlimefunItem}
+ * instead of the held {@link ItemStack}, this will be thrown.
+ * 
+ * @author TheBusyBiscuit
+ * 
+ * @see SlimefunItemStack
+ * @see SlimefunItem
+ *
+ */
+public class WrongItemStackException extends RuntimeException {
+
+    private static final long serialVersionUID = 9144658137363309071L;
+
+    /**
+     * This constructs a new {@link WrongItemStackException} with the given error context.
+     * 
+     * @param message
+     *            An error message to display
+     */
+    @ParametersAreNonnullByDefault
+    public WrongItemStackException(String message) {
+<span class="fc" id="L36">        super(&quot;You probably wanted to alter a different ItemStack: &quot; + message);</span>
+<span class="fc" id="L37">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,930 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProgrammableAndroid.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.androids</a> &gt; <span class="el_source">ProgrammableAndroid.java</span></div><h1>ProgrammableAndroid.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.androids;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
+import java.util.logging.Level;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.Tag;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.Dispenser;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.block.data.Rotatable;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import io.github.bakedlibs.dough.chat.ChatInput;
+import io.github.bakedlibs.dough.common.ChatColors;
+import io.github.bakedlibs.dough.common.CommonPatterns;
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.bakedlibs.dough.items.ItemUtils;
+import io.github.bakedlibs.dough.skins.PlayerHead;
+import io.github.bakedlibs.dough.skins.PlayerSkin;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.RecipeDisplayItem;
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.utils.ChestMenuUtils;
+import io.github.thebusybiscuit.slimefun4.utils.HeadTexture;
+import io.github.thebusybiscuit.slimefun4.utils.NumberUtils;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+import io.papermc.lib.PaperLib;
+
+import me.mrCookieSlime.CSCoreLibPlugin.Configuration.Config;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ChestMenu.AdvancedMenuClickHandler;
+import me.mrCookieSlime.CSCoreLibPlugin.general.Inventory.ClickAction;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems.MachineFuel;
+import me.mrCookieSlime.Slimefun.Objects.SlimefunItem.interfaces.InventoryBlock;
+import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenu;
+import me.mrCookieSlime.Slimefun.api.inventory.BlockMenuPreset;
+import me.mrCookieSlime.Slimefun.api.item_transport.ItemTransportFlow;
+
+public class ProgrammableAndroid extends SlimefunItem implements InventoryBlock, RecipeDisplayItem {
+
+<span class="fc" id="L70">    private static final List&lt;BlockFace&gt; POSSIBLE_ROTATIONS = Arrays.asList(BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST);</span>
+<span class="fc" id="L71">    private static final int[] BORDER = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 18, 24, 25, 26, 27, 33, 35, 36, 42, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53 };</span>
+<span class="fc" id="L72">    private static final int[] OUTPUT_BORDER = { 10, 11, 12, 13, 14, 19, 23, 28, 32, 37, 38, 39, 40, 41 };</span>
+    private static final String DEFAULT_SCRIPT = &quot;START-TURN_LEFT-REPEAT&quot;;
+    private static final int MAX_SCRIPT_LENGTH = 54;
+
+<span class="fc" id="L76">    protected final List&lt;MachineFuel&gt; fuelTypes = new ArrayList&lt;&gt;();</span>
+    protected final String texture;
+    private final int tier;
+
+    @ParametersAreNonnullByDefault
+    public ProgrammableAndroid(ItemGroup itemGroup, int tier, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+<span class="fc" id="L82">        super(itemGroup, item, recipeType, recipe);</span>
+
+<span class="fc" id="L84">        this.tier = tier;</span>
+<span class="fc" id="L85">        texture = item.getSkullTexture().orElse(null);</span>
+<span class="fc" id="L86">        registerDefaultFuelTypes();</span>
+
+<span class="fc" id="L88">        new BlockMenuPreset(getId(), &quot;Programmable Android&quot;) {</span>
+
+            @Override
+            public void init() {
+<span class="fc" id="L92">                constructMenu(this);</span>
+<span class="fc" id="L93">            }</span>
+
+            @Override
+            public boolean canOpen(Block b, Player p) {
+<span class="nc bnc" id="L97" title="All 4 branches missed.">                boolean open = BlockStorage.getLocationInfo(b.getLocation(), &quot;owner&quot;).equals(p.getUniqueId().toString()) || p.hasPermission(&quot;slimefun.android.bypass&quot;);</span>
+
+<span class="nc bnc" id="L99" title="All 2 branches missed.">                if (!open) {</span>
+<span class="nc" id="L100">                    Slimefun.getLocalization().sendMessage(p, &quot;inventory.no-access&quot;, true);</span>
+                }
+
+<span class="nc" id="L103">                return open;</span>
+            }
+
+            @Override
+            public void newInstance(BlockMenu menu, Block b) {
+<span class="nc" id="L108">                menu.replaceExistingItem(15, new CustomItemStack(HeadTexture.SCRIPT_START.getAsItemStack(), &quot;&amp;aStart/Continue&quot;));</span>
+<span class="nc" id="L109">                menu.addMenuClickHandler(15, (p, slot, item, action) -&gt; {</span>
+<span class="nc" id="L110">                    Slimefun.getLocalization().sendMessage(p, &quot;android.started&quot;, true);</span>
+<span class="nc" id="L111">                    BlockStorage.addBlockInfo(b, &quot;paused&quot;, &quot;false&quot;);</span>
+<span class="nc" id="L112">                    p.closeInventory();</span>
+<span class="nc" id="L113">                    return false;</span>
+                });
+
+<span class="nc" id="L116">                menu.replaceExistingItem(17, new CustomItemStack(HeadTexture.SCRIPT_PAUSE.getAsItemStack(), &quot;&amp;4Pause&quot;));</span>
+<span class="nc" id="L117">                menu.addMenuClickHandler(17, (p, slot, item, action) -&gt; {</span>
+<span class="nc" id="L118">                    BlockStorage.addBlockInfo(b, &quot;paused&quot;, &quot;true&quot;);</span>
+<span class="nc" id="L119">                    Slimefun.getLocalization().sendMessage(p, &quot;android.stopped&quot;, true);</span>
+<span class="nc" id="L120">                    return false;</span>
+                });
+
+<span class="nc" id="L123">                menu.replaceExistingItem(16, new CustomItemStack(HeadTexture.ENERGY_REGULATOR.getAsItemStack(), &quot;&amp;bMemory Core&quot;, &quot;&quot;, &quot;&amp;8\u21E8 &amp;7Click to open the Script Editor&quot;));</span>
+<span class="nc" id="L124">                menu.addMenuClickHandler(16, (p, slot, item, action) -&gt; {</span>
+<span class="nc" id="L125">                    BlockStorage.addBlockInfo(b, &quot;paused&quot;, &quot;true&quot;);</span>
+<span class="nc" id="L126">                    Slimefun.getLocalization().sendMessage(p, &quot;android.stopped&quot;, true);</span>
+<span class="nc" id="L127">                    openScriptEditor(p, b);</span>
+<span class="nc" id="L128">                    return false;</span>
+                });
+<span class="nc" id="L130">            }</span>
+
+            @Override
+            public int[] getSlotsAccessedByItemTransport(ItemTransportFlow flow) {
+<span class="nc" id="L134">                return new int[0];</span>
+            }
+        };
+
+<span class="fc" id="L138">        addItemHandler(onPlace(), onBreak());</span>
+<span class="fc" id="L139">    }</span>
+
+    @Nonnull
+    private BlockPlaceHandler onPlace() {
+<span class="fc" id="L143">        return new BlockPlaceHandler(false) {</span>
+
+            @Override
+            public void onPlayerPlace(BlockPlaceEvent e) {
+<span class="nc" id="L147">                Player p = e.getPlayer();</span>
+<span class="nc" id="L148">                Block b = e.getBlock();</span>
+
+<span class="nc" id="L150">                BlockStorage.addBlockInfo(b, &quot;owner&quot;, p.getUniqueId().toString());</span>
+<span class="nc" id="L151">                BlockStorage.addBlockInfo(b, &quot;script&quot;, DEFAULT_SCRIPT);</span>
+<span class="nc" id="L152">                BlockStorage.addBlockInfo(b, &quot;index&quot;, &quot;0&quot;);</span>
+<span class="nc" id="L153">                BlockStorage.addBlockInfo(b, &quot;fuel&quot;, &quot;0&quot;);</span>
+<span class="nc" id="L154">                BlockStorage.addBlockInfo(b, &quot;rotation&quot;, p.getFacing().getOppositeFace().toString());</span>
+<span class="nc" id="L155">                BlockStorage.addBlockInfo(b, &quot;paused&quot;, &quot;true&quot;);</span>
+
+<span class="nc" id="L157">                BlockData blockData = Material.PLAYER_HEAD.createBlockData(data -&gt; {</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">                    if (data instanceof Rotatable rotatable) {</span>
+<span class="nc" id="L159">                        rotatable.setRotation(p.getFacing());</span>
+                    }
+<span class="nc" id="L161">                });</span>
+
+<span class="nc" id="L163">                b.setBlockData(blockData);</span>
+<span class="nc" id="L164">            }</span>
+        };
+    }
+
+    @Nonnull
+    private BlockBreakHandler onBreak() {
+<span class="fc" id="L170">        return new BlockBreakHandler(false, false) {</span>
+
+            @Override
+            public void onPlayerBreak(BlockBreakEvent e, ItemStack item, List&lt;ItemStack&gt; drops) {
+<span class="nc" id="L174">                Block b = e.getBlock();</span>
+<span class="nc" id="L175">                String owner = BlockStorage.getLocationInfo(b.getLocation(), &quot;owner&quot;);</span>
+
+<span class="nc bnc" id="L177" title="All 4 branches missed.">                if (!e.getPlayer().hasPermission(&quot;slimefun.android.bypass&quot;) &amp;&amp; !e.getPlayer().getUniqueId().toString().equals(owner)) {</span>
+                    // The Player is not allowed to break this android
+<span class="nc" id="L179">                    e.setCancelled(true);</span>
+<span class="nc" id="L180">                    return;</span>
+                }
+
+<span class="nc" id="L183">                BlockMenu inv = BlockStorage.getInventory(b);</span>
+
+<span class="nc bnc" id="L185" title="All 2 branches missed.">                if (inv != null) {</span>
+<span class="nc" id="L186">                    inv.dropItems(b.getLocation(), 43);</span>
+<span class="nc" id="L187">                    inv.dropItems(b.getLocation(), getOutputSlots());</span>
+                }
+<span class="nc" id="L189">            }</span>
+        };
+    }
+
+    /**
+     * This returns the {@link AndroidType} that is associated with this {@link ProgrammableAndroid}.
+     * 
+     * @return The type of this {@link ProgrammableAndroid}
+     */
+    public AndroidType getAndroidType() {
+<span class="nc" id="L199">        return AndroidType.NONE;</span>
+    }
+
+    /**
+     * This returns the {@link AndroidFuelSource} for this {@link ProgrammableAndroid}.
+     * It determines what kind of fuel is required to run it.
+     * 
+     * @return The required type of fuel
+     */
+    public AndroidFuelSource getFuelSource() {
+<span class="pc bpc" id="L209" title="1 of 4 branches missed.">        return switch (getTier()) {</span>
+<span class="fc" id="L210">            case 1 -&gt; AndroidFuelSource.SOLID;</span>
+<span class="fc" id="L211">            case 2 -&gt; AndroidFuelSource.LIQUID;</span>
+<span class="fc" id="L212">            case 3 -&gt; AndroidFuelSource.NUCLEAR;</span>
+<span class="nc" id="L213">            default -&gt; throw new IllegalStateException(&quot;Cannot convert the following Android tier to a fuel type: &quot; + getTier());</span>
+        };
+    }
+
+    @Override
+    public void preRegister() {
+<span class="fc" id="L219">        super.preRegister();</span>
+
+<span class="fc" id="L221">        addItemHandler(new BlockTicker() {</span>
+
+            @Override
+            public void tick(Block b, SlimefunItem item, Config data) {
+<span class="nc bnc" id="L225" title="All 4 branches missed.">                if (b != null &amp;&amp; data != null) {</span>
+<span class="nc" id="L226">                    ProgrammableAndroid.this.tick(b, data);</span>
+                }
+<span class="nc" id="L228">            }</span>
+
+            @Override
+            public boolean isSynchronized() {
+<span class="nc" id="L232">                return true;</span>
+            }
+        });
+<span class="fc" id="L235">    }</span>
+
+    @ParametersAreNonnullByDefault
+    public void openScript(Player p, Block b, String sourceCode) {
+<span class="nc" id="L239">        ChestMenu menu = new ChestMenu(ChatColor.DARK_AQUA + Slimefun.getLocalization().getMessage(p, &quot;android.scripts.editor&quot;));</span>
+<span class="nc" id="L240">        menu.setEmptySlotsClickable(false);</span>
+
+<span class="nc" id="L242">        menu.addItem(0, new CustomItemStack(Instruction.START.getItem(), Slimefun.getLocalization().getMessage(p, &quot;android.scripts.instructions.START&quot;), &quot;&quot;, &quot;&amp;7\u21E8 &amp;eLeft Click &amp;7to return to the Android's interface&quot;));</span>
+<span class="nc" id="L243">        menu.addMenuClickHandler(0, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L244">            BlockMenu inv = BlockStorage.getInventory(b);</span>
+            // Fixes #2937
+<span class="nc bnc" id="L246" title="All 2 branches missed.">            if (inv != null) {</span>
+<span class="nc" id="L247">                inv.open(pl);</span>
+            } else {
+<span class="nc" id="L249">                pl.closeInventory();</span>
+            }
+<span class="nc" id="L251">            return false;</span>
+        });
+
+<span class="nc" id="L254">        String[] script = CommonPatterns.DASH.split(sourceCode);</span>
+
+<span class="nc bnc" id="L256" title="All 2 branches missed.">        for (int i = 1; i &lt; script.length; i++) {</span>
+<span class="nc" id="L257">            int index = i;</span>
+
+<span class="nc bnc" id="L259" title="All 2 branches missed.">            if (i == script.length - 1) {</span>
+<span class="nc bnc" id="L260" title="All 2 branches missed.">                boolean hasFreeSlot = script.length &lt; 54;</span>
+
+<span class="nc bnc" id="L262" title="All 2 branches missed.">                if (hasFreeSlot) {</span>
+<span class="nc" id="L263">                    menu.addItem(i, new CustomItemStack(HeadTexture.SCRIPT_NEW.getAsItemStack(), &quot;&amp;7&gt; Add new Command&quot;));</span>
+<span class="nc" id="L264">                    menu.addMenuClickHandler(i, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L265">                        editInstruction(pl, b, script, index);</span>
+<span class="nc" id="L266">                        return false;</span>
+                    });
+                }
+
+<span class="nc bnc" id="L270" title="All 2 branches missed.">                int slot = i + (hasFreeSlot ? 1 : 0);</span>
+<span class="nc" id="L271">                menu.addItem(slot, new CustomItemStack(Instruction.REPEAT.getItem(), Slimefun.getLocalization().getMessage(p, &quot;android.scripts.instructions.REPEAT&quot;), &quot;&quot;, &quot;&amp;7\u21E8 &amp;eLeft Click &amp;7to return to the Android's interface&quot;));</span>
+<span class="nc" id="L272">                menu.addMenuClickHandler(slot, (pl, s, item, action) -&gt; {</span>
+<span class="nc" id="L273">                    BlockMenu inv = BlockStorage.getInventory(b);</span>
+                    // Fixes #2937
+<span class="nc bnc" id="L275" title="All 2 branches missed.">                    if (inv != null) {</span>
+<span class="nc" id="L276">                        inv.open(pl);</span>
+                    } else {
+<span class="nc" id="L278">                        pl.closeInventory();</span>
+                    }
+<span class="nc" id="L280">                    return false;</span>
+                });
+<span class="nc" id="L282">            } else {</span>
+<span class="nc" id="L283">                Instruction instruction = Instruction.getInstruction(script[i]);</span>
+
+<span class="nc bnc" id="L285" title="All 2 branches missed.">                if (instruction == null) {</span>
+<span class="nc" id="L286">                    Slimefun.instance().getLogger().log(Level.WARNING, &quot;Failed to parse Android instruction: {0}, maybe your server is out of date?&quot;, script[i]);</span>
+<span class="nc" id="L287">                    return;</span>
+                }
+
+<span class="nc" id="L290">                ItemStack stack = instruction.getItem();</span>
+<span class="nc" id="L291">                menu.addItem(i, new CustomItemStack(stack, Slimefun.getLocalization().getMessage(p, &quot;android.scripts.instructions.&quot; + instruction.name()), &quot;&quot;, &quot;&amp;7\u21E8 &amp;eLeft Click &amp;7to edit&quot;, &quot;&amp;7\u21E8 &amp;eRight Click &amp;7to delete&quot;, &quot;&amp;7\u21E8 &amp;eShift + Right Click &amp;7to duplicate&quot;));</span>
+<span class="nc" id="L292">                menu.addMenuClickHandler(i, (pl, slot, item, action) -&gt; {</span>
+<span class="nc bnc" id="L293" title="All 4 branches missed.">                    if (action.isRightClicked() &amp;&amp; action.isShiftClicked()) {</span>
+<span class="nc bnc" id="L294" title="All 2 branches missed.">                        if (script.length == 54) {</span>
+<span class="nc" id="L295">                            return false;</span>
+                        }
+
+<span class="nc" id="L298">                        String code = duplicateInstruction(script, index);</span>
+<span class="nc" id="L299">                        setScript(b.getLocation(), code);</span>
+<span class="nc" id="L300">                        openScript(pl, b, code);</span>
+<span class="nc bnc" id="L301" title="All 2 branches missed.">                    } else if (action.isRightClicked()) {</span>
+<span class="nc" id="L302">                        String code = deleteInstruction(script, index);</span>
+<span class="nc" id="L303">                        setScript(b.getLocation(), code);</span>
+<span class="nc" id="L304">                        openScript(pl, b, code);</span>
+<span class="nc" id="L305">                    } else {</span>
+<span class="nc" id="L306">                        editInstruction(pl, b, script, index);</span>
+                    }
+
+<span class="nc" id="L309">                    return false;</span>
+                });
+            }
+        }
+
+<span class="nc" id="L314">        menu.open(p);</span>
+<span class="nc" id="L315">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private String addInstruction(String[] script, int index, Instruction instruction) {
+<span class="nc" id="L319">        int i = 0;</span>
+<span class="nc" id="L320">        StringBuilder builder = new StringBuilder(Instruction.START.name() + '-');</span>
+
+<span class="nc bnc" id="L322" title="All 2 branches missed.">        for (String current : script) {</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">            if (i &gt; 0) {</span>
+<span class="nc bnc" id="L324" title="All 2 branches missed.">                if (i == index) {</span>
+<span class="nc" id="L325">                    builder.append(instruction).append('-');</span>
+<span class="nc bnc" id="L326" title="All 2 branches missed.">                } else if (i &lt; script.length - 1) {</span>
+<span class="nc" id="L327">                    builder.append(current).append('-');</span>
+                }
+            }
+<span class="nc" id="L330">            i++;</span>
+        }
+
+<span class="nc" id="L333">        builder.append(Instruction.REPEAT.name());</span>
+<span class="nc" id="L334">        return builder.toString();</span>
+    }
+
+    private String duplicateInstruction(@Nonnull String[] script, int index) {
+<span class="nc" id="L338">        int i = 0;</span>
+<span class="nc" id="L339">        StringBuilder builder = new StringBuilder(Instruction.START + &quot;-&quot;);</span>
+
+<span class="nc bnc" id="L341" title="All 2 branches missed.">        for (String instruction : script) {</span>
+<span class="nc bnc" id="L342" title="All 2 branches missed.">            if (i &gt; 0) {</span>
+<span class="nc bnc" id="L343" title="All 2 branches missed.">                if (i == index) {</span>
+<span class="nc" id="L344">                    builder.append(script[i]).append('-').append(script[i]).append('-');</span>
+<span class="nc bnc" id="L345" title="All 2 branches missed.">                } else if (i &lt; script.length - 1) {</span>
+<span class="nc" id="L346">                    builder.append(instruction).append('-');</span>
+                }
+            }
+<span class="nc" id="L349">            i++;</span>
+        }
+
+<span class="nc" id="L352">        builder.append(Instruction.REPEAT.name());</span>
+<span class="nc" id="L353">        return builder.toString();</span>
+    }
+
+    private String deleteInstruction(String[] script, int index) {
+<span class="nc" id="L357">        int i = 0;</span>
+<span class="nc" id="L358">        StringBuilder builder = new StringBuilder(Instruction.START.name() + '-');</span>
+
+<span class="nc bnc" id="L360" title="All 2 branches missed.">        for (String instruction : script) {</span>
+<span class="nc bnc" id="L361" title="All 6 branches missed.">            if (i != index &amp;&amp; i &gt; 0 &amp;&amp; i &lt; script.length - 1) {</span>
+<span class="nc" id="L362">                builder.append(instruction).append('-');</span>
+            }
+
+<span class="nc" id="L365">            i++;</span>
+        }
+
+<span class="nc" id="L368">        builder.append(Instruction.REPEAT.name());</span>
+<span class="nc" id="L369">        return builder.toString();</span>
+    }
+
+    protected void openScriptDownloader(Player p, Block b, int page) {
+<span class="nc" id="L373">        ChestMenu menu = new ChestMenu(&quot;Android Scripts&quot;);</span>
+
+<span class="nc" id="L375">        menu.setEmptySlotsClickable(false);</span>
+<span class="nc" id="L376">        menu.addMenuOpeningHandler(pl -&gt; pl.playSound(pl.getLocation(), Sound.BLOCK_NOTE_BLOCK_HAT, 0.7F, 0.7F));</span>
+
+<span class="nc" id="L378">        List&lt;Script&gt; scripts = Script.getUploadedScripts(getAndroidType());</span>
+<span class="nc" id="L379">        int pages = (scripts.size() / 45) + 1;</span>
+
+<span class="nc bnc" id="L381" title="All 2 branches missed.">        for (int i = 45; i &lt; 54; i++) {</span>
+<span class="nc" id="L382">            menu.addItem(i, ChestMenuUtils.getBackground());</span>
+<span class="nc" id="L383">            menu.addMenuClickHandler(i, ChestMenuUtils.getEmptyClickHandler());</span>
+        }
+
+<span class="nc" id="L386">        menu.addItem(46, ChestMenuUtils.getPreviousButton(p, page, pages));</span>
+<span class="nc" id="L387">        menu.addMenuClickHandler(46, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L388">            int next = page - 1;</span>
+<span class="nc bnc" id="L389" title="All 2 branches missed.">            if (next &lt; 1) {</span>
+<span class="nc" id="L390">                next = pages;</span>
+            }
+<span class="nc bnc" id="L392" title="All 2 branches missed.">            if (next != page) {</span>
+<span class="nc" id="L393">                openScriptDownloader(pl, b, next);</span>
+            }
+<span class="nc" id="L395">            return false;</span>
+        });
+
+<span class="nc" id="L398">        menu.addItem(48, new CustomItemStack(HeadTexture.SCRIPT_UP.getAsItemStack(), &quot;&amp;eUpload a Script&quot;, &quot;&quot;, &quot;&amp;6Click &amp;7to upload your Android's Script&quot;, &quot;&amp;7to the Server's database&quot;));</span>
+<span class="nc" id="L399">        menu.addMenuClickHandler(48, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L400">            uploadScript(pl, b, page);</span>
+<span class="nc" id="L401">            return false;</span>
+        });
+
+<span class="nc" id="L404">        menu.addItem(50, ChestMenuUtils.getNextButton(p, page, pages));</span>
+<span class="nc" id="L405">        menu.addMenuClickHandler(50, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L406">            int next = page + 1;</span>
+<span class="nc bnc" id="L407" title="All 2 branches missed.">            if (next &gt; pages) {</span>
+<span class="nc" id="L408">                next = 1;</span>
+            }
+<span class="nc bnc" id="L410" title="All 2 branches missed.">            if (next != page) {</span>
+<span class="nc" id="L411">                openScriptDownloader(pl, b, next);</span>
+            }
+<span class="nc" id="L413">            return false;</span>
+        });
+
+<span class="nc" id="L416">        menu.addItem(53, new CustomItemStack(HeadTexture.SCRIPT_LEFT.getAsItemStack(), &quot;&amp;6&gt; Back&quot;, &quot;&quot;, &quot;&amp;7Return to the Android's interface&quot;));</span>
+<span class="nc" id="L417">        menu.addMenuClickHandler(53, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L418">            openScriptEditor(pl, b);</span>
+<span class="nc" id="L419">            return false;</span>
+        });
+
+<span class="nc" id="L422">        int index = 0;</span>
+<span class="nc" id="L423">        int categoryIndex = 45 * (page - 1);</span>
+
+<span class="nc bnc" id="L425" title="All 2 branches missed.">        for (int i = 0; i &lt; 45; i++) {</span>
+<span class="nc" id="L426">            int target = categoryIndex + i;</span>
+
+<span class="nc bnc" id="L428" title="All 2 branches missed.">            if (target &gt;= scripts.size()) {</span>
+<span class="nc" id="L429">                break;</span>
+            } else {
+<span class="nc" id="L431">                Script script = scripts.get(target);</span>
+<span class="nc" id="L432">                menu.addItem(index, script.getAsItemStack(this, p), (player, slot, stack, action) -&gt; {</span>
+                    try {
+<span class="nc bnc" id="L434" title="All 2 branches missed.">                        if (action.isShiftClicked()) {</span>
+<span class="nc bnc" id="L435" title="All 2 branches missed.">                            if (script.isAuthor(player)) {</span>
+<span class="nc" id="L436">                                Slimefun.getLocalization().sendMessage(player, &quot;android.scripts.rating.own&quot;, true);</span>
+<span class="nc bnc" id="L437" title="All 2 branches missed.">                            } else if (script.canRate(player)) {</span>
+<span class="nc bnc" id="L438" title="All 2 branches missed.">                                script.rate(player, !action.isRightClicked());</span>
+<span class="nc" id="L439">                                openScriptDownloader(player, b, page);</span>
+                            } else {
+<span class="nc" id="L441">                                Slimefun.getLocalization().sendMessage(player, &quot;android.scripts.rating.already&quot;, true);</span>
+                            }
+<span class="nc bnc" id="L443" title="All 2 branches missed.">                        } else if (!action.isRightClicked()) {</span>
+<span class="nc" id="L444">                            script.download();</span>
+<span class="nc" id="L445">                            setScript(b.getLocation(), script.getSourceCode());</span>
+<span class="nc" id="L446">                            openScriptEditor(player, b);</span>
+                        }
+<span class="nc" id="L448">                    } catch (Exception x) {</span>
+<span class="nc" id="L449">                        Slimefun.logger().log(Level.SEVERE, &quot;An Exception was thrown when a User tried to download a Script!&quot;, x);</span>
+<span class="nc" id="L450">                    }</span>
+
+<span class="nc" id="L452">                    return false;</span>
+                });
+
+<span class="nc" id="L455">                index++;</span>
+            }
+        }
+
+<span class="nc" id="L459">        menu.open(p);</span>
+<span class="nc" id="L460">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void uploadScript(Player p, Block b, int page) {
+<span class="nc" id="L464">        String code = getScript(b.getLocation());</span>
+<span class="nc" id="L465">        int nextId = 1;</span>
+
+<span class="nc bnc" id="L467" title="All 2 branches missed.">        for (Script script : Script.getUploadedScripts(getAndroidType())) {</span>
+<span class="nc bnc" id="L468" title="All 2 branches missed.">            if (script.isAuthor(p)) {</span>
+<span class="nc" id="L469">                nextId++;</span>
+            }
+
+<span class="nc bnc" id="L472" title="All 2 branches missed.">            if (script.getSourceCode().equals(code)) {</span>
+<span class="nc" id="L473">                Slimefun.getLocalization().sendMessage(p, &quot;android.scripts.already-uploaded&quot;, true);</span>
+<span class="nc" id="L474">                return;</span>
+            }
+<span class="nc" id="L476">        }</span>
+
+<span class="nc" id="L478">        p.closeInventory();</span>
+<span class="nc" id="L479">        Slimefun.getLocalization().sendMessages(p, &quot;android.scripts.enter-name&quot;);</span>
+<span class="nc" id="L480">        int id = nextId;</span>
+
+<span class="nc" id="L482">        ChatInput.waitForPlayer(Slimefun.instance(), p, msg -&gt; {</span>
+<span class="nc" id="L483">            Script.upload(p, getAndroidType(), id, msg, code);</span>
+<span class="nc" id="L484">            Slimefun.getLocalization().sendMessages(p, &quot;android.scripts.uploaded&quot;);</span>
+<span class="nc" id="L485">            openScriptDownloader(p, b, page);</span>
+<span class="nc" id="L486">        });</span>
+<span class="nc" id="L487">    }</span>
+
+    public void openScriptEditor(Player p, Block b) {
+<span class="nc" id="L490">        ChestMenu menu = new ChestMenu(ChatColor.DARK_AQUA + Slimefun.getLocalization().getMessage(p, &quot;android.scripts.editor&quot;));</span>
+<span class="nc" id="L491">        menu.setEmptySlotsClickable(false);</span>
+
+<span class="nc" id="L493">        menu.addItem(1, new CustomItemStack(HeadTexture.SCRIPT_FORWARD.getAsItemStack(), &quot;&amp;2&gt; Edit Script&quot;, &quot;&quot;, &quot;&amp;aEdits your current Script&quot;));</span>
+<span class="nc" id="L494">        menu.addMenuClickHandler(1, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L495">            String script = BlockStorage.getLocationInfo(b.getLocation()).getString(&quot;script&quot;);</span>
+            // Fixes #2937
+<span class="nc bnc" id="L497" title="All 2 branches missed.">            if (script != null) {</span>
+<span class="nc bnc" id="L498" title="All 2 branches missed.">                if (CommonPatterns.DASH.split(script).length &lt;= MAX_SCRIPT_LENGTH) {</span>
+<span class="nc" id="L499">                    openScript(pl, b, getScript(b.getLocation()));</span>
+                } else {
+<span class="nc" id="L501">                    pl.closeInventory();</span>
+<span class="nc" id="L502">                    Slimefun.getLocalization().sendMessage(pl, &quot;android.scripts.too-long&quot;);</span>
+                }
+            } else {
+<span class="nc" id="L505">                pl.closeInventory();</span>
+            }
+<span class="nc" id="L507">            return false;</span>
+        });
+
+<span class="nc" id="L510">        menu.addItem(3, new CustomItemStack(HeadTexture.SCRIPT_NEW.getAsItemStack(), &quot;&amp;4&gt; Create new Script&quot;, &quot;&quot;, &quot;&amp;cDeletes your current Script&quot;, &quot;&amp;cand creates a blank one&quot;));</span>
+<span class="nc" id="L511">        menu.addMenuClickHandler(3, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L512">            openScript(pl, b, DEFAULT_SCRIPT);</span>
+<span class="nc" id="L513">            return false;</span>
+        });
+
+<span class="nc" id="L516">        menu.addItem(5, new CustomItemStack(HeadTexture.SCRIPT_DOWN.getAsItemStack(), &quot;&amp;6&gt; Download a Script&quot;, &quot;&quot;, &quot;&amp;eDownload a Script from the Server&quot;, &quot;&amp;eYou can edit or simply use it&quot;));</span>
+<span class="nc" id="L517">        menu.addMenuClickHandler(5, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L518">            openScriptDownloader(pl, b, 1);</span>
+<span class="nc" id="L519">            return false;</span>
+        });
+
+<span class="nc" id="L522">        menu.addItem(8, new CustomItemStack(HeadTexture.SCRIPT_LEFT.getAsItemStack(), &quot;&amp;6&gt; Back&quot;, &quot;&quot;, &quot;&amp;7Return to the Android's interface&quot;));</span>
+<span class="nc" id="L523">        menu.addMenuClickHandler(8, (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L524">            BlockMenu inv = BlockStorage.getInventory(b);</span>
+            // Fixes #2937
+<span class="nc bnc" id="L526" title="All 2 branches missed.">            if (inv != null) {</span>
+<span class="nc" id="L527">                inv.open(pl);</span>
+            } else {
+<span class="nc" id="L529">                pl.closeInventory();</span>
+            }
+<span class="nc" id="L531">            return false;</span>
+        });
+
+<span class="nc" id="L534">        menu.open(p);</span>
+<span class="nc" id="L535">    }</span>
+
+    @Nonnull
+    protected List&lt;Instruction&gt; getValidScriptInstructions() {
+<span class="nc" id="L539">        List&lt;Instruction&gt; list = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L541" title="All 2 branches missed.">        for (Instruction part : Instruction.valuesCache) {</span>
+<span class="nc bnc" id="L542" title="All 4 branches missed.">            if (part == Instruction.START || part == Instruction.REPEAT) {</span>
+<span class="nc" id="L543">                continue;</span>
+            }
+
+<span class="nc bnc" id="L546" title="All 2 branches missed.">            if (getAndroidType().isType(part.getRequiredType())) {</span>
+<span class="nc" id="L547">                list.add(part);</span>
+            }
+        }
+
+<span class="nc" id="L551">        return list;</span>
+    }
+
+    protected void editInstruction(Player p, Block b, String[] script, int index) {
+<span class="nc" id="L555">        ChestMenu menu = new ChestMenu(ChatColor.DARK_AQUA + Slimefun.getLocalization().getMessage(p, &quot;android.scripts.editor&quot;));</span>
+<span class="nc" id="L556">        ChestMenuUtils.drawBackground(menu, 0, 1, 2, 3, 4, 5, 6, 7, 8);</span>
+
+<span class="nc" id="L558">        menu.setEmptySlotsClickable(false);</span>
+<span class="nc" id="L559">        menu.addItem(9, new CustomItemStack(HeadTexture.SCRIPT_PAUSE.getAsItemStack(), &quot;&amp;fDo nothing&quot;), (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L560">            String code = deleteInstruction(script, index);</span>
+<span class="nc" id="L561">            setScript(b.getLocation(), code);</span>
+<span class="nc" id="L562">            openScript(p, b, code);</span>
+<span class="nc" id="L563">            return false;</span>
+        });
+
+<span class="nc" id="L566">        int i = 10;</span>
+<span class="nc bnc" id="L567" title="All 2 branches missed.">        for (Instruction instruction : getValidScriptInstructions()) {</span>
+<span class="nc" id="L568">            menu.addItem(i, new CustomItemStack(instruction.getItem(), Slimefun.getLocalization().getMessage(p, &quot;android.scripts.instructions.&quot; + instruction.name())), (pl, slot, item, action) -&gt; {</span>
+<span class="nc" id="L569">                String code = addInstruction(script, index, instruction);</span>
+<span class="nc" id="L570">                setScript(b.getLocation(), code);</span>
+<span class="nc" id="L571">                openScript(p, b, code);</span>
+<span class="nc" id="L572">                return false;</span>
+            });
+
+<span class="nc" id="L575">            i++;</span>
+<span class="nc" id="L576">        }</span>
+
+<span class="nc" id="L578">        menu.open(p);</span>
+<span class="nc" id="L579">    }</span>
+
+    @Nonnull
+    public String getScript(@Nonnull Location l) {
+<span class="nc" id="L583">        Validate.notNull(l, &quot;Location for android not specified&quot;);</span>
+<span class="nc" id="L584">        String script = BlockStorage.getLocationInfo(l, &quot;script&quot;);</span>
+<span class="nc bnc" id="L585" title="All 2 branches missed.">        return script != null ? script : DEFAULT_SCRIPT;</span>
+    }
+
+    public void setScript(@Nonnull Location l, @Nonnull String script) {
+<span class="nc" id="L589">        Validate.notNull(l, &quot;Location for android not specified&quot;);</span>
+<span class="nc" id="L590">        Validate.notNull(script, &quot;No script given&quot;);</span>
+<span class="nc" id="L591">        Validate.isTrue(script.startsWith(Instruction.START.name() + '-'), &quot;A script must begin with a 'START' token.&quot;);</span>
+<span class="nc" id="L592">        Validate.isTrue(script.endsWith('-' + Instruction.REPEAT.name()), &quot;A script must end with a 'REPEAT' token.&quot;);</span>
+<span class="nc bnc" id="L593" title="All 2 branches missed.">        Validate.isTrue(CommonPatterns.DASH.split(script).length &lt;= MAX_SCRIPT_LENGTH, &quot;Scripts may not have more than &quot; + MAX_SCRIPT_LENGTH + &quot; segments&quot;);</span>
+
+<span class="nc" id="L595">        BlockStorage.addBlockInfo(l, &quot;script&quot;, script);</span>
+<span class="nc" id="L596">    }</span>
+
+    private void registerDefaultFuelTypes() {
+<span class="pc bpc" id="L599" title="1 of 4 branches missed.">        switch (getFuelSource()) {</span>
+            case SOLID -&gt; {
+<span class="fc" id="L601">                registerFuelType(new MachineFuel(80, new ItemStack(Material.COAL_BLOCK)));</span>
+<span class="fc" id="L602">                registerFuelType(new MachineFuel(45, new ItemStack(Material.BLAZE_ROD)));</span>
+<span class="fc" id="L603">                registerFuelType(new MachineFuel(70, new ItemStack(Material.DRIED_KELP_BLOCK)));</span>
+
+                // Coal &amp; Charcoal
+<span class="fc" id="L606">                registerFuelType(new MachineFuel(8, new ItemStack(Material.COAL)));</span>
+<span class="fc" id="L607">                registerFuelType(new MachineFuel(8, new ItemStack(Material.CHARCOAL)));</span>
+
+                // Logs
+<span class="fc bfc" id="L610" title="All 2 branches covered.">                for (Material mat : Tag.LOGS.getValues()) {</span>
+<span class="fc" id="L611">                    registerFuelType(new MachineFuel(2, new ItemStack(mat)));</span>
+<span class="fc" id="L612">                }</span>
+
+                // Wooden Planks
+<span class="fc bfc" id="L615" title="All 2 branches covered.">                for (Material mat : Tag.PLANKS.getValues()) {</span>
+<span class="fc" id="L616">                    registerFuelType(new MachineFuel(1, new ItemStack(mat)));</span>
+<span class="fc" id="L617">                }</span>
+<span class="fc" id="L618">            }</span>
+            case LIQUID -&gt; {
+<span class="fc" id="L620">                registerFuelType(new MachineFuel(100, new ItemStack(Material.LAVA_BUCKET)));</span>
+<span class="fc" id="L621">                registerFuelType(new MachineFuel(200, SlimefunItems.OIL_BUCKET));</span>
+<span class="fc" id="L622">                registerFuelType(new MachineFuel(500, SlimefunItems.FUEL_BUCKET));</span>
+<span class="fc" id="L623">            }</span>
+            case NUCLEAR -&gt; {
+<span class="fc" id="L625">                registerFuelType(new MachineFuel(2500, SlimefunItems.URANIUM));</span>
+<span class="fc" id="L626">                registerFuelType(new MachineFuel(1200, SlimefunItems.NEPTUNIUM));</span>
+<span class="fc" id="L627">                registerFuelType(new MachineFuel(3000, SlimefunItems.BOOSTED_URANIUM));</span>
+<span class="fc" id="L628">            }</span>
+<span class="nc" id="L629">            default -&gt; throw new IllegalStateException(&quot;Unhandled Fuel Source: &quot; + getFuelSource());</span>
+        }
+<span class="fc" id="L631">    }</span>
+
+    public void registerFuelType(@Nonnull MachineFuel fuel) {
+<span class="fc" id="L634">        Validate.notNull(fuel, &quot;Cannot register null as a Fuel type&quot;);</span>
+
+<span class="fc" id="L636">        fuelTypes.add(fuel);</span>
+<span class="fc" id="L637">    }</span>
+
+    @Override
+    public String getLabelLocalPath() {
+<span class="nc" id="L641">        return &quot;guide.tooltips.recipes.generator&quot;;</span>
+    }
+
+    @Override
+    public List&lt;ItemStack&gt; getDisplayRecipes() {
+<span class="nc" id="L646">        List&lt;ItemStack&gt; list = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L648" title="All 2 branches missed.">        for (MachineFuel fuel : fuelTypes) {</span>
+<span class="nc" id="L649">            ItemStack item = fuel.getInput().clone();</span>
+<span class="nc" id="L650">            ItemMeta im = item.getItemMeta();</span>
+<span class="nc" id="L651">            List&lt;String&gt; lore = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L652">            lore.add(ChatColors.color(&quot;&amp;8\u21E8 &amp;7Lasts &quot; + NumberUtils.getTimeLeft(fuel.getTicks() / 2)));</span>
+<span class="nc" id="L653">            im.setLore(lore);</span>
+<span class="nc" id="L654">            item.setItemMeta(im);</span>
+<span class="nc" id="L655">            list.add(item);</span>
+<span class="nc" id="L656">        }</span>
+
+<span class="nc" id="L658">        return list;</span>
+    }
+
+    @Override
+    public int[] getInputSlots() {
+<span class="nc" id="L663">        return new int[0];</span>
+    }
+
+    @Override
+    public int[] getOutputSlots() {
+<span class="fc" id="L668">        return new int[] { 20, 21, 22, 29, 30, 31 };</span>
+    }
+
+    public int getTier() {
+<span class="fc" id="L672">        return tier;</span>
+    }
+
+    protected void tick(Block b, Config data) {
+<span class="nc bnc" id="L676" title="All 2 branches missed.">        if (b.getType() != Material.PLAYER_HEAD) {</span>
+            // The Android was destroyed or moved.
+<span class="nc" id="L678">            return;</span>
+        }
+
+<span class="nc bnc" id="L681" title="All 2 branches missed.">        if (&quot;false&quot;.equals(data.getString(&quot;paused&quot;))) {</span>
+<span class="nc" id="L682">            BlockMenu menu = BlockStorage.getInventory(b);</span>
+
+<span class="nc" id="L684">            String fuelData = data.getString(&quot;fuel&quot;);</span>
+<span class="nc bnc" id="L685" title="All 2 branches missed.">            float fuel = fuelData == null ? 0 : Float.parseFloat(fuelData);</span>
+
+<span class="nc bnc" id="L687" title="All 2 branches missed.">            if (fuel &lt; 0.001) {</span>
+<span class="nc" id="L688">                consumeFuel(b, menu);</span>
+            } else {
+<span class="nc" id="L690">                String code = data.getString(&quot;script&quot;);</span>
+<span class="nc bnc" id="L691" title="All 2 branches missed.">                String[] script = CommonPatterns.DASH.split(code == null ? DEFAULT_SCRIPT : code);</span>
+
+<span class="nc" id="L693">                String indexData = data.getString(&quot;index&quot;);</span>
+<span class="nc bnc" id="L694" title="All 2 branches missed.">                int index = (indexData == null ? 0 : Integer.parseInt(indexData)) + 1;</span>
+
+<span class="nc bnc" id="L696" title="All 2 branches missed.">                if (index &gt;= script.length) {</span>
+<span class="nc" id="L697">                    index = 0;</span>
+                }
+
+<span class="nc" id="L700">                BlockStorage.addBlockInfo(b, &quot;fuel&quot;, String.valueOf(fuel - 1));</span>
+<span class="nc" id="L701">                Instruction instruction = Instruction.getInstruction(script[index]);</span>
+
+<span class="nc bnc" id="L703" title="All 2 branches missed.">                if (instruction == null) {</span>
+<span class="nc" id="L704">                    Slimefun.instance().getLogger().log(Level.WARNING, &quot;Failed to parse Android instruction: {0}, maybe your server is out of date?&quot;, script[index]);</span>
+<span class="nc" id="L705">                    return;</span>
+                }
+
+<span class="nc" id="L708">                executeInstruction(instruction, b, menu, data, index);</span>
+            }
+        }
+<span class="nc" id="L711">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void executeInstruction(Instruction instruction, Block b, BlockMenu inv, Config data, int index) {
+<span class="nc bnc" id="L715" title="All 2 branches missed.">        if (getAndroidType().isType(instruction.getRequiredType())) {</span>
+<span class="nc" id="L716">            String rotationData = data.getString(&quot;rotation&quot;);</span>
+<span class="nc bnc" id="L717" title="All 2 branches missed.">            BlockFace face = rotationData == null ? BlockFace.NORTH : BlockFace.valueOf(rotationData);</span>
+
+<span class="nc bnc" id="L719" title="All 4 branches missed.">            switch (instruction) {</span>
+                case START:
+                case WAIT:
+                    // We are &quot;waiting&quot; here, so we only move a step forward
+<span class="nc" id="L723">                    BlockStorage.addBlockInfo(b, &quot;index&quot;, String.valueOf(index));</span>
+<span class="nc" id="L724">                    break;</span>
+                case REPEAT:
+                    // &quot;repeat&quot; just means, we reset our index
+<span class="nc" id="L727">                    BlockStorage.addBlockInfo(b, &quot;index&quot;, String.valueOf(0));</span>
+<span class="nc" id="L728">                    break;</span>
+                case CHOP_TREE:
+                    // We only move to the next step if we finished chopping wood
+<span class="nc bnc" id="L731" title="All 2 branches missed.">                    if (chopTree(b, inv, face)) {</span>
+<span class="nc" id="L732">                        BlockStorage.addBlockInfo(b, &quot;index&quot;, String.valueOf(index));</span>
+                    }
+                    break;
+                default:
+                    // We set the index here in advance to fix moving android issues
+<span class="nc" id="L737">                    BlockStorage.addBlockInfo(b, &quot;index&quot;, String.valueOf(index));</span>
+<span class="nc" id="L738">                    instruction.execute(this, b, inv, face);</span>
+                    break;
+            }
+        }
+<span class="nc" id="L742">    }</span>
+
+    protected void rotate(Block b, BlockFace current, int mod) {
+<span class="nc" id="L745">        int index = POSSIBLE_ROTATIONS.indexOf(current) + mod;</span>
+
+<span class="nc bnc" id="L747" title="All 2 branches missed.">        if (index == POSSIBLE_ROTATIONS.size()) {</span>
+<span class="nc" id="L748">            index = 0;</span>
+<span class="nc bnc" id="L749" title="All 2 branches missed.">        } else if (index &lt; 0) {</span>
+<span class="nc" id="L750">            index = POSSIBLE_ROTATIONS.size() - 1;</span>
+        }
+
+<span class="nc" id="L753">        BlockFace rotation = POSSIBLE_ROTATIONS.get(index);</span>
+
+<span class="nc" id="L755">        BlockData blockData = Material.PLAYER_HEAD.createBlockData(data -&gt; {</span>
+<span class="nc bnc" id="L756" title="All 2 branches missed.">            if (data instanceof Rotatable rotatable) {</span>
+<span class="nc" id="L757">                rotatable.setRotation(rotation.getOppositeFace());</span>
+            }
+<span class="nc" id="L759">        });</span>
+
+<span class="nc" id="L761">        b.setBlockData(blockData);</span>
+<span class="nc" id="L762">        BlockStorage.addBlockInfo(b, &quot;rotation&quot;, rotation.name());</span>
+<span class="nc" id="L763">    }</span>
+
+    protected void depositItems(BlockMenu menu, Block facedBlock) {
+<span class="nc bnc" id="L766" title="All 4 branches missed.">        if (facedBlock.getType() == Material.DISPENSER &amp;&amp; BlockStorage.check(facedBlock, &quot;ANDROID_INTERFACE_ITEMS&quot;)) {</span>
+<span class="nc" id="L767">            BlockState state = PaperLib.getBlockState(facedBlock, false).getState();</span>
+
+<span class="nc bnc" id="L769" title="All 2 branches missed.">            if (state instanceof Dispenser dispenser) {</span>
+<span class="nc bnc" id="L770" title="All 2 branches missed.">                for (int slot : getOutputSlots()) {</span>
+<span class="nc" id="L771">                    ItemStack stack = menu.getItemInSlot(slot);</span>
+
+<span class="nc bnc" id="L773" title="All 2 branches missed.">                    if (stack != null) {</span>
+<span class="nc" id="L774">                        Optional&lt;ItemStack&gt; optional = dispenser.getInventory().addItem(stack).values().stream().findFirst();</span>
+
+<span class="nc bnc" id="L776" title="All 2 branches missed.">                        if (optional.isPresent()) {</span>
+<span class="nc" id="L777">                            menu.replaceExistingItem(slot, optional.get());</span>
+                        } else {
+<span class="nc" id="L779">                            menu.replaceExistingItem(slot, null);</span>
+                        }
+                    }
+                }
+            }
+        }
+<span class="nc" id="L785">    }</span>
+
+    protected void refuel(BlockMenu menu, Block facedBlock) {
+<span class="nc bnc" id="L788" title="All 4 branches missed.">        if (facedBlock.getType() == Material.DISPENSER &amp;&amp; BlockStorage.check(facedBlock, &quot;ANDROID_INTERFACE_FUEL&quot;)) {</span>
+<span class="nc" id="L789">            BlockState state = PaperLib.getBlockState(facedBlock, false).getState();</span>
+
+<span class="nc bnc" id="L791" title="All 2 branches missed.">            if (state instanceof Dispenser dispenser) {</span>
+<span class="nc bnc" id="L792" title="All 2 branches missed.">                for (int slot = 0; slot &lt; 9; slot++) {</span>
+<span class="nc" id="L793">                    ItemStack item = dispenser.getInventory().getItem(slot);</span>
+
+<span class="nc bnc" id="L795" title="All 2 branches missed.">                    if (item != null) {</span>
+<span class="nc" id="L796">                        insertFuel(menu, dispenser.getInventory(), slot, menu.getItemInSlot(43), item);</span>
+                    }
+                }
+            }
+        }
+<span class="nc" id="L801">    }</span>
+
+    private boolean insertFuel(BlockMenu menu, Inventory dispenser, int slot, ItemStack currentFuel, ItemStack newFuel) {
+<span class="nc bnc" id="L804" title="All 2 branches missed.">        if (currentFuel == null) {</span>
+<span class="nc" id="L805">            menu.replaceExistingItem(43, newFuel);</span>
+<span class="nc" id="L806">            dispenser.setItem(slot, null);</span>
+<span class="nc" id="L807">            return true;</span>
+<span class="nc bnc" id="L808" title="All 2 branches missed.">        } else if (SlimefunUtils.isItemSimilar(newFuel, currentFuel, true, false)) {</span>
+<span class="nc" id="L809">            int rest = newFuel.getType().getMaxStackSize() - currentFuel.getAmount();</span>
+
+<span class="nc bnc" id="L811" title="All 2 branches missed.">            if (rest &gt; 0) {</span>
+<span class="nc bnc" id="L812" title="All 2 branches missed.">                int amount = newFuel.getAmount() &gt; rest ? rest : newFuel.getAmount();</span>
+<span class="nc" id="L813">                menu.replaceExistingItem(43, new CustomItemStack(newFuel, currentFuel.getAmount() + amount));</span>
+<span class="nc" id="L814">                ItemUtils.consumeItem(newFuel, amount, false);</span>
+            }
+
+<span class="nc" id="L817">            return true;</span>
+        }
+
+<span class="nc" id="L820">        return false;</span>
+    }
+
+    @ParametersAreNonnullByDefault
+    private void consumeFuel(Block b, BlockMenu menu) {
+<span class="nc" id="L825">        ItemStack item = menu.getItemInSlot(43);</span>
+
+<span class="nc bnc" id="L827" title="All 4 branches missed.">        if (item != null &amp;&amp; item.getType() != Material.AIR) {</span>
+<span class="nc bnc" id="L828" title="All 2 branches missed.">            for (MachineFuel fuel : fuelTypes) {</span>
+<span class="nc bnc" id="L829" title="All 2 branches missed.">                if (fuel.test(item)) {</span>
+<span class="nc" id="L830">                    menu.consumeItem(43);</span>
+
+<span class="nc bnc" id="L832" title="All 2 branches missed.">                    if (getFuelSource() == AndroidFuelSource.LIQUID) {</span>
+<span class="nc" id="L833">                        menu.pushItem(new ItemStack(Material.BUCKET), getOutputSlots());</span>
+                    }
+
+<span class="nc" id="L836">                    int fuelLevel = fuel.getTicks();</span>
+<span class="nc" id="L837">                    BlockStorage.addBlockInfo(b, &quot;fuel&quot;, String.valueOf(fuelLevel));</span>
+<span class="nc" id="L838">                    break;</span>
+                }
+<span class="nc" id="L840">            }</span>
+        }
+<span class="nc" id="L842">    }</span>
+
+    private void constructMenu(@Nonnull BlockMenuPreset preset) {
+<span class="fc" id="L845">        preset.drawBackground(BORDER);</span>
+<span class="fc" id="L846">        preset.drawBackground(ChestMenuUtils.getOutputSlotTexture(), OUTPUT_BORDER);</span>
+
+<span class="fc bfc" id="L848" title="All 2 branches covered.">        for (int i : getOutputSlots()) {</span>
+<span class="fc" id="L849">            preset.addMenuClickHandler(i, new AdvancedMenuClickHandler() {</span>
+
+                @Override
+                public boolean onClick(Player p, int slot, ItemStack cursor, ClickAction action) {
+<span class="nc" id="L853">                    return false;</span>
+                }
+
+                @Override
+                public boolean onClick(InventoryClickEvent e, Player p, int slot, ItemStack cursor, ClickAction action) {
+<span class="nc bnc" id="L858" title="All 6 branches missed.">                    return cursor == null || cursor.getType() == null || cursor.getType() == Material.AIR;</span>
+                }
+            });
+        }
+
+<span class="fc" id="L863">        preset.addItem(34, getFuelSource().getItem(), ChestMenuUtils.getEmptyClickHandler());</span>
+<span class="fc" id="L864">    }</span>
+
+    @ParametersAreNonnullByDefault
+    public void addItems(Block b, ItemStack... items) {
+<span class="nc" id="L868">        Validate.notNull(b, &quot;The Block cannot be null.&quot;);</span>
+
+<span class="nc" id="L870">        BlockMenu inv = BlockStorage.getInventory(b);</span>
+
+<span class="nc bnc" id="L872" title="All 2 branches missed.">        if (inv != null) {</span>
+<span class="nc bnc" id="L873" title="All 2 branches missed.">            for (ItemStack item : items) {</span>
+<span class="nc" id="L874">                inv.pushItem(item, getOutputSlots());</span>
+            }
+        }
+<span class="nc" id="L877">    }</span>
+
+    @ParametersAreNonnullByDefault
+    protected void move(Block b, BlockFace face, Block block) {
+<span class="nc bnc" id="L881" title="All 6 branches missed.">        if (block.getY() &gt; block.getWorld().getMinHeight() &amp;&amp; block.getY() &lt; block.getWorld().getMaxHeight() &amp;&amp; block.isEmpty()) {</span>
+
+<span class="nc bnc" id="L883" title="All 2 branches missed.">            if (!block.getWorld().getWorldBorder().isInside(block.getLocation())) {</span>
+<span class="nc" id="L884">                return;</span>
+            }
+
+<span class="nc" id="L887">            BlockData blockData = Material.PLAYER_HEAD.createBlockData(data -&gt; {</span>
+<span class="nc bnc" id="L888" title="All 2 branches missed.">                if (data instanceof Rotatable rotatable) {</span>
+<span class="nc" id="L889">                    rotatable.setRotation(face.getOppositeFace());</span>
+                }
+<span class="nc" id="L891">            });</span>
+
+<span class="nc" id="L893">            block.setBlockData(blockData);</span>
+
+<span class="nc" id="L895">            Slimefun.runSync(() -&gt; {</span>
+<span class="nc" id="L896">                PlayerSkin skin = PlayerSkin.fromBase64(texture);</span>
+<span class="nc" id="L897">                PlayerHead.setSkin(block, skin, true);</span>
+<span class="nc" id="L898">            });</span>
+
+<span class="nc" id="L900">            b.setType(Material.AIR);</span>
+<span class="nc" id="L901">            BlockStorage.moveBlockInfo(b.getLocation(), block.getLocation());</span>
+        }
+<span class="nc" id="L903">    }</span>
+
+    protected void attack(Block b, BlockFace face, Predicate&lt;LivingEntity&gt; predicate) {
+<span class="nc" id="L906">        throw new UnsupportedOperationException(&quot;Non-butcher Android tried to butcher!&quot;);</span>
+    }
+
+    protected void fish(Block b, BlockMenu menu) {
+<span class="nc" id="L910">        throw new UnsupportedOperationException(&quot;Non-fishing Android tried to fish!&quot;);</span>
+    }
+
+    protected void dig(Block b, BlockMenu menu, Block block) {
+<span class="nc" id="L914">        throw new UnsupportedOperationException(&quot;Non-mining Android tried to mine!&quot;);</span>
+    }
+
+    protected void moveAndDig(Block b, BlockMenu menu, BlockFace face, Block block) {
+<span class="nc" id="L918">        throw new UnsupportedOperationException(&quot;Non-mining Android tried to mine!&quot;);</span>
+    }
+
+    protected boolean chopTree(Block b, BlockMenu menu, BlockFace face) {
+<span class="nc" id="L922">        throw new UnsupportedOperationException(&quot;Non-woodcutter Android tried to chop a Tree!&quot;);</span>
+    }
+
+    protected void farm(Block b, BlockMenu menu, Block block, boolean isAdvanced) {
+<span class="nc" id="L926">        throw new UnsupportedOperationException(&quot;Non-farming Android tried to farm!&quot;);</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

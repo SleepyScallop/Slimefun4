@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GuideModeOption.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.core.guide.options</a> &gt; <span class="el_source">GuideModeOption.java</span></div><h1>GuideModeOption.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.core.guide.options;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
+import io.github.thebusybiscuit.slimefun4.core.guide.SlimefunGuide;
+import io.github.thebusybiscuit.slimefun4.core.guide.SlimefunGuideMode;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.utils.ChatUtils;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+
+<span class="nc" id="L24">class GuideModeOption implements SlimefunGuideOption&lt;SlimefunGuideMode&gt; {</span>
+
+    @Nonnull
+    @Override
+    public SlimefunAddon getAddon() {
+<span class="nc" id="L29">        return Slimefun.instance();</span>
+    }
+
+    @Nonnull
+    @Override
+    public NamespacedKey getKey() {
+<span class="nc" id="L35">        return new NamespacedKey(Slimefun.instance(), &quot;guide_mode&quot;);</span>
+    }
+
+    @Nonnull
+    @Override
+    public Optional&lt;ItemStack&gt; getDisplayItem(Player p, ItemStack guide) {
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        if (!p.hasPermission(&quot;slimefun.cheat.items&quot;)) {</span>
+            // Only Players with the appropriate permission can access the cheat sheet
+<span class="nc" id="L43">            return Optional.empty();</span>
+        }
+
+<span class="nc" id="L46">        Optional&lt;SlimefunGuideMode&gt; current = getSelectedOption(p, guide);</span>
+
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        if (current.isPresent()) {</span>
+<span class="nc" id="L49">            SlimefunGuideMode selectedMode = current.get();</span>
+<span class="nc" id="L50">            ItemStack item = new ItemStack(Material.AIR);</span>
+
+<span class="nc bnc" id="L52" title="All 2 branches missed.">            if (selectedMode == SlimefunGuideMode.SURVIVAL_MODE) {</span>
+<span class="nc" id="L53">                item.setType(Material.CHEST);</span>
+            } else {
+<span class="nc" id="L55">                item.setType(Material.COMMAND_BLOCK);</span>
+            }
+
+<span class="nc" id="L58">            ItemMeta meta = item.getItemMeta();</span>
+<span class="nc" id="L59">            meta.setDisplayName(ChatColor.GRAY + &quot;Slimefun Guide Type: &quot; + ChatColor.YELLOW + ChatUtils.humanize(selectedMode.name()));</span>
+<span class="nc" id="L60">            List&lt;String&gt; lore = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L61">            lore.add(&quot;&quot;);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">            lore.add((selectedMode == SlimefunGuideMode.SURVIVAL_MODE ? ChatColor.GREEN : ChatColor.GRAY) + &quot;Survival Mode&quot;);</span>
+<span class="nc bnc" id="L63" title="All 2 branches missed.">            lore.add((selectedMode == SlimefunGuideMode.CHEAT_MODE ? ChatColor.GREEN : ChatColor.GRAY) + &quot;Cheat Sheet&quot;);</span>
+
+<span class="nc" id="L65">            lore.add(&quot;&quot;);</span>
+<span class="nc" id="L66">            lore.add(ChatColor.GRAY + &quot;\u21E8 &quot; + ChatColor.YELLOW + &quot;Click to change the type&quot;);</span>
+<span class="nc" id="L67">            meta.setLore(lore);</span>
+<span class="nc" id="L68">            item.setItemMeta(meta);</span>
+
+<span class="nc" id="L70">            return Optional.of(item);</span>
+        }
+
+<span class="nc" id="L73">        return Optional.empty();</span>
+    }
+
+    @Override
+    public void onClick(@Nonnull Player p, @Nonnull ItemStack guide) {
+<span class="nc" id="L78">        Optional&lt;SlimefunGuideMode&gt; current = getSelectedOption(p, guide);</span>
+
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (current.isPresent()) {</span>
+<span class="nc" id="L81">            SlimefunGuideMode next = getNextMode(p, current.get());</span>
+<span class="nc" id="L82">            setSelectedOption(p, guide, next);</span>
+        }
+
+<span class="nc" id="L85">        SlimefunGuideSettings.openSettings(p, guide);</span>
+<span class="nc" id="L86">    }</span>
+
+    @Nonnull
+    private SlimefunGuideMode getNextMode(@Nonnull Player p, @Nonnull SlimefunGuideMode mode) {
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        if (p.hasPermission(&quot;slimefun.cheat.items&quot;)) {</span>
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (mode == SlimefunGuideMode.SURVIVAL_MODE) {</span>
+<span class="nc" id="L92">                return SlimefunGuideMode.CHEAT_MODE;</span>
+            } else {
+<span class="nc" id="L94">                return SlimefunGuideMode.SURVIVAL_MODE;</span>
+            }
+        } else {
+<span class="nc" id="L97">            return SlimefunGuideMode.SURVIVAL_MODE;</span>
+        }
+    }
+
+    @Nonnull
+    @Override
+    public Optional&lt;SlimefunGuideMode&gt; getSelectedOption(@Nonnull Player p, @Nonnull ItemStack guide) {
+<span class="nc bnc" id="L104" title="All 2 branches missed.">        if (SlimefunUtils.isItemSimilar(guide, SlimefunGuide.getItem(SlimefunGuideMode.CHEAT_MODE), true, false)) {</span>
+<span class="nc" id="L105">            return Optional.of(SlimefunGuideMode.CHEAT_MODE);</span>
+        } else {
+<span class="nc" id="L107">            return Optional.of(SlimefunGuideMode.SURVIVAL_MODE);</span>
+        }
+    }
+
+    @Override
+    @ParametersAreNonnullByDefault
+    public void setSelectedOption(Player p, ItemStack guide, SlimefunGuideMode value) {
+<span class="nc" id="L114">        guide.setItemMeta(SlimefunGuide.getItem(value).getItemMeta());</span>
+<span class="nc" id="L115">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

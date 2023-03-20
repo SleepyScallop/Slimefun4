@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BlockListener.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.listeners</a> &gt; <span class="el_source">BlockListener.java</span></div><h1>BlockListener.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.listeners;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+
+import io.github.bakedlibs.dough.protection.Interaction;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.core.attributes.NotPlaceable;
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockBreakHandler;
+import io.github.thebusybiscuit.slimefun4.core.handlers.BlockPlaceHandler;
+import io.github.thebusybiscuit.slimefun4.core.handlers.ToolUseHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.utils.tags.SlimefunTag;
+
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
+
+/**
+ * The {@link BlockListener} is responsible for listening to the {@link BlockPlaceEvent}
+ * and {@link BlockBreakEvent}.
+ *
+ * @author TheBusyBiscuit
+ * @author Linox
+ * @author Patbox
+ *
+ * @see BlockPlaceHandler
+ * @see BlockBreakHandler
+ * @see ToolUseHandler
+ *
+ */
+public class BlockListener implements Listener {
+
+<span class="nc" id="L52">    public BlockListener(@Nonnull Slimefun plugin) {</span>
+<span class="nc" id="L53">        plugin.getServer().getPluginManager().registerEvents(this, plugin);</span>
+<span class="nc" id="L54">    }</span>
+
+    @EventHandler(priority = EventPriority.NORMAL, ignoreCancelled = true)
+    public void onBlockPlaceExisting(BlockPlaceEvent e) {
+<span class="nc" id="L58">        Block block = e.getBlock();</span>
+
+        // Fixes #2636 - This will solve the &quot;ghost blocks&quot; issue
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (e.getBlockReplacedState().getType().isAir()) {</span>
+<span class="nc" id="L62">            SlimefunItem sfItem = BlockStorage.check(block);</span>
+
+<span class="nc bnc" id="L64" title="All 4 branches missed.">            if (sfItem != null &amp;&amp; !Slimefun.getTickerTask().isDeletedSoon(block.getLocation())) {</span>
+<span class="nc bnc" id="L65" title="All 2 branches missed.">                for (ItemStack item : sfItem.getDrops()) {</span>
+<span class="nc bnc" id="L66" title="All 4 branches missed.">                    if (item != null &amp;&amp; !item.getType().isAir()) {</span>
+<span class="nc" id="L67">                        block.getWorld().dropItemNaturally(block.getLocation(), item);</span>
+                    }
+<span class="nc" id="L69">                }</span>
+
+<span class="nc" id="L71">                BlockStorage.clearBlockInfo(block);</span>
+            }
+<span class="nc bnc" id="L73" title="All 2 branches missed.">        } else if (BlockStorage.hasBlockInfo(e.getBlock())) {</span>
+            // If there is no air (e.g. grass) then don't let the block be placed
+<span class="nc" id="L75">            e.setCancelled(true);</span>
+        }
+<span class="nc" id="L77">    }</span>
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent e) {
+<span class="nc" id="L81">        ItemStack item = e.getItemInHand();</span>
+<span class="nc" id="L82">        SlimefunItem sfItem = SlimefunItem.getByItem(item);</span>
+
+<span class="nc bnc" id="L84" title="All 4 branches missed.">        if (sfItem != null &amp;&amp; !(sfItem instanceof NotPlaceable)) {</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">            if (!sfItem.canUse(e.getPlayer(), true)) {</span>
+<span class="nc" id="L86">                e.setCancelled(true);</span>
+            } else {
+<span class="nc bnc" id="L88" title="All 2 branches missed.">                if (Slimefun.getBlockDataService().isTileEntity(e.getBlock().getType())) {</span>
+<span class="nc" id="L89">                    Slimefun.getBlockDataService().setBlockData(e.getBlock(), sfItem.getId());</span>
+                }
+
+<span class="nc" id="L92">                BlockStorage.addBlockInfo(e.getBlock(), &quot;id&quot;, sfItem.getId(), true);</span>
+<span class="nc" id="L93">                sfItem.callItemHandler(BlockPlaceHandler.class, handler -&gt; handler.onPlayerPlace(e));</span>
+            }
+        }
+<span class="nc" id="L96">    }</span>
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent e) {
+        // Simply ignore any events that were faked by other plugins
+<span class="nc bnc" id="L101" title="All 2 branches missed.">        if (Slimefun.getIntegrations().isEventFaked(e)) {</span>
+<span class="nc" id="L102">            return;</span>
+        }
+
+        // Also ignore custom blocks which were placed by other plugins
+<span class="nc bnc" id="L106" title="All 2 branches missed.">        if (Slimefun.getIntegrations().isCustomBlock(e.getBlock())) {</span>
+<span class="nc" id="L107">            return;</span>
+        }
+
+        // Ignore blocks which we have marked as deleted (Fixes #2771)
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (Slimefun.getTickerTask().isDeletedSoon(e.getBlock().getLocation())) {</span>
+<span class="nc" id="L112">            return;</span>
+        }
+
+<span class="nc" id="L115">        ItemStack item = e.getPlayer().getInventory().getItemInMainHand();</span>
+<span class="nc" id="L116">        checkForSensitiveBlockAbove(e, item);</span>
+
+<span class="nc" id="L118">        int fortune = getBonusDropsWithFortune(item, e.getBlock());</span>
+<span class="nc" id="L119">        List&lt;ItemStack&gt; drops = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L121" title="All 4 branches missed.">        if (!e.isCancelled() &amp;&amp; !item.getType().isAir()) {</span>
+<span class="nc" id="L122">            callToolHandler(e, item, fortune, drops);</span>
+        }
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        if (!e.isCancelled()) {</span>
+<span class="nc" id="L126">            callBlockHandler(e, item, drops);</span>
+        }
+
+<span class="nc" id="L129">        dropItems(e, drops);</span>
+<span class="nc" id="L130">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void callToolHandler(BlockBreakEvent e, ItemStack item, int fortune, List&lt;ItemStack&gt; drops) {
+<span class="nc" id="L134">        SlimefunItem tool = SlimefunItem.getByItem(item);</span>
+
+<span class="nc bnc" id="L136" title="All 2 branches missed.">        if (tool != null) {</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">            if (tool.canUse(e.getPlayer(), true)) {</span>
+<span class="nc" id="L138">                tool.callItemHandler(ToolUseHandler.class, handler -&gt; handler.onToolUse(e, item, fortune, drops));</span>
+            } else {
+<span class="nc" id="L140">                e.setCancelled(true);</span>
+            }
+        }
+<span class="nc" id="L143">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void callBlockHandler(BlockBreakEvent e, ItemStack item, List&lt;ItemStack&gt; drops) {
+<span class="nc" id="L147">        SlimefunItem sfItem = BlockStorage.check(e.getBlock());</span>
+
+<span class="nc bnc" id="L149" title="All 4 branches missed.">        if (sfItem == null &amp;&amp; Slimefun.getBlockDataService().isTileEntity(e.getBlock().getType())) {</span>
+<span class="nc" id="L150">            Optional&lt;String&gt; blockData = Slimefun.getBlockDataService().getBlockData(e.getBlock());</span>
+
+<span class="nc bnc" id="L152" title="All 2 branches missed.">            if (blockData.isPresent()) {</span>
+<span class="nc" id="L153">                sfItem = SlimefunItem.getById(blockData.get());</span>
+            }
+        }
+
+<span class="nc bnc" id="L157" title="All 4 branches missed.">        if (sfItem != null &amp;&amp; !sfItem.useVanillaBlockBreaking()) {</span>
+<span class="nc" id="L158">            sfItem.callItemHandler(BlockBreakHandler.class, handler -&gt; handler.onPlayerBreak(e, item, drops));</span>
+
+<span class="nc bnc" id="L160" title="All 2 branches missed.">            if (e.isCancelled()) {</span>
+<span class="nc" id="L161">                return;</span>
+            }
+
+<span class="nc" id="L164">            drops.addAll(sfItem.getDrops());</span>
+<span class="nc" id="L165">            BlockStorage.clearBlockInfo(e.getBlock());</span>
+        }
+<span class="nc" id="L167">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void dropItems(BlockBreakEvent e, List&lt;ItemStack&gt; drops) {
+<span class="nc bnc" id="L171" title="All 4 branches missed.">        if (!drops.isEmpty() &amp;&amp; !e.isCancelled()) {</span>
+            // Notify plugins like CoreProtect
+<span class="nc" id="L173">            Slimefun.getProtectionManager().logAction(e.getPlayer(), e.getBlock(), Interaction.BREAK_BLOCK);</span>
+
+            // Fixes #2560
+<span class="nc bnc" id="L176" title="All 2 branches missed.">            if (e.isDropItems()) {</span>
+                // Disable normal block drops
+<span class="nc" id="L178">                e.setDropItems(false);</span>
+
+<span class="nc bnc" id="L180" title="All 2 branches missed.">                for (ItemStack drop : drops) {</span>
+                    // Prevent null or air from being dropped
+<span class="nc bnc" id="L182" title="All 4 branches missed.">                    if (drop != null &amp;&amp; drop.getType() != Material.AIR) {</span>
+<span class="nc" id="L183">                        e.getBlock().getWorld().dropItemNaturally(e.getBlock().getLocation(), drop);</span>
+                    }
+<span class="nc" id="L185">                }</span>
+            }
+        }
+<span class="nc" id="L188">    }</span>
+
+    /**
+     * This method checks for a sensitive {@link Block}.
+     * Sensitive {@link Block Blocks} are pressure plates or saplings, which should be broken
+     * when the block beneath is broken as well.
+     *
+     * @param p
+     *            The {@link Player} who broke this {@link Block}
+     * @param b
+     *            The {@link Block} that was broken
+     */
+    @ParametersAreNonnullByDefault
+    private void checkForSensitiveBlockAbove(BlockBreakEvent e, ItemStack item) {
+<span class="nc" id="L202">        Block blockAbove = e.getBlock().getRelative(BlockFace.UP);</span>
+
+<span class="nc bnc" id="L204" title="All 2 branches missed.">        if (SlimefunTag.SENSITIVE_MATERIALS.isTagged(blockAbove.getType())) {</span>
+<span class="nc" id="L205">            SlimefunItem sfItem = BlockStorage.check(blockAbove);</span>
+
+<span class="nc bnc" id="L207" title="All 4 branches missed.">            if (sfItem != null &amp;&amp; !sfItem.useVanillaBlockBreaking()) {</span>
+                /*
+                 * We create a dummy here to pass onto the BlockBreakHandler.
+                 * This will set the correct block context.
+                 */
+<span class="nc" id="L212">                BlockBreakEvent dummyEvent = new BlockBreakEvent(blockAbove, e.getPlayer());</span>
+<span class="nc" id="L213">                List&lt;ItemStack&gt; drops = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L214">                drops.addAll(sfItem.getDrops(e.getPlayer()));</span>
+
+<span class="nc" id="L216">                sfItem.callItemHandler(BlockBreakHandler.class, handler -&gt; handler.onPlayerBreak(dummyEvent, item, drops));</span>
+<span class="nc" id="L217">                blockAbove.setType(Material.AIR);</span>
+
+<span class="nc bnc" id="L219" title="All 4 branches missed.">                if (!dummyEvent.isCancelled() &amp;&amp; dummyEvent.isDropItems()) {</span>
+<span class="nc bnc" id="L220" title="All 2 branches missed.">                    for (ItemStack drop : drops) {</span>
+<span class="nc bnc" id="L221" title="All 4 branches missed.">                        if (drop != null &amp;&amp; !drop.getType().isAir()) {</span>
+<span class="nc" id="L222">                            blockAbove.getWorld().dropItemNaturally(blockAbove.getLocation(), drop);</span>
+                        }
+<span class="nc" id="L224">                    }</span>
+                }
+
+                // Fixes #2944 - Don't forget to clear the Block Data
+<span class="nc" id="L228">                BlockStorage.clearBlockInfo(blockAbove);</span>
+            }
+        }
+<span class="nc" id="L231">    }</span>
+
+    private int getBonusDropsWithFortune(@Nullable ItemStack item, @Nonnull Block b) {
+<span class="nc" id="L234">        int amount = 1;</span>
+
+<span class="nc bnc" id="L236" title="All 6 branches missed.">        if (item != null &amp;&amp; !item.getType().isAir() &amp;&amp; item.hasItemMeta()) {</span>
+            /*
+             * Small performance optimization:
+             * ItemStack#getEnchantmentLevel() calls ItemStack#getItemMeta(), so if
+             * we are handling more than one Enchantment, we should access the ItemMeta
+             * directly and re use it.
+             */
+<span class="nc" id="L243">            ItemMeta meta = item.getItemMeta();</span>
+<span class="nc" id="L244">            int fortuneLevel = meta.getEnchantLevel(Enchantment.LOOT_BONUS_BLOCKS);</span>
+
+<span class="nc bnc" id="L246" title="All 4 branches missed.">            if (fortuneLevel &gt; 0 &amp;&amp; !meta.hasEnchant(Enchantment.SILK_TOUCH)) {</span>
+<span class="nc" id="L247">                Random random = ThreadLocalRandom.current();</span>
+
+<span class="nc" id="L249">                amount = Math.max(1, random.nextInt(fortuneLevel + 2) - 1);</span>
+<span class="nc bnc" id="L250" title="All 2 branches missed.">                amount = (b.getType() == Material.LAPIS_ORE ? 4 + random.nextInt(5) : 1) * (amount + 1);</span>
+            }
+        }
+
+<span class="nc" id="L254">        return amount;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

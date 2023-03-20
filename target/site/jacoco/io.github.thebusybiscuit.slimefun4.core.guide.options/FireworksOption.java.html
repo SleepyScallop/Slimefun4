@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FireworksOption.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.core.guide.options</a> &gt; <span class="el_source">FireworksOption.java</span></div><h1>FireworksOption.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.core.guide.options;
+
+import java.util.Optional;
+
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.bakedlibs.dough.data.persistent.PersistentDataAPI;
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.thebusybiscuit.slimefun4.api.SlimefunAddon;
+import io.github.thebusybiscuit.slimefun4.core.SlimefunRegistry;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+
+<span class="nc" id="L16">class FireworksOption implements SlimefunGuideOption&lt;Boolean&gt; {</span>
+
+    @Override
+    public SlimefunAddon getAddon() {
+<span class="nc" id="L20">        return Slimefun.instance();</span>
+    }
+
+    @Override
+    public NamespacedKey getKey() {
+<span class="nc" id="L25">        return new NamespacedKey(Slimefun.instance(), &quot;research_fireworks&quot;);</span>
+    }
+
+    @Override
+    public Optional&lt;ItemStack&gt; getDisplayItem(Player p, ItemStack guide) {
+<span class="nc" id="L30">        SlimefunRegistry registry = Slimefun.getRegistry();</span>
+
+<span class="nc bnc" id="L32" title="All 4 branches missed.">        if (registry.isResearchingEnabled() &amp;&amp; registry.isResearchFireworkEnabled()) {</span>
+<span class="nc" id="L33">            boolean enabled = getSelectedOption(p, guide).orElse(true);</span>
+<span class="nc bnc" id="L34" title="All 4 branches missed.">            ItemStack item = new CustomItemStack(Material.FIREWORK_ROCKET, &quot;&amp;bFireworks: &amp;&quot; + (enabled ? &quot;aYes&quot; : &quot;4No&quot;), &quot;&quot;, &quot;&amp;7You can now toggle whether you&quot;, &quot;&amp;7will be presented with a big firework&quot;, &quot;&amp;7upon researching an item.&quot;, &quot;&quot;, &quot;&amp;7\u21E8 &amp;eClick to &quot; + (enabled ? &quot;disable&quot; : &quot;enable&quot;) + &quot; your fireworks&quot;);</span>
+<span class="nc" id="L35">            return Optional.of(item);</span>
+        } else {
+<span class="nc" id="L37">            return Optional.empty();</span>
+        }
+    }
+
+    @Override
+    public void onClick(Player p, ItemStack guide) {
+<span class="nc bnc" id="L43" title="All 2 branches missed.">        setSelectedOption(p, guide, !getSelectedOption(p, guide).orElse(true));</span>
+<span class="nc" id="L44">        SlimefunGuideSettings.openSettings(p, guide);</span>
+<span class="nc" id="L45">    }</span>
+
+    @Override
+    public Optional&lt;Boolean&gt; getSelectedOption(Player p, ItemStack guide) {
+<span class="nc" id="L49">        NamespacedKey key = getKey();</span>
+<span class="nc bnc" id="L50" title="All 4 branches missed.">        boolean value = !PersistentDataAPI.hasByte(p, key) || PersistentDataAPI.getByte(p, key) == (byte) 1;</span>
+<span class="nc" id="L51">        return Optional.of(value);</span>
+    }
+
+    @Override
+    public void setSelectedOption(Player p, ItemStack guide, Boolean value) {
+<span class="nc bnc" id="L56" title="All 2 branches missed.">        PersistentDataAPI.setByte(p, getKey(), value.booleanValue() ? (byte) 1 : (byte) 0);</span>
+<span class="nc" id="L57">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

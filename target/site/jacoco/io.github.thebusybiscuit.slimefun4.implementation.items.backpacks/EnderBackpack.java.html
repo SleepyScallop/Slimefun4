@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EnderBackpack.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.backpacks</a> &gt; <span class="el_source">EnderBackpack.java</span></div><h1>EnderBackpack.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.backpacks;
+
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Sound;
+import org.bukkit.block.EnderChest;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.NotPlaceable;
+import io.github.thebusybiscuit.slimefun4.core.handlers.ItemUseHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.items.SimpleSlimefunItem;
+
+/**
+ * The {@link EnderBackpack} is a pretty simple {@link SlimefunItem} which opens your
+ * {@link EnderChest} upon right clicking.
+ * 
+ * @author TheBusyBiscuit
+ *
+ */
+public class EnderBackpack extends SimpleSlimefunItem&lt;ItemUseHandler&gt; implements NotPlaceable {
+
+    @ParametersAreNonnullByDefault
+    public EnderBackpack(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+<span class="fc" id="L29">        super(itemGroup, item, recipeType, recipe);</span>
+<span class="fc" id="L30">    }</span>
+
+    @Override
+    public ItemUseHandler getItemHandler() {
+<span class="fc" id="L34">        return e -&gt; {</span>
+<span class="fc" id="L35">            Player p = e.getPlayer();</span>
+<span class="fc" id="L36">            p.openInventory(p.getEnderChest());</span>
+<span class="fc" id="L37">            p.playSound(p.getEyeLocation(), Sound.ENTITY_ENDERMAN_TELEPORT, 1F, 1F);</span>
+<span class="fc" id="L38">            e.cancel();</span>
+<span class="fc" id="L39">        };</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

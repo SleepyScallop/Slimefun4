@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Talisman.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.magical.talismans</a> &gt; <span class="el_source">Talisman.java</span></div><h1>Talisman.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.magical.talismans;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.apache.commons.lang.Validate;
+import org.bukkit.ChatColor;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Cancellable;
+import org.bukkit.event.Event;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDropItemEvent;
+import org.bukkit.event.enchantment.EnchantItemEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityEvent;
+import org.bukkit.event.player.PlayerEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.bakedlibs.dough.items.ItemUtils;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.api.researches.Research;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+
+public class Talisman extends SlimefunItem {
+
+<span class="fc" id="L41">    protected static final ItemGroup TALISMANS_ITEMGROUP = new ItemGroup(new NamespacedKey(Slimefun.instance(), &quot;talismans&quot;), new CustomItemStack(SlimefunItems.COMMON_TALISMAN, &quot;&amp;7Talismans - &amp;aTier I&quot;), 2);</span>
+    private static final String WIKI_PAGE = &quot;Talismans&quot;;
+
+    private final SlimefunItemStack enderTalisman;
+
+    protected final String suffix;
+    protected final boolean consumable;
+    protected final boolean cancel;
+    protected final PotionEffect[] effects;
+    protected final int chance;
+
+    @ParametersAreNonnullByDefault
+    public Talisman(SlimefunItemStack item, ItemStack[] recipe, boolean consumable, boolean cancelEvent, @Nullable String messageSuffix, PotionEffect... effects) {
+<span class="fc" id="L54">        this(item, recipe, consumable, cancelEvent, messageSuffix, 100, effects);</span>
+<span class="fc" id="L55">    }</span>
+
+    @ParametersAreNonnullByDefault
+    public Talisman(SlimefunItemStack item, ItemStack[] recipe, @Nullable String messageSuffix, int chance, PotionEffect... effects) {
+<span class="fc" id="L59">        this(item, recipe, true, true, messageSuffix, chance, effects);</span>
+<span class="fc" id="L60">    }</span>
+
+    @ParametersAreNonnullByDefault
+    public Talisman(SlimefunItemStack item, ItemStack[] recipe, boolean consumable, boolean cancelEvent, @Nullable String messageSuffix, int chance, PotionEffect... effects) {
+<span class="fc" id="L64">        this(TALISMANS_ITEMGROUP, item, recipe, consumable, cancelEvent, messageSuffix, chance, effects);</span>
+<span class="fc" id="L65">    }</span>
+
+    @ParametersAreNonnullByDefault
+    protected Talisman(ItemGroup itemGroup, SlimefunItemStack item, ItemStack[] recipe, boolean consumable, boolean cancelEvent, @Nullable String messageSuffix, int chance, PotionEffect... effects) {
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        super(itemGroup, item, RecipeType.MAGIC_WORKBENCH, recipe, new CustomItemStack(item, consumable ? 4 : 1));</span>
+
+<span class="fc" id="L71">        this.consumable = consumable;</span>
+<span class="fc" id="L72">        this.cancel = cancelEvent;</span>
+<span class="fc" id="L73">        this.suffix = messageSuffix;</span>
+<span class="fc" id="L74">        this.effects = effects;</span>
+<span class="fc" id="L75">        this.chance = chance;</span>
+<span class="fc" id="L76">        addOfficialWikipage(WIKI_PAGE);</span>
+
+<span class="fc bfc" id="L78" title="All 2 branches covered.">        if (!(this instanceof EnderTalisman)) {</span>
+<span class="fc" id="L79">            String name = &quot;&amp;5Ender &quot; + ChatColor.stripColor(getItem().getItemMeta().getDisplayName());</span>
+<span class="fc" id="L80">            List&lt;String&gt; lore = new ArrayList&lt;&gt;();</span>
+<span class="fc" id="L81">            lore.add(&quot;&amp;7&amp;oEnder Infused&quot;);</span>
+<span class="fc" id="L82">            lore.add(&quot;&quot;);</span>
+
+<span class="fc bfc" id="L84" title="All 2 branches covered.">            for (String line : getItem().getItemMeta().getLore()) {</span>
+<span class="fc" id="L85">                lore.add(line);</span>
+<span class="fc" id="L86">            }</span>
+
+<span class="fc" id="L88">            enderTalisman = new SlimefunItemStack(&quot;ENDER_&quot; + getId(), getItem().getType(), name, lore.toArray(new String[0]));</span>
+<span class="fc" id="L89">        } else {</span>
+<span class="fc" id="L90">            enderTalisman = null;</span>
+        }
+<span class="fc" id="L92">    }</span>
+
+    /**
+     * This returns whether the {@link Talisman} will be consumed upon use.
+     * 
+     * @return Whether this {@link Talisman} is consumed on use.
+     */
+    public boolean isConsumable() {
+<span class="fc" id="L100">        return consumable;</span>
+    }
+
+    /**
+     * This returns the chance of this {@link Talisman} activating.
+     * The chance will be between 1 and 100.
+     * 
+     * @return The chance of this {@link Talisman} activating.
+     */
+    public int getChance() {
+<span class="fc" id="L110">        return chance;</span>
+    }
+
+    @Nonnull
+    public PotionEffect[] getEffects() {
+<span class="fc" id="L115">        return effects;</span>
+    }
+
+    protected boolean isEventCancelled() {
+<span class="fc" id="L119">        return cancel;</span>
+    }
+
+    @Nullable
+    private SlimefunItemStack getEnderVariant() {
+<span class="fc" id="L124">        return enderTalisman;</span>
+    }
+
+    @Override
+    public void postRegister() {
+<span class="fc" id="L129">        EnderTalisman talisman = new EnderTalisman(this, getEnderVariant());</span>
+<span class="fc" id="L130">        talisman.register(getAddon());</span>
+<span class="fc" id="L131">    }</span>
+
+    @Override
+    public void load() {
+<span class="fc" id="L135">        super.load();</span>
+<span class="fc" id="L136">        loadEnderTalisman();</span>
+<span class="fc" id="L137">    }</span>
+
+    void loadEnderTalisman() {
+<span class="fc" id="L140">        EnderTalisman talisman = (EnderTalisman) SlimefunItem.getByItem(getEnderVariant());</span>
+<span class="fc" id="L141">        Optional&lt;Research&gt; research = Research.getResearch(new NamespacedKey(Slimefun.instance(), &quot;ender_talismans&quot;));</span>
+
+<span class="pc bpc" id="L143" title="2 of 4 branches missed.">        if (talisman != null &amp;&amp; research.isPresent()) {</span>
+<span class="fc" id="L144">            talisman.setResearch(research.get());</span>
+        }
+<span class="fc" id="L146">    }</span>
+
+    @ParametersAreNonnullByDefault
+    public static boolean trigger(Event e, SlimefunItemStack stack) {
+<span class="nc" id="L150">        return trigger(e, stack.getItem(), true);</span>
+    }
+
+    @ParametersAreNonnullByDefault
+    public static boolean trigger(Event e, SlimefunItemStack stack, boolean sendMessage) {
+<span class="nc" id="L155">        return trigger(e, stack.getItem(), sendMessage);</span>
+    }
+
+    @ParametersAreNonnullByDefault
+    public static boolean trigger(Event e, SlimefunItem item) {
+<span class="nc" id="L160">        return trigger(e, item, true);</span>
+    }
+
+    @ParametersAreNonnullByDefault
+    public static boolean trigger(Event e, SlimefunItem item, boolean sendMessage) {
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        if (!(item instanceof Talisman talisman)) {</span>
+<span class="nc" id="L166">            return false;</span>
+        }
+
+<span class="nc bnc" id="L169" title="All 2 branches missed.">        if (ThreadLocalRandom.current().nextInt(100) &gt; talisman.getChance()) {</span>
+<span class="nc" id="L170">            return false;</span>
+        }
+
+<span class="nc" id="L173">        Player p = getPlayerByEventType(e);</span>
+
+<span class="nc bnc" id="L175" title="All 4 branches missed.">        if (p == null || !talisman.canEffectsBeApplied(p)) {</span>
+<span class="nc" id="L176">            return false;</span>
+        }
+
+<span class="nc" id="L179">        ItemStack talismanItem = talisman.getItem();</span>
+
+<span class="nc bnc" id="L181" title="All 2 branches missed.">        if (SlimefunUtils.containsSimilarItem(p.getInventory(), talismanItem, true)) {</span>
+<span class="nc bnc" id="L182" title="All 2 branches missed.">            if (talisman.canUse(p, true)) {</span>
+<span class="nc" id="L183">                activateTalisman(e, p, p.getInventory(), talisman, talismanItem, sendMessage);</span>
+<span class="nc" id="L184">                return true;</span>
+            } else {
+<span class="nc" id="L186">                return false;</span>
+            }
+        } else {
+<span class="nc" id="L189">            ItemStack enderTalisman = talisman.getEnderVariant();</span>
+
+<span class="nc bnc" id="L191" title="All 2 branches missed.">            if (SlimefunUtils.containsSimilarItem(p.getEnderChest(), enderTalisman, true)) {</span>
+<span class="nc bnc" id="L192" title="All 2 branches missed.">                if (talisman.canUse(p, true)) {</span>
+<span class="nc" id="L193">                    activateTalisman(e, p, p.getEnderChest(), talisman, enderTalisman, sendMessage);</span>
+<span class="nc" id="L194">                    return true;</span>
+                } else {
+<span class="nc" id="L196">                    return false;</span>
+                }
+            } else {
+<span class="nc" id="L199">                return false;</span>
+            }
+        }
+    }
+
+    @ParametersAreNonnullByDefault
+    private static void activateTalisman(Event e, Player p, Inventory inv, Talisman talisman, ItemStack talismanItem, boolean sendMessage) {
+<span class="nc" id="L206">        consumeItem(inv, talisman, talismanItem);</span>
+<span class="nc" id="L207">        applyTalismanEffects(p, talisman);</span>
+<span class="nc" id="L208">        cancelEvent(e, talisman);</span>
+
+<span class="nc bnc" id="L210" title="All 2 branches missed.">        if (sendMessage) {</span>
+<span class="nc" id="L211">            talisman.sendMessage(p);</span>
+        }
+<span class="nc" id="L213">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private static void consumeItem(Inventory inv, Talisman talisman, ItemStack talismanItem) {
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        if (talisman.isConsumable()) {</span>
+<span class="nc" id="L218">            ItemStack[] contents = inv.getContents();</span>
+
+<span class="nc bnc" id="L220" title="All 2 branches missed.">            for (int i = 0; i &lt; contents.length; i++) {</span>
+<span class="nc" id="L221">                ItemStack item = contents[i];</span>
+
+<span class="nc bnc" id="L223" title="All 2 branches missed.">                if (SlimefunUtils.isItemSimilar(item, talismanItem, true, false)) {</span>
+<span class="nc" id="L224">                    ItemUtils.consumeItem(item, false);</span>
+<span class="nc" id="L225">                    return;</span>
+                }
+            }
+        }
+<span class="nc" id="L229">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private static void applyTalismanEffects(Player p, Talisman talisman) {
+<span class="nc bnc" id="L233" title="All 2 branches missed.">        for (PotionEffect effect : talisman.getEffects()) {</span>
+<span class="nc" id="L234">            p.addPotionEffect(effect);</span>
+        }
+<span class="nc" id="L236">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private static void cancelEvent(Event e, Talisman talisman) {
+<span class="nc bnc" id="L240" title="All 4 branches missed.">        if (e instanceof Cancellable cancellable &amp;&amp; talisman.isEventCancelled()) {</span>
+<span class="nc" id="L241">            cancellable.setCancelled(true);</span>
+        }
+<span class="nc" id="L243">    }</span>
+
+    /**
+     * This returns whether the {@link Talisman} is silent.
+     * A silent {@link Talisman} will not send a message to a {@link Player}
+     * when activated.
+     * 
+     * @return Whether this {@link Talisman} is silent
+     */
+    public boolean isSilent() {
+<span class="nc bnc" id="L253" title="All 2 branches missed.">        return getMessageSuffix() == null;</span>
+    }
+
+    @Nullable
+    protected final String getMessageSuffix() {
+<span class="fc" id="L258">        return suffix;</span>
+    }
+
+    /**
+     * This method sends the given {@link Player} the message of this {@link Talisman}.
+     * Dependent on the selected config setting, the message will be sent via the actionbar
+     * or in the chat window.
+     * 
+     * @param p
+     *            The {@link Player} who shall receive the message
+     */
+    public void sendMessage(@Nonnull Player p) {
+<span class="nc" id="L270">        Validate.notNull(p, &quot;The Player must not be null.&quot;);</span>
+
+        // Check if this Talisman has a message
+<span class="nc bnc" id="L273" title="All 2 branches missed.">        if (!isSilent()) {</span>
+            try {
+<span class="nc" id="L275">                String messageKey = &quot;messages.talisman.&quot; + getMessageSuffix();</span>
+
+<span class="nc bnc" id="L277" title="All 2 branches missed.">                if (Slimefun.getRegistry().useActionbarForTalismans()) {</span>
+                    // Use the actionbar
+<span class="nc" id="L279">                    Slimefun.getLocalization().sendActionbarMessage(p, messageKey, false);</span>
+                } else {
+                    // Send the message via chat
+<span class="nc" id="L282">                    Slimefun.getLocalization().sendMessage(p, messageKey, true);</span>
+                }
+<span class="nc" id="L284">            } catch (Exception x) {</span>
+<span class="nc" id="L285">                error(&quot;An Exception was thrown while trying to send a Talisman message&quot;, x);</span>
+<span class="nc" id="L286">            }</span>
+        }
+<span class="nc" id="L288">    }</span>
+
+    private boolean canEffectsBeApplied(@Nonnull Player p) {
+<span class="nc bnc" id="L291" title="All 2 branches missed.">        for (PotionEffect effect : getEffects()) {</span>
+<span class="nc bnc" id="L292" title="All 4 branches missed.">            if (effect != null &amp;&amp; p.hasPotionEffect(effect.getType())) {</span>
+<span class="nc" id="L293">                return false;</span>
+            }
+        }
+
+<span class="nc" id="L297">        return true;</span>
+    }
+
+    @Nullable
+    private static Player getPlayerByEventType(@Nonnull Event e) {
+<span class="nc bnc" id="L302" title="All 2 branches missed.">        if (e instanceof EntityDeathEvent entityDeathEvent) {</span>
+<span class="nc" id="L303">            return entityDeathEvent.getEntity().getKiller();</span>
+<span class="nc bnc" id="L304" title="All 2 branches missed.">        } else if (e instanceof BlockBreakEvent blockBreakEvent) {</span>
+<span class="nc" id="L305">            return blockBreakEvent.getPlayer();</span>
+<span class="nc bnc" id="L306" title="All 2 branches missed.">        } else if (e instanceof BlockDropItemEvent blockDropItemEvent) {</span>
+<span class="nc" id="L307">            return blockDropItemEvent.getPlayer();</span>
+<span class="nc bnc" id="L308" title="All 2 branches missed.">        } else if (e instanceof PlayerEvent playerEvent) {</span>
+<span class="nc" id="L309">            return playerEvent.getPlayer();</span>
+<span class="nc bnc" id="L310" title="All 2 branches missed.">        } else if (e instanceof EntityEvent entityEvent) {</span>
+<span class="nc" id="L311">            return (Player) entityEvent.getEntity();</span>
+<span class="nc bnc" id="L312" title="All 2 branches missed.">        } else if (e instanceof EnchantItemEvent enchantItemEvent) {</span>
+<span class="nc" id="L313">            return enchantItemEvent.getEnchanter();</span>
+        }
+
+<span class="nc" id="L316">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

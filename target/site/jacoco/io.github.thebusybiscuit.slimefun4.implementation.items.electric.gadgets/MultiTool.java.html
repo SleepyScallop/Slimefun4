@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MultiTool.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.electric.gadgets</a> &gt; <span class="el_source">MultiTool.java</span></div><h1>MultiTool.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.electric.gadgets;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.Rechargeable;
+import io.github.thebusybiscuit.slimefun4.core.handlers.EntityInteractHandler;
+import io.github.thebusybiscuit.slimefun4.core.handlers.ItemUseHandler;
+import io.github.thebusybiscuit.slimefun4.core.handlers.ToolUseHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+
+/**
+ * The {@link MultiTool} is an electric device which can mimic
+ * the behaviour of any other {@link SlimefunItem}.
+ * 
+ * @author TheBusyBiscuit
+ *
+ */
+public class MultiTool extends SlimefunItem implements Rechargeable {
+
+    private static final float COST = 0.3F;
+
+<span class="fc" id="L37">    private final Map&lt;UUID, Integer&gt; selectedMode = new HashMap&lt;&gt;();</span>
+<span class="fc" id="L38">    private final List&lt;MultiToolMode&gt; modes = new ArrayList&lt;&gt;();</span>
+    private final float capacity;
+
+    @ParametersAreNonnullByDefault
+    public MultiTool(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe, float capacity, String... items) {
+<span class="fc" id="L43">        super(itemGroup, item, recipeType, recipe);</span>
+
+<span class="fc bfc" id="L45" title="All 2 branches covered.">        for (int i = 0; i &lt; items.length; i++) {</span>
+<span class="fc" id="L46">            modes.add(new MultiToolMode(this, i, items[i]));</span>
+        }
+
+<span class="fc" id="L49">        this.capacity = capacity;</span>
+<span class="fc" id="L50">    }</span>
+
+    @Override
+    public float getMaxItemCharge(ItemStack item) {
+<span class="nc" id="L54">        return capacity;</span>
+    }
+
+    private int nextIndex(int i) {
+<span class="nc" id="L58">        int index = i;</span>
+
+        do {
+<span class="nc" id="L61">            index++;</span>
+
+<span class="nc bnc" id="L63" title="All 2 branches missed.">            if (index &gt;= modes.size()) {</span>
+<span class="nc" id="L64">                index = 0;</span>
+            }
+<span class="nc bnc" id="L66" title="All 4 branches missed.">        } while (index != i &amp;&amp; !modes.get(index).isEnabled());</span>
+
+<span class="nc" id="L68">        return index;</span>
+    }
+
+    @Nonnull
+    protected ItemUseHandler getItemUseHandler() {
+<span class="fc" id="L73">        return e -&gt; {</span>
+<span class="nc" id="L74">            Player p = e.getPlayer();</span>
+<span class="nc" id="L75">            ItemStack item = e.getItem();</span>
+<span class="nc" id="L76">            e.cancel();</span>
+
+<span class="nc" id="L78">            int index = selectedMode.getOrDefault(p.getUniqueId(), 0);</span>
+
+<span class="nc bnc" id="L80" title="All 2 branches missed.">            if (!p.isSneaking()) {</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">                if (removeItemCharge(item, COST)) {</span>
+<span class="nc" id="L82">                    SlimefunItem sfItem = modes.get(index).getItem();</span>
+
+<span class="nc bnc" id="L84" title="All 2 branches missed.">                    if (sfItem != null) {</span>
+<span class="nc" id="L85">                        sfItem.callItemHandler(ItemUseHandler.class, handler -&gt; handler.onRightClick(e));</span>
+                    }
+<span class="nc" id="L87">                }</span>
+            } else {
+<span class="nc" id="L89">                index = nextIndex(index);</span>
+
+<span class="nc" id="L91">                SlimefunItem selectedItem = modes.get(index).getItem();</span>
+<span class="nc bnc" id="L92" title="All 2 branches missed.">                String itemName = selectedItem != null ? selectedItem.getItemName() : &quot;Unknown&quot;;</span>
+<span class="nc" id="L93">                Slimefun.getLocalization().sendMessage(p, &quot;messages.multi-tool.mode-change&quot;, true, msg -&gt; msg.replace(&quot;%device%&quot;, &quot;Multi Tool&quot;).replace(&quot;%mode%&quot;, ChatColor.stripColor(itemName)));</span>
+<span class="nc" id="L94">                selectedMode.put(p.getUniqueId(), index);</span>
+            }
+<span class="nc" id="L96">        };</span>
+    }
+
+    @Nonnull
+    private ToolUseHandler getToolUseHandler() {
+<span class="fc" id="L101">        return (e, tool, fortune, drops) -&gt; {</span>
+            // Multi Tools cannot be used as shears
+<span class="nc" id="L103">            Slimefun.getLocalization().sendMessage(e.getPlayer(), &quot;messages.multi-tool.not-shears&quot;);</span>
+<span class="nc" id="L104">            e.setCancelled(true);</span>
+<span class="nc" id="L105">        };</span>
+    }
+
+    @Nonnull
+    private EntityInteractHandler getEntityInteractionHandler() {
+<span class="fc" id="L110">        return (e, item, offhand) -&gt; {</span>
+            // Fixes #2217 - Prevent them from being used to shear entities
+<span class="nc bnc" id="L112" title="All 2 branches missed.">            switch (e.getRightClicked().getType()) {</span>
+                case MUSHROOM_COW:
+                case SHEEP:
+                case SNOWMAN:
+<span class="nc" id="L116">                    Slimefun.getLocalization().sendMessage(e.getPlayer(), &quot;messages.multi-tool.not-shears&quot;);</span>
+<span class="nc" id="L117">                    e.setCancelled(true);</span>
+<span class="nc" id="L118">                    break;</span>
+                default:
+                    break;
+            }
+<span class="nc" id="L122">        };</span>
+    }
+
+    @Override
+    public void preRegister() {
+<span class="fc" id="L127">        super.preRegister();</span>
+
+<span class="fc" id="L129">        addItemHandler(getItemUseHandler());</span>
+<span class="fc" id="L130">        addItemHandler(getToolUseHandler());</span>
+<span class="fc" id="L131">        addItemHandler(getEntityInteractionHandler());</span>
+<span class="fc" id="L132">    }</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

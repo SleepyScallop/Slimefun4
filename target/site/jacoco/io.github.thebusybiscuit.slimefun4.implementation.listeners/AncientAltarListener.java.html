@@ -1,0 +1,363 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AncientAltarListener.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.listeners</a> &gt; <span class="el_source">AncientAltarListener.java</span></div><h1>AncientAltarListener.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.listeners;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
+import java.util.Map;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
+import org.bukkit.event.Event.Result;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.bakedlibs.dough.items.ItemUtils;
+import io.github.bakedlibs.dough.protection.Interaction;
+import io.github.thebusybiscuit.slimefun4.api.events.PlayerRightClickEvent;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.implementation.items.altar.AltarRecipe;
+import io.github.thebusybiscuit.slimefun4.implementation.items.altar.AncientAltar;
+import io.github.thebusybiscuit.slimefun4.implementation.items.altar.AncientPedestal;
+import io.github.thebusybiscuit.slimefun4.implementation.items.blocks.RepairedSpawner;
+import io.github.thebusybiscuit.slimefun4.implementation.tasks.AncientAltarTask;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+import io.github.thebusybiscuit.slimefun4.utils.itemstack.ItemStackWrapper;
+
+import me.mrCookieSlime.Slimefun.api.BlockStorage;
+
+/**
+ * This {@link Listener} is responsible for providing the core mechanics of the {@link AncientAltar}
+ * and the {@link AncientPedestal}, it also handles the crafting of items using the Altar.
+ * 
+ * @author Redemption198
+ * @author TheBusyBiscuit
+ *
+ */
+public class AncientAltarListener implements Listener {
+
+    private AncientAltar altarItem;
+    private AncientPedestal pedestalItem;
+
+<span class="nc" id="L60">    private final Set&lt;Location&gt; altarsInUse = new HashSet&lt;&gt;();</span>
+
+<span class="nc" id="L62">    private final List&lt;Block&gt; altars = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L63">    private final Set&lt;UUID&gt; removedItems = new HashSet&lt;&gt;();</span>
+
+    @ParametersAreNonnullByDefault
+<span class="nc" id="L66">    public AncientAltarListener(Slimefun plugin, AncientAltar altar, AncientPedestal pedestal) {</span>
+<span class="nc" id="L67">        plugin.getServer().getPluginManager().registerEvents(this, plugin);</span>
+
+<span class="nc" id="L69">        this.altarItem = altar;</span>
+<span class="nc" id="L70">        this.pedestalItem = pedestal;</span>
+<span class="nc" id="L71">    }</span>
+
+    /**
+     * This returns all {@link AncientAltar Altars} that are currently in use.
+     * 
+     * @return A {@link Set} of every {@link AncientAltar} currently in use
+     */
+    public @Nonnull Set&lt;Location&gt; getAltarsInUse() {
+<span class="nc" id="L79">        return altarsInUse;</span>
+    }
+
+    public @Nonnull List&lt;Block&gt; getAltars() {
+<span class="nc" id="L83">        return altars;</span>
+    }
+
+    @EventHandler
+    public void onInteract(PlayerRightClickEvent e) {
+<span class="nc bnc" id="L88" title="All 6 branches missed.">        if (altarItem == null || altarItem.isDisabled() || e.useBlock() == Result.DENY) {</span>
+<span class="nc" id="L89">            return;</span>
+        }
+
+<span class="nc" id="L92">        Optional&lt;Block&gt; blockOptional = e.getClickedBlock();</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">        if (!blockOptional.isPresent()) {</span>
+<span class="nc" id="L94">            return;</span>
+        }
+
+<span class="nc" id="L97">        Block b = blockOptional.get();</span>
+<span class="nc bnc" id="L98" title="All 4 branches missed.">        if (b.getType() != Material.ENCHANTING_TABLE &amp;&amp; b.getType() != Material.DISPENSER) {</span>
+<span class="nc" id="L99">            return;</span>
+        }
+
+<span class="nc" id="L102">        Optional&lt;SlimefunItem&gt; slimefunBlock = e.getSlimefunBlock();</span>
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (!slimefunBlock.isPresent()) {</span>
+<span class="nc" id="L104">            return;</span>
+        }
+
+<span class="nc" id="L107">        String id = slimefunBlock.get().getId();</span>
+<span class="nc" id="L108">        Player p = e.getPlayer();</span>
+
+<span class="nc bnc" id="L110" title="All 2 branches missed.">        if (id.equals(pedestalItem.getId())) {</span>
+<span class="nc" id="L111">            e.cancel();</span>
+<span class="nc" id="L112">            usePedestal(b, p);</span>
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        } else if (id.equals(altarItem.getId())) {</span>
+<span class="nc bnc" id="L114" title="All 4 branches missed.">            if (!altarItem.canUse(p, true) || altarsInUse.contains(b.getLocation())) {</span>
+<span class="nc" id="L115">                e.cancel();</span>
+<span class="nc" id="L116">                return;</span>
+            }
+
+            // Make altar in use simply because that was the last block clicked.
+<span class="nc" id="L120">            altarsInUse.add(b.getLocation());</span>
+<span class="nc" id="L121">            e.cancel();</span>
+
+<span class="nc" id="L123">            useAltar(b, p);</span>
+        }
+<span class="nc" id="L125">    }</span>
+
+    private void usePedestal(@Nonnull Block pedestal, @Nonnull Player p) {
+<span class="nc bnc" id="L128" title="All 2 branches missed.">        if (altarsInUse.contains(pedestal.getLocation())) {</span>
+<span class="nc" id="L129">            return;</span>
+        }
+
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        if (!Slimefun.getProtectionManager().hasPermission(p, pedestal, Interaction.INTERACT_BLOCK)) {</span>
+<span class="nc" id="L133">            Slimefun.getLocalization().sendMessage(p, &quot;inventory.no-access&quot;, true);</span>
+<span class="nc" id="L134">            return;</span>
+        }
+
+        // getting the currently placed item
+<span class="nc" id="L138">        Optional&lt;Item&gt; stack = pedestalItem.getPlacedItem(pedestal);</span>
+
+<span class="nc bnc" id="L140" title="All 2 branches missed.">        if (!stack.isPresent()) {</span>
+            // Check if the Item in hand is valid
+<span class="nc bnc" id="L142" title="All 2 branches missed.">            if (p.getInventory().getItemInMainHand().getType() != Material.AIR) {</span>
+                // Check for pedestal obstructions
+<span class="nc bnc" id="L144" title="All 2 branches missed.">                if (pedestal.getRelative(0, 1, 0).getType() != Material.AIR) {</span>
+<span class="nc" id="L145">                    Slimefun.getLocalization().sendMessage(p, &quot;machines.ANCIENT_PEDESTAL.obstructed&quot;, true);</span>
+<span class="nc" id="L146">                    return;</span>
+                }
+
+                // place the item onto the pedestal
+<span class="nc" id="L150">                pedestalItem.placeItem(p, pedestal);</span>
+            }
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        } else if (!removedItems.contains(stack.get().getUniqueId())) {</span>
+<span class="nc" id="L153">            Item entity = stack.get();</span>
+<span class="nc" id="L154">            UUID uuid = entity.getUniqueId();</span>
+<span class="nc" id="L155">            removedItems.add(uuid);</span>
+
+<span class="nc" id="L157">            Slimefun.runSync(() -&gt; removedItems.remove(uuid), 30L);</span>
+
+<span class="nc" id="L159">            entity.remove();</span>
+<span class="nc" id="L160">            p.playSound(pedestal.getLocation(), Sound.ENTITY_ITEM_PICKUP, 1F, 1F);</span>
+
+            /*
+             * Fixes #3476
+             * Drop the item instead if the player's inventory is full and
+             * no stack space left else add remaining items from the returned map value
+             */
+<span class="nc" id="L167">            Map&lt;Integer, ItemStack&gt; remainingItemMap = p.getInventory().addItem(pedestalItem.getOriginalItemStack(entity));</span>
+
+<span class="nc bnc" id="L169" title="All 2 branches missed.">            for (ItemStack item : remainingItemMap.values()) {</span>
+<span class="nc" id="L170">                p.getWorld().dropItem(pedestal.getLocation().add(0, 1, 0), item.clone());</span>
+<span class="nc" id="L171">            }</span>
+        }
+<span class="nc" id="L173">    }</span>
+
+    private void useAltar(@Nonnull Block altar, @Nonnull Player p) {
+<span class="nc bnc" id="L176" title="All 2 branches missed.">        if (!Slimefun.getProtectionManager().hasPermission(p, altar, Interaction.INTERACT_BLOCK)) {</span>
+<span class="nc" id="L177">            Slimefun.getLocalization().sendMessage(p, &quot;inventory.no-access&quot;, true);</span>
+<span class="nc" id="L178">            return;</span>
+        }
+
+<span class="nc" id="L181">        ItemStack catalyst = new CustomItemStack(p.getInventory().getItemInMainHand(), 1);</span>
+<span class="nc" id="L182">        List&lt;Block&gt; pedestals = getPedestals(altar);</span>
+
+<span class="nc bnc" id="L184" title="All 2 branches missed.">        if (!altars.contains(altar)) {</span>
+<span class="nc" id="L185">            altars.add(altar);</span>
+
+<span class="nc bnc" id="L187" title="All 2 branches missed.">            if (pedestals.size() == 8) {</span>
+<span class="nc" id="L188">                pedestals.forEach(block -&gt; altarsInUse.add(block.getLocation()));</span>
+
+<span class="nc bnc" id="L190" title="All 2 branches missed.">                if (catalyst.getType() != Material.AIR) {</span>
+<span class="nc" id="L191">                    startRitual(p, altar, pedestals, catalyst);</span>
+                } else {
+<span class="nc" id="L193">                    altars.remove(altar);</span>
+<span class="nc" id="L194">                    Slimefun.getLocalization().sendMessage(p, &quot;machines.ANCIENT_ALTAR.unknown-catalyst&quot;, true);</span>
+
+<span class="nc bnc" id="L196" title="All 2 branches missed.">                    for (Block block : pedestals) {</span>
+<span class="nc" id="L197">                        altarsInUse.remove(block.getLocation());</span>
+<span class="nc" id="L198">                    }</span>
+
+                    // Unknown catalyst, no longer in use
+<span class="nc" id="L201">                    altarsInUse.remove(altar.getLocation());</span>
+                }
+            } else {
+<span class="nc" id="L204">                altars.remove(altar);</span>
+<span class="nc" id="L205">                Slimefun.getLocalization().sendMessage(p, &quot;machines.ANCIENT_ALTAR.not-enough-pedestals&quot;, true, msg -&gt; msg.replace(&quot;%pedestals%&quot;, String.valueOf(pedestals.size())));</span>
+
+                // Not a valid altar so remove from inuse
+<span class="nc" id="L208">                altarsInUse.remove(altar.getLocation());</span>
+            }
+        }
+<span class="nc" id="L211">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void startRitual(Player p, Block b, List&lt;Block&gt; pedestals, ItemStack catalyst) {
+<span class="nc" id="L215">        List&lt;ItemStack&gt; input = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        for (Block pedestal : pedestals) {</span>
+<span class="nc" id="L218">            Optional&lt;Item&gt; stack = pedestalItem.getPlacedItem(pedestal);</span>
+
+<span class="nc bnc" id="L220" title="All 2 branches missed.">            if (stack.isPresent()) {</span>
+<span class="nc" id="L221">                input.add(pedestalItem.getOriginalItemStack(stack.get()));</span>
+            }
+<span class="nc" id="L223">        }</span>
+
+<span class="nc" id="L225">        Optional&lt;ItemStack&gt; result = getRecipeOutput(catalyst, input);</span>
+
+<span class="nc bnc" id="L227" title="All 2 branches missed.">        if (result.isPresent()) {</span>
+<span class="nc bnc" id="L228" title="All 2 branches missed.">            if (SlimefunUtils.canPlayerUseItem(p, result.get(), true)) {</span>
+<span class="nc" id="L229">                List&lt;ItemStack&gt; consumed = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L230">                consumed.add(catalyst);</span>
+
+<span class="nc bnc" id="L232" title="All 2 branches missed.">                if (p.getGameMode() != GameMode.CREATIVE) {</span>
+<span class="nc" id="L233">                    ItemUtils.consumeItem(p.getInventory().getItemInMainHand(), false);</span>
+                }
+
+<span class="nc" id="L236">                b.getWorld().playSound(b.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_MIRROR, 1, 1);</span>
+
+<span class="nc" id="L238">                AncientAltarTask task = new AncientAltarTask(this, b, altarItem.getStepDelay(), result.get(), pedestals, consumed, p);</span>
+<span class="nc" id="L239">                Slimefun.runSync(task, 10L);</span>
+<span class="nc" id="L240">            } else {</span>
+<span class="nc" id="L241">                altars.remove(b);</span>
+
+<span class="nc bnc" id="L243" title="All 2 branches missed.">                for (Block block : pedestals) {</span>
+<span class="nc" id="L244">                    altarsInUse.remove(block.getLocation());</span>
+<span class="nc" id="L245">                }</span>
+
+                // Item not unlocked, no longer in use.
+<span class="nc" id="L248">                altarsInUse.remove(b.getLocation());</span>
+            }
+        } else {
+<span class="nc" id="L251">            altars.remove(b);</span>
+<span class="nc" id="L252">            Slimefun.getLocalization().sendMessage(p, &quot;machines.ANCIENT_ALTAR.unknown-recipe&quot;, true);</span>
+
+<span class="nc bnc" id="L254" title="All 2 branches missed.">            for (Block block : pedestals) {</span>
+<span class="nc" id="L255">                altarsInUse.remove(block.getLocation());</span>
+<span class="nc" id="L256">            }</span>
+
+            // Bad recipe, no longer in use.
+<span class="nc" id="L259">            altarsInUse.remove(b.getLocation());</span>
+        }
+<span class="nc" id="L261">    }</span>
+
+    @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent e) {
+<span class="nc bnc" id="L265" title="All 4 branches missed.">        if (altarItem == null || altarItem.isDisabled()) {</span>
+<span class="nc" id="L266">            return;</span>
+        }
+
+<span class="nc" id="L269">        Block pedestal = e.getBlockPlaced().getRelative(BlockFace.DOWN);</span>
+
+<span class="nc bnc" id="L271" title="All 2 branches missed.">        if (pedestal.getType() == Material.DISPENSER) {</span>
+<span class="nc" id="L272">            String id = BlockStorage.checkID(pedestal);</span>
+
+<span class="nc bnc" id="L274" title="All 4 branches missed.">            if (id != null &amp;&amp; id.equals(pedestalItem.getId())) {</span>
+<span class="nc" id="L275">                Slimefun.getLocalization().sendMessage(e.getPlayer(), &quot;messages.cannot-place&quot;, true);</span>
+<span class="nc" id="L276">                e.setCancelled(true);</span>
+            }
+        }
+<span class="nc" id="L279">    }</span>
+
+    private @Nonnull List&lt;Block&gt; getPedestals(@Nonnull Block altar) {
+<span class="nc" id="L282">        List&lt;Block&gt; list = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L284" title="All 2 branches missed.">        if (BlockStorage.check(altar.getRelative(2, 0, -2), pedestalItem.getId())) {</span>
+<span class="nc" id="L285">            list.add(altar.getRelative(2, 0, -2));</span>
+        }
+<span class="nc bnc" id="L287" title="All 2 branches missed.">        if (BlockStorage.check(altar.getRelative(3, 0, 0), pedestalItem.getId())) {</span>
+<span class="nc" id="L288">            list.add(altar.getRelative(3, 0, 0));</span>
+        }
+<span class="nc bnc" id="L290" title="All 2 branches missed.">        if (BlockStorage.check(altar.getRelative(2, 0, 2), pedestalItem.getId())) {</span>
+<span class="nc" id="L291">            list.add(altar.getRelative(2, 0, 2));</span>
+        }
+<span class="nc bnc" id="L293" title="All 2 branches missed.">        if (BlockStorage.check(altar.getRelative(0, 0, 3), pedestalItem.getId())) {</span>
+<span class="nc" id="L294">            list.add(altar.getRelative(0, 0, 3));</span>
+        }
+<span class="nc bnc" id="L296" title="All 2 branches missed.">        if (BlockStorage.check(altar.getRelative(-2, 0, 2), pedestalItem.getId())) {</span>
+<span class="nc" id="L297">            list.add(altar.getRelative(-2, 0, 2));</span>
+        }
+<span class="nc bnc" id="L299" title="All 2 branches missed.">        if (BlockStorage.check(altar.getRelative(-3, 0, 0), pedestalItem.getId())) {</span>
+<span class="nc" id="L300">            list.add(altar.getRelative(-3, 0, 0));</span>
+        }
+<span class="nc bnc" id="L302" title="All 2 branches missed.">        if (BlockStorage.check(altar.getRelative(-2, 0, -2), pedestalItem.getId())) {</span>
+<span class="nc" id="L303">            list.add(altar.getRelative(-2, 0, -2));</span>
+        }
+<span class="nc bnc" id="L305" title="All 2 branches missed.">        if (BlockStorage.check(altar.getRelative(0, 0, -3), pedestalItem.getId())) {</span>
+<span class="nc" id="L306">            list.add(altar.getRelative(0, 0, -3));</span>
+        }
+
+<span class="nc" id="L309">        return list;</span>
+    }
+
+    public @Nonnull Optional&lt;ItemStack&gt; getRecipeOutput(@Nonnull ItemStack catalyst, @Nonnull List&lt;ItemStack&gt; inputs) {
+<span class="nc bnc" id="L313" title="All 2 branches missed.">        if (inputs.size() != 8) {</span>
+<span class="nc" id="L314">            return Optional.empty();</span>
+        }
+
+<span class="nc" id="L317">        ItemStackWrapper wrapper = ItemStackWrapper.wrap(catalyst);</span>
+<span class="nc" id="L318">        List&lt;ItemStackWrapper&gt; items = ItemStackWrapper.wrapList(inputs);</span>
+
+<span class="nc bnc" id="L320" title="All 2 branches missed.">        if (SlimefunUtils.isItemSimilar(wrapper, SlimefunItems.BROKEN_SPAWNER, false, false)) {</span>
+<span class="nc bnc" id="L321" title="All 2 branches missed.">            if (!checkRecipe(SlimefunItems.BROKEN_SPAWNER, items).isPresent()) {</span>
+<span class="nc" id="L322">                return Optional.empty();</span>
+            }
+
+<span class="nc" id="L325">            RepairedSpawner spawner = (RepairedSpawner) SlimefunItems.REPAIRED_SPAWNER.getItem();</span>
+<span class="nc" id="L326">            return Optional.of(spawner.getItemForEntityType(spawner.getEntityType(wrapper).orElse(EntityType.PIG)));</span>
+        }
+
+<span class="nc" id="L329">        return checkRecipe(wrapper, items);</span>
+    }
+
+    private @Nonnull Optional&lt;ItemStack&gt; checkRecipe(@Nonnull ItemStack catalyst, @Nonnull List&lt;ItemStackWrapper&gt; items) {
+<span class="nc bnc" id="L333" title="All 2 branches missed.">        for (AltarRecipe recipe : altarItem.getRecipes()) {</span>
+<span class="nc bnc" id="L334" title="All 2 branches missed.">            if (SlimefunUtils.isItemSimilar(catalyst, recipe.getCatalyst(), true)) {</span>
+<span class="nc" id="L335">                Optional&lt;ItemStack&gt; optional = checkPedestals(items, recipe);</span>
+
+<span class="nc bnc" id="L337" title="All 2 branches missed.">                if (optional.isPresent()) {</span>
+<span class="nc" id="L338">                    return optional;</span>
+                }
+            }
+<span class="nc" id="L341">        }</span>
+
+<span class="nc" id="L343">        return Optional.empty();</span>
+    }
+
+    private @Nonnull Optional&lt;ItemStack&gt; checkPedestals(@Nonnull List&lt;ItemStackWrapper&gt; items, @Nonnull AltarRecipe recipe) {
+<span class="nc bnc" id="L347" title="All 2 branches missed.">        for (int i = 0; i &lt; 8; i++) {</span>
+<span class="nc bnc" id="L348" title="All 2 branches missed.">            if (SlimefunUtils.isItemSimilar(items.get(i), recipe.getInput().get(0), true)) {</span>
+<span class="nc bnc" id="L349" title="All 2 branches missed.">                for (int j = 1; j &lt; 8; j++) {</span>
+<span class="nc bnc" id="L350" title="All 2 branches missed.">                    if (!SlimefunUtils.isItemSimilar(items.get((i + j) % items.size()), recipe.getInput().get(j), true)) {</span>
+<span class="nc" id="L351">                        break;</span>
+<span class="nc bnc" id="L352" title="All 2 branches missed.">                    } else if (j == 7) {</span>
+<span class="nc" id="L353">                        return Optional.of(recipe.getOutput());</span>
+                    }
+                }
+            }
+        }
+
+<span class="nc" id="L359">        return Optional.empty();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

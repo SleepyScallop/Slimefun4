@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>PerformanceSummary.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.core.services.profiler</a> &gt; <span class="el_source">PerformanceSummary.java</span></div><h1>PerformanceSummary.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.core.services.profiler;
+
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import io.github.bakedlibs.dough.common.ChatColors;
+import io.github.thebusybiscuit.slimefun4.core.services.profiler.inspectors.PlayerPerformanceInspector;
+import io.github.thebusybiscuit.slimefun4.utils.ChatUtils;
+import io.github.thebusybiscuit.slimefun4.utils.NumberUtils;
+
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.chat.HoverEvent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.chat.hover.content.Content;
+import net.md_5.bungee.api.chat.hover.content.Text;
+
+class PerformanceSummary {
+
+    // The threshold at which a Block or Chunk is significant enough to appear in /sf timings
+    private static final int VISIBILITY_THRESHOLD = 260_000;
+    private static final int MIN_ITEMS = 6;
+    private static final int MAX_ITEMS = 20;
+
+    private final SlimefunProfiler profiler;
+    private final PerformanceRating rating;
+    private final long totalElapsedTime;
+    private final int totalTickedBlocks;
+    private final float percentage;
+    private final int tickRate;
+
+    private final Map&lt;String, Long&gt; chunks;
+    private final Map&lt;String, Long&gt; plugins;
+    private final Map&lt;String, Long&gt; items;
+
+<span class="nc" id="L43">    PerformanceSummary(@Nonnull SlimefunProfiler profiler, long totalElapsedTime, int totalTickedBlocks) {</span>
+<span class="nc" id="L44">        this.profiler = profiler;</span>
+<span class="nc" id="L45">        this.rating = profiler.getPerformance();</span>
+<span class="nc" id="L46">        this.percentage = profiler.getPercentageOfTick();</span>
+<span class="nc" id="L47">        this.totalElapsedTime = totalElapsedTime;</span>
+<span class="nc" id="L48">        this.totalTickedBlocks = totalTickedBlocks;</span>
+<span class="nc" id="L49">        this.tickRate = profiler.getTickRate();</span>
+
+<span class="nc" id="L51">        chunks = profiler.getByChunk();</span>
+<span class="nc" id="L52">        plugins = profiler.getByPlugin();</span>
+<span class="nc" id="L53">        items = profiler.getByItem();</span>
+<span class="nc" id="L54">    }</span>
+
+    public void send(@Nonnull PerformanceInspector sender) {
+<span class="nc" id="L57">        sender.sendMessage(&quot;&quot;);</span>
+<span class="nc" id="L58">        sender.sendMessage(ChatColor.GREEN + &quot;===== Slimefun Lag Profiler =====&quot;);</span>
+<span class="nc" id="L59">        sender.sendMessage(ChatColor.GOLD + &quot;Total time: &quot; + ChatColor.YELLOW + NumberUtils.getAsMillis(totalElapsedTime));</span>
+<span class="nc" id="L60">        sender.sendMessage(ChatColor.GOLD + &quot;Running every: &quot; + ChatColor.YELLOW + NumberUtils.roundDecimalNumber(tickRate / 20.0) + &quot;s (&quot; + tickRate + &quot; ticks)&quot;);</span>
+<span class="nc" id="L61">        sender.sendMessage(ChatColor.GOLD + &quot;Performance: &quot; + getPerformanceRating());</span>
+<span class="nc" id="L62">        sender.sendMessage(&quot;&quot;);</span>
+
+<span class="nc" id="L64">        summarizeTimings(totalTickedBlocks, &quot;block&quot;, sender, items, entry -&gt; {</span>
+<span class="nc" id="L65">            int count = profiler.getBlocksOfId(entry.getKey());</span>
+<span class="nc" id="L66">            String time = NumberUtils.getAsMillis(entry.getValue());</span>
+
+<span class="nc bnc" id="L68" title="All 2 branches missed.">            if (count &gt; 1) {</span>
+<span class="nc" id="L69">                String average = NumberUtils.getAsMillis(entry.getValue() / count);</span>
+
+<span class="nc" id="L71">                return entry.getKey() + &quot; - &quot; + count + &quot;x (&quot; + time + &quot; | avg: &quot; + average + ')';</span>
+            } else {
+<span class="nc" id="L73">                return entry.getKey() + &quot; - &quot; + count + &quot;x (&quot; + time + ')';</span>
+            }
+        });
+
+<span class="nc" id="L77">        summarizeTimings(chunks.size(), &quot;chunk&quot;, sender, chunks, entry -&gt; {</span>
+<span class="nc" id="L78">            int count = profiler.getBlocksInChunk(entry.getKey());</span>
+<span class="nc" id="L79">            String time = NumberUtils.getAsMillis(entry.getValue());</span>
+
+<span class="nc bnc" id="L81" title="All 2 branches missed.">            return entry.getKey() + &quot; - &quot; + count + &quot; block&quot; + (count != 1 ? 's' : &quot;&quot;) + &quot; (&quot; + time + &quot;)&quot;;</span>
+        });
+
+<span class="nc" id="L84">        summarizeTimings(plugins.size(), &quot;plugin&quot;, sender, plugins, entry -&gt; {</span>
+<span class="nc" id="L85">            int count = profiler.getBlocksFromPlugin(entry.getKey());</span>
+<span class="nc" id="L86">            String time = NumberUtils.getAsMillis(entry.getValue());</span>
+
+<span class="nc bnc" id="L88" title="All 2 branches missed.">            return entry.getKey() + &quot; - &quot; + count + &quot; block&quot; + (count != 1 ? 's' : &quot;&quot;) + &quot; (&quot; + time + &quot;)&quot;;</span>
+        });
+<span class="nc" id="L90">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private void summarizeTimings(int count, String name, PerformanceInspector inspector, Map&lt;String, Long&gt; map, Function&lt;Map.Entry&lt;String, Long&gt;, String&gt; formatter) {
+<span class="nc" id="L94">        Stream&lt;Map.Entry&lt;String, Long&gt;&gt; stream = map.entrySet().stream();</span>
+<span class="nc" id="L95">        List&lt;Entry&lt;String, Long&gt;&gt; results = stream.sorted(Map.Entry.comparingByValue(Comparator.reverseOrder())).collect(Collectors.toList());</span>
+<span class="nc bnc" id="L96" title="All 2 branches missed.">        String prefix = count + &quot; &quot; + name + (count != 1 ? 's' : &quot;&quot;);</span>
+
+<span class="nc bnc" id="L98" title="All 2 branches missed.">        if (inspector instanceof PlayerPerformanceInspector playerPerformanceInspector) {</span>
+<span class="nc" id="L99">            TextComponent component = summarizeAsTextComponent(count, prefix, results, formatter);</span>
+<span class="nc" id="L100">            playerPerformanceInspector.sendMessage(component);</span>
+<span class="nc" id="L101">        } else {</span>
+<span class="nc" id="L102">            String text = summarizeAsString(inspector, count, prefix, results, formatter);</span>
+<span class="nc" id="L103">            inspector.sendMessage(text);</span>
+        }
+<span class="nc" id="L105">    }</span>
+
+    @Nonnull
+    @ParametersAreNonnullByDefault
+    private TextComponent summarizeAsTextComponent(int count, String prefix, List&lt;Map.Entry&lt;String, Long&gt;&gt; results, Function&lt;Entry&lt;String, Long&gt;, String&gt; formatter) {
+<span class="nc" id="L110">        TextComponent component = new TextComponent(prefix);</span>
+<span class="nc" id="L111">        component.setColor(ChatColor.YELLOW);</span>
+
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        if (count &gt; 0) {</span>
+<span class="nc" id="L114">            TextComponent hoverComponent = new TextComponent(&quot;  (Hover for details)&quot;);</span>
+<span class="nc" id="L115">            hoverComponent.setColor(ChatColor.GRAY);</span>
+<span class="nc" id="L116">            StringBuilder builder = new StringBuilder();</span>
+
+<span class="nc" id="L118">            int shownEntries = 0;</span>
+<span class="nc" id="L119">            int hiddenEntries = 0;</span>
+
+<span class="nc bnc" id="L121" title="All 2 branches missed.">            for (Map.Entry&lt;String, Long&gt; entry : results) {</span>
+<span class="nc bnc" id="L122" title="All 6 branches missed.">                if (shownEntries &lt; MAX_ITEMS &amp;&amp; (shownEntries &lt; MIN_ITEMS || entry.getValue() &gt; VISIBILITY_THRESHOLD)) {</span>
+<span class="nc" id="L123">                    builder.append(&quot;\n&quot;).append(ChatColor.YELLOW).append(formatter.apply(entry));</span>
+<span class="nc" id="L124">                    shownEntries++;</span>
+                } else {
+<span class="nc" id="L126">                    hiddenEntries++;</span>
+                }
+<span class="nc" id="L128">            }</span>
+
+<span class="nc bnc" id="L130" title="All 2 branches missed.">            if (hiddenEntries &gt; 0) {</span>
+<span class="nc" id="L131">                builder.append(&quot;\n\n&amp;c+ &amp;6&quot;).append(hiddenEntries).append(&quot; more&quot;);</span>
+            }
+
+<span class="nc" id="L134">            Content content = new Text(TextComponent.fromLegacyText(ChatColors.color(builder.toString())));</span>
+<span class="nc" id="L135">            hoverComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, content));</span>
+
+<span class="nc" id="L137">            component.addExtra(hoverComponent);</span>
+        }
+
+<span class="nc" id="L140">        return component;</span>
+    }
+
+    @Nonnull
+    @ParametersAreNonnullByDefault
+    private String summarizeAsString(PerformanceInspector inspector, int count, String prefix, List&lt;Entry&lt;String, Long&gt;&gt; results, Function&lt;Entry&lt;String, Long&gt;, String&gt; formatter) {
+<span class="nc" id="L146">        int shownEntries = 0;</span>
+<span class="nc" id="L147">        int hiddenEntries = 0;</span>
+
+<span class="nc" id="L149">        StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L150">        builder.append(ChatColor.GOLD).append(prefix);</span>
+
+<span class="nc bnc" id="L152" title="All 2 branches missed.">        if (count &gt; 0) {</span>
+<span class="nc" id="L153">            builder.append(ChatColor.YELLOW);</span>
+
+<span class="nc bnc" id="L155" title="All 2 branches missed.">            for (Map.Entry&lt;String, Long&gt; entry : results) {</span>
+<span class="nc bnc" id="L156" title="All 8 branches missed.">                if (inspector.isVerbose() || (shownEntries &lt; MAX_ITEMS &amp;&amp; (shownEntries &lt; MIN_ITEMS || entry.getValue() &gt; VISIBILITY_THRESHOLD))) {</span>
+<span class="nc" id="L157">                    builder.append(&quot;\n  &quot;);</span>
+<span class="nc" id="L158">                    builder.append(ChatColor.stripColor(formatter.apply(entry)));</span>
+<span class="nc" id="L159">                    shownEntries++;</span>
+                } else {
+<span class="nc" id="L161">                    hiddenEntries++;</span>
+                }
+<span class="nc" id="L163">            }</span>
+
+<span class="nc bnc" id="L165" title="All 2 branches missed.">            if (hiddenEntries &gt; 0) {</span>
+<span class="nc" id="L166">                builder.append(&quot;\n+ &quot;).append(hiddenEntries).append(&quot; more...&quot;);</span>
+            }
+        }
+
+<span class="nc" id="L170">        return builder.toString();</span>
+    }
+
+    @Nonnull
+    private String getPerformanceRating() {
+<span class="nc" id="L175">        StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L176">        builder.append(NumberUtils.getColorFromPercentage(100 - Math.min(percentage, 100)));</span>
+
+<span class="nc" id="L178">        int rest = 20;</span>
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        for (int i = (int) Math.min(percentage, 100); i &gt;= 5; i = i - 5) {</span>
+<span class="nc" id="L180">            builder.append(':');</span>
+<span class="nc" id="L181">            rest--;</span>
+        }
+
+<span class="nc" id="L184">        builder.append(ChatColor.DARK_GRAY);</span>
+
+<span class="nc bnc" id="L186" title="All 2 branches missed.">        for (int i = 0; i &lt; rest; i++) {</span>
+<span class="nc" id="L187">            builder.append(':');</span>
+        }
+
+<span class="nc" id="L190">        builder.append(&quot; - &quot;);</span>
+
+<span class="nc" id="L192">        builder.append(rating.getColor() + ChatUtils.humanize(rating.name()));</span>
+
+<span class="nc" id="L194">        builder.append(ChatColor.GRAY);</span>
+<span class="nc" id="L195">        builder.append(&quot; (&quot;);</span>
+<span class="nc" id="L196">        builder.append(NumberUtils.roundDecimalNumber(percentage));</span>
+<span class="nc" id="L197">        builder.append(&quot;%)&quot;);</span>
+
+<span class="nc" id="L199">        return builder.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

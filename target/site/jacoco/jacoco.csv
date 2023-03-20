@@ -1,0 +1,598 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,InfiniteBlockGenerator,4,242,3,23,1,46,3,18,0,7
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,ChestMenuUtils,404,144,20,0,58,18,28,6,18,6
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,JsonUtils,6,7,1,1,1,2,1,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,HeadTexture,7,747,0,0,2,111,2,4,2,4
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,ChargeUtils,0,174,1,19,0,35,1,12,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,FireworkUtils,57,123,2,2,10,15,4,4,3,3
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,UnbreakingAlgorithm,16,50,2,4,0,9,2,6,1,4
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,NumberUtils,154,170,22,30,38,36,19,24,8,9
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,ColoredMaterial,25,605,5,1,4,15,5,3,2,3
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,ChatUtils,43,70,2,2,10,9,4,4,3,3
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,SlimefunUtils,203,567,65,119,46,125,56,56,5,15
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,PatternUtils,0,21,0,0,0,6,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.utils,LoreBuilder,1,53,1,1,0,12,1,12,0,12
+Slimefun,io.github.thebusybiscuit.slimefun4.core.networks,NetworkManager,15,170,3,23,4,44,4,21,1,11
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.profiler,SlimefunProfiler,544,49,48,0,126,10,48,1,24,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.profiler,SlimefunThreadFactory,6,9,0,0,1,4,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.profiler,PerformanceSummary,513,0,40,0,95,0,29,0,9,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.profiler,ProfiledBlock,150,0,6,0,24,0,16,0,13,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.profiler,PerformanceRating,24,81,6,0,4,14,5,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricIngotPulverizer,39,33,3,1,7,7,4,3,2,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,Refinery,2,18,0,0,1,5,1,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,FoodComposter,2,222,0,0,1,15,1,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricIngotFactory,2,12,0,0,1,3,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ChargingBench,108,12,16,0,22,3,11,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricPress,2,474,1,1,1,46,2,4,1,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,FluidPump.new SimpleBlockBreakHandler() {...},20,6,2,0,5,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,FluidPump.new BlockTicker() {...},7,6,0,0,3,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,FluidPump.new ChestMenu.AdvancedMenuClickHandler() {...},15,6,6,0,2,1,5,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,CarbonPress,2,145,0,0,1,11,1,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,Freezer,88,218,3,1,9,15,4,3,2,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricOreGrinder,2,12,0,0,1,3,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricGoldPan,178,54,22,0,27,9,16,2,5,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,AutoDrier,5,322,1,7,2,46,3,6,2,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,AutoAnvil,151,15,18,0,23,4,12,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,FluidPump,271,327,45,8,58,21,32,9,9,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectrifiedCrucible,2,388,1,5,1,21,2,5,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,HeatedPressureChamber,12,181,0,0,2,13,3,3,3,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricFurnace,56,17,6,0,9,5,5,3,2,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricDustWasher,152,23,22,0,21,5,14,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,AutoBrewer,297,103,60,0,53,22,34,3,4,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricSmeltery.new ChestMenu.AdvancedMenuClickHandler() {...},15,6,6,0,2,1,5,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricSmeltery.new BlockMenuPreset() {...},114,13,20,0,21,3,13,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,ElectricSmeltery,39,290,0,8,3,18,4,9,4,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,HeatedPressureChamber.new BlockMenuPreset() {...},94,13,14,0,15,3,10,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines,FoodFabricator,2,299,0,0,1,15,1,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.utils.biomes,BiomeMap,63,127,2,2,15,29,9,11,7,11
+Slimefun,io.github.thebusybiscuit.slimefun4.utils.biomes,BiomeMapParser,0,260,1,23,0,64,1,19,0,8
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,GEOResourceGenerationEvent,63,0,2,0,22,0,13,0,12,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,PlayerPreResearchEvent,4,42,0,0,2,15,1,8,1,8
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,AutoDisenchantEvent,26,0,0,0,10,0,7,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,MultiBlockInteractEvent,4,34,0,0,2,12,1,8,1,8
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,WaypointCreateEvent,18,42,0,0,8,14,3,8,3,8
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,SlimefunItemSpawnEvent,63,0,2,0,22,0,12,0,11,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,AsyncMachineOperationFinishEvent,35,0,2,0,11,0,8,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,AncientAltarCraftEvent,47,0,4,0,16,0,11,0,9,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,PlayerRightClickEvent,77,84,11,3,21,21,15,8,8,8
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,AndroidMineEvent,31,0,0,0,12,0,8,0,8,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,SlimefunGuideOpenEvent,53,0,0,0,20,0,10,0,10,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,ClimbingPickLaunchEvent,16,34,0,0,7,12,4,7,4,7
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,AsyncProfileLoadEvent,0,43,0,0,0,14,0,7,0,7
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,ResearchUnlockEvent,4,38,0,2,2,12,1,8,1,7
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,BlockPlacerPlaceEvent,67,0,4,0,23,0,12,0,10,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,CoolerFeedPlayerEvent,19,32,0,0,7,11,3,7,3,7
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,PlayerLanguageChangeEvent,30,0,0,0,11,0,7,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,AsyncAutoEnchanterProcessEvent,47,0,0,0,17,0,9,0,9,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,ReactorExplodeEvent,30,0,0,0,11,0,6,0,6,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,AndroidFarmEvent,47,0,0,0,18,0,11,0,11,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,AutoEnchantEvent,26,0,0,0,10,0,7,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.events,ExplosiveToolBreakBlocksEvent,49,7,0,0,18,2,8,2,8,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,TrashCan,34,142,0,2,2,10,2,4,2,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,ReactorAccessPort.new SimpleBlockBreakHandler() {...},25,6,2,0,6,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,ReactorAccessPort.new BlockMenuPreset() {...},150,13,14,0,22,3,13,2,6,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,ReactorAccessPort,90,340,2,0,9,17,6,3,5,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,CargoInputNode,259,162,12,0,30,4,12,3,6,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,AbstractFilterNode.new SimpleBlockBreakHandler() {...},11,6,2,0,4,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,CargoManager,0,40,0,0,0,6,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,AbstractCargoNode.new BlockPlaceHandler() {...},19,7,0,0,5,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,AbstractCargoNode.new BlockMenuPreset() {...},36,13,4,0,5,3,6,2,4,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,AbstractCargoNode,168,25,10,0,31,4,9,2,4,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,AdvancedCargoOutputNode,0,170,0,0,0,4,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,CargoConnectorNode,29,10,4,0,8,3,3,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,CargoOutputNode,12,137,0,2,5,6,4,4,4,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,AbstractFilterNode,223,116,14,2,39,9,15,5,8,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,CargoManager.new BlockTicker() {...},8,6,0,0,3,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,CargoManager.new SimpleBlockBreakHandler() {...},5,6,0,0,2,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,CargoManager.new BlockUseHandler() {...},38,6,4,0,10,1,3,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.cargo,TrashCan.new BlockTicker() {...},28,6,2,0,5,1,3,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide,GuideEntry,0,19,0,0,0,8,0,4,0,4
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide,SlimefunGuideMode,0,15,0,0,0,3,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide,SlimefunGuideImplementation,39,0,8,0,7,0,5,0,1,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide,SlimefunGuide,115,34,10,8,30,7,17,6,11,3
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide,GuideHistory,22,212,5,19,5,46,6,20,2,12
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items.settings,EnumSetting,13,54,0,6,2,11,1,7,1,4
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items.settings,MaterialTagSetting,2,48,0,6,1,13,1,7,1,4
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items.settings,DoubleRangeSetting,6,52,1,9,1,8,2,8,1,4
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items.settings,IntRangeSetting,6,48,1,9,1,8,2,8,1,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.talismans,EnderTalisman,0,81,0,0,0,5,0,4,0,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.talismans,Talisman,303,202,56,8,71,43,41,17,12,14
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.talismans,MagicianTalisman,124,62,14,4,20,10,15,2,7,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,BowShootHandler,0,17,0,2,0,4,0,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,ItemConsumptionHandler,0,2,0,0,0,1,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,BlockUseHandler,8,12,2,2,1,3,2,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,ItemUseHandler,0,2,0,0,0,1,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,ToolUseHandler,0,2,0,0,0,1,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,RainbowTickHandler,96,41,16,2,25,13,13,4,4,4
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,ItemDropHandler,0,2,0,0,0,1,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,BlockDispenseHandler,8,12,2,2,1,3,2,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,BlockBreakHandler,8,11,0,0,4,5,4,2,4,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,BlockPlaceHandler,4,8,0,0,2,4,2,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,MultiBlockInteractionHandler,8,7,1,1,1,3,1,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,EntityInteractHandler,0,2,0,0,0,1,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,EntityKillHandler,0,2,0,0,0,1,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.handlers,WeaponUseHandler,0,2,0,0,0,1,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.player,StatusEffect,98,0,8,0,26,0,12,0,8,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.player,PlayerBackpack,32,193,2,20,8,39,3,21,2,11
+Slimefun,io.github.thebusybiscuit.slimefun4.api.player,PlayerProfile,215,636,28,56,41,131,28,53,6,33
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.seasonal,EasterEgg,32,14,2,0,7,4,2,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.seasonal,ChristmasPresent,45,13,2,0,10,4,3,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.api.geo,GEOResource,18,5,2,0,2,2,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.geo,ResourceManager,431,154,30,4,67,14,24,3,8,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric,EnergyRegulator,8,48,0,0,3,8,1,4,1,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric,EnergyRegulator.new SimpleBlockBreakHandler() {...},5,6,0,0,2,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric,EnergyRegulator.new BlockTicker() {...},7,6,0,0,3,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric,EnergyRegulator.new BlockPlaceHandler() {...},7,7,0,0,2,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric,AbstractEnergyProvider,80,24,2,0,16,7,5,3,4,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric,EnergyConnector,31,10,4,0,10,3,5,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric,Capacitor,5,10,0,0,2,3,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.crafting,CauldronListener,0,46,2,8,0,13,2,5,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.crafting,SlimefunCraftingListener,2,47,4,12,1,9,4,7,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.crafting,SmithingTableListener,0,42,3,5,0,9,3,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.crafting,CraftingTableListener,0,83,2,12,0,17,2,8,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.crafting,BrewingStandListener,25,54,9,7,6,12,8,3,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.crafting,GrindstoneListener,0,43,3,5,0,9,3,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.crafting,CartographyTableListener,0,53,3,5,0,10,3,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.crafting,AnvilListener,0,53,3,5,0,10,3,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.api,ErrorReport,510,0,30,0,107,0,32,0,17,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api,MinecraftVersion,0,142,1,15,0,30,1,15,0,8
+Slimefun,io.github.thebusybiscuit.slimefun4.api,SlimefunBranch,8,57,1,1,2,12,2,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.api,SlimefunAddon,26,16,5,1,4,4,5,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation,Slimefun,1160,413,68,14,208,121,60,43,21,41
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation,SlimefunItems,0,11470,0,0,0,631,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation,StartupWarnings,152,0,0,0,38,0,4,0,4,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.geo,GEOMiner,260,464,34,18,51,46,31,16,8,13
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.geo,OilPump,133,40,10,0,17,6,8,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.geo,PortableGEOScanner,18,9,0,0,4,3,2,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.geo,GEOMiner.new BlockTicker() {...},7,6,0,0,3,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.geo,GEOMiner.new ChestMenu.AdvancedMenuClickHandler() {...},15,6,6,0,2,1,5,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.geo,GEOMiner.new SimpleBlockBreakHandler() {...},21,6,2,0,6,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.geo,GEOMiner.new BlockPlaceHandler() {...},7,7,0,0,2,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.geo,OilPump.new BlockMenuPreset() {...},51,13,8,0,9,3,6,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.geo,GEOScanner,48,10,8,0,10,3,6,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.api.network,NetworkVisualizer,76,0,4,0,15,0,5,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.network,NetworkComponent,0,21,0,0,0,4,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.network,Network,41,290,12,24,13,67,12,18,2,10
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,AbstractEntityAssembler.new BlockPlaceHandler() {...},20,7,0,0,7,1,3,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,AbstractEntityAssembler.new BlockMenuPreset() {...},61,46,14,0,12,6,11,2,4,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,AbstractEntityAssembler.new BlockTicker() {...},125,6,10,0,19,1,9,1,4,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,AbstractEntityAssembler.new BlockBreakHandler() {...},23,8,2,0,6,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,IronGolemAssembler,18,89,0,0,4,10,3,6,3,6
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,AbstractEntityAssembler,380,255,30,0,50,14,23,4,8,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,ExpCollector.new BlockPlaceHandler() {...},9,7,0,0,2,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,ExpCollector.new BlockTicker() {...},7,6,0,0,3,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,ExpCollector.new SimpleBlockBreakHandler() {...},13,6,2,0,4,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,AnimalProduce,5,22,0,0,1,4,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,ProduceCollector,212,86,24,0,32,14,20,5,8,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,ProduceCollector.new BlockTicker() {...},7,6,0,0,3,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,WitherAssembler,11,90,0,0,3,10,3,6,3,6
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,ExpCollector,140,179,16,2,28,12,16,6,8,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,AutoBreeder.new SimpleBlockBreakHandler() {...},13,6,2,0,4,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,AutoBreeder,143,159,18,2,20,12,16,6,7,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.entities,AutoBreeder.new BlockTicker() {...},7,6,0,0,3,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.altar,AncientPedestal.new SimpleBlockBreakHandler() {...},32,6,4,0,8,1,3,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.altar,AncientAltar,6,34,0,0,1,6,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.altar,AltarRecipe,9,81,0,0,3,13,3,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.altar,AncientPedestal,171,28,18,0,35,6,14,4,5,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,TelepositionScroll,74,29,10,0,9,5,6,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,KnowledgeTome,109,9,8,0,23,3,7,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,MagicEyeOfEnder,51,10,10,0,10,3,7,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,InfusedHopper.new BlockTicker() {...},99,6,12,0,19,1,9,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,SoulboundItem,0,7,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,InfernalBonemeal,50,10,8,0,13,3,5,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,KnowledgeFlask,59,10,8,0,10,3,5,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,InfusedHopper,28,70,10,0,3,8,6,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,MagicalZombiePills,81,22,10,0,22,5,9,3,4,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,BeeWings,0,7,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical,InfusedMagnet,6,26,0,0,1,4,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.utils.tags,SlimefunTag,0,450,0,16,0,87,0,21,0,13
+Slimefun,io.github.thebusybiscuit.slimefun4.utils.tags,TagParser,8,302,2,38,2,67,2,25,0,7
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.armor,FarmerShoes,0,7,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.armor,Parachute,0,7,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.armor,ElytraCap,27,15,2,0,8,3,7,1,6,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.armor,StomperBoots,167,7,26,0,22,2,16,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.armor,EnderBoots,0,7,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.armor,SlimefunArmorPiece,0,18,0,2,0,4,0,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.armor,HazmatArmorPiece,8,27,0,0,3,4,3,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.armor,LongFallBoots,0,8,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.misc,BasicCircuitBoard,12,46,0,0,2,7,2,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.misc,StrangeNetherGoo,66,39,10,0,16,7,8,3,3,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.misc,CoolantCell,0,16,0,0,0,4,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.misc,SteelThruster,8,25,2,0,3,5,2,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.misc,SyntheticEmerald,0,11,0,0,0,3,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.misc,AlloyIngot,0,7,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.misc,GoldIngot,5,23,2,2,1,5,3,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.misc,OrganicFertilizer,0,49,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.misc,OrganicFood,0,52,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.networks.energy,EnergyNetComponentType,0,33,0,0,0,6,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.networks.energy,EnergyNet,560,0,61,0,140,0,46,0,14,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.resources,NetherIceResource,0,27,0,2,0,6,0,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.resources,SaltResource,14,37,2,4,2,9,2,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.resources,GEOResourcesSetup,0,17,0,0,0,5,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.resources,AbstractResource,25,60,2,0,5,18,2,7,1,7
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.resources,UraniumResource,15,34,3,3,3,8,2,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.resources,OilResource,5,34,1,3,1,8,1,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,ParachuteTask,30,0,2,0,9,0,3,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,TickerTask,530,29,36,0,125,7,40,1,22,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,SlimefunStartupTask,103,0,10,0,22,0,9,0,4,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,ArmorTask,48,303,20,40,11,65,16,25,1,10
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,AbstractPlayerTask,60,0,10,0,18,0,12,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,CapacitorTextureUpdateTask,81,0,10,0,20,0,8,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,AsyncRecipeChoiceTask,148,0,4,0,33,0,9,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,AncientAltarTask,448,0,30,0,82,0,22,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,JetpackTask,83,0,6,0,16,0,5,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,InfusedMagnetTask,82,0,16,0,14,0,11,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,JetBootsTask,105,0,8,0,17,0,6,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.tasks,BeeWingsTask,125,0,22,0,28,0,16,0,5,0
+Slimefun,me.mrCookieSlime.CSCoreLibPlugin.general.Inventory,ChestMenu,197,90,12,4,44,22,28,6,22,4
+Slimefun,me.mrCookieSlime.CSCoreLibPlugin.general.Inventory,ClickAction,15,0,0,0,6,0,3,0,3,0
+Slimefun,me.mrCookieSlime.CSCoreLibPlugin.general.Inventory,MenuListener,144,0,22,0,20,0,15,0,4,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.accelerators,TreeGrowthAccelerator,194,11,24,0,33,3,18,2,6,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.accelerators,CropGrowthAccelerator,121,11,16,0,20,3,11,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.accelerators,AbstractGrowthAccelerator,36,153,0,2,3,12,3,6,3,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.accelerators,AnimalGrowthAccelerator,109,11,16,0,18,3,11,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.accelerators,AbstractGrowthAccelerator.new BlockTicker() {...},7,6,0,0,3,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.accelerators,AbstractGrowthAccelerator.new SimpleBlockBreakHandler() {...},13,6,2,0,4,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,CustomTextureService,9,157,1,11,3,41,1,13,0,8
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,PermissionsService,36,141,4,18,7,27,5,13,2,5
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,CustomItemDataService,15,92,7,5,2,26,5,8,0,7
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,UpdaterService,106,60,9,7,25,19,9,6,4,3
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,AutoSavingService,120,3,18,0,32,1,12,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,MetricsService,343,53,31,1,76,16,25,2,9,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,MinecraftRecipeService,14,164,2,18,4,31,2,16,1,7
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,PerWorldSettingsService,151,243,24,14,29,50,23,12,6,10
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,BackupService,261,14,20,0,49,3,16,1,6,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,LocalizationService,384,54,36,2,81,16,32,4,13,4
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services,BlockDataService,92,29,10,6,23,9,9,6,4,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.entity,FireworksListener,0,34,3,3,0,8,3,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.entity,IronGolemListener,0,73,6,12,0,20,6,5,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.entity,BeeListener,4,63,3,9,2,14,3,5,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.entity,EntityInteractionListener,68,0,12,0,15,0,9,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.entity,PiglinListener,55,67,16,10,14,19,11,6,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.entity,WitherListener,41,0,6,0,9,0,5,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners.entity,MobDropListener,127,0,26,0,29,0,17,0,4,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.food,MeatJerky,0,41,0,0,0,5,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.food,FortuneCookie,18,9,0,0,4,3,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.food,MagicSugar,45,9,8,0,10,3,5,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.food,HeavyCream,15,10,4,0,4,3,3,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.food,MonsterJerky,0,32,1,1,0,7,1,4,0,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.food,Juice,100,33,13,1,17,8,9,3,2,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.food,BirthdayCake,0,7,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.food,DietCookie,3,32,1,1,1,8,1,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.autocrafters,ArmorAutoCrafter,0,8,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.autocrafters,AbstractAutoCrafter.new BlockTicker() {...},8,6,0,0,3,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.autocrafters,EnhancedAutoCrafter,0,8,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.autocrafters,VanillaAutoCrafter,359,22,24,4,60,6,19,4,7,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.autocrafters,SlimefunAutoCrafter,220,10,16,0,41,3,11,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.autocrafters,SlimefunItemRecipe,125,0,8,0,18,0,9,0,5,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.autocrafters,AbstractAutoCrafter,432,448,53,34,91,68,42,22,9,11
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.autocrafters,VanillaRecipe,135,169,15,7,21,16,10,7,2,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.autocrafters,AbstractRecipe,14,55,4,4,3,17,3,8,1,6
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.runes,EnchantmentRune,263,74,39,9,64,11,27,6,7,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.runes,ElementalRune,0,15,0,0,0,4,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.runes,SoulboundRune,153,10,22,0,33,3,16,2,5,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.runes,VillagerRune,87,10,12,0,16,3,7,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.enchanting,AutoEnchanter,276,30,44,0,44,5,27,2,5,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.enchanting,BookBinder,351,59,50,0,54,7,31,2,6,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.enchanting,AutoDisenchanter,291,12,38,0,50,3,24,2,5,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.enchanting,AbstractEnchantmentMachine,101,82,16,0,18,10,11,1,3,1
+Slimefun,me.mrCookieSlime.Slimefun.api,BlockStorage,1857,24,193,1,402,7,174,3,77,3
+Slimefun,me.mrCookieSlime.Slimefun.api,EmptyBlockData,9,4,0,0,2,2,2,1,2,1
+Slimefun,me.mrCookieSlime.Slimefun.api,BlockInfoConfig,102,8,6,0,21,3,18,1,15,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.medical,Splint,43,10,6,0,9,3,4,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.medical,MedicalSupply,42,55,4,0,10,12,5,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.medical,Bandage,46,14,6,0,10,4,4,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.medical,Medicine,10,11,0,0,4,3,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.medical,Vitamins,31,11,2,0,9,3,2,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.teleporter,Teleporter.new BlockPlaceHandler() {...},9,7,0,0,2,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.teleporter,PersonalActivationPlate.new BlockPlaceHandler() {...},9,7,0,0,2,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.teleporter,PortableTeleporter,32,29,2,0,7,5,3,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.teleporter,PersonalActivationPlate,9,22,0,0,1,4,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.teleporter,TeleporterPylon,0,21,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.teleporter,AbstractTeleporterPlate,0,7,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.teleporter,Teleporter,0,13,0,0,0,3,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.teleporter,SharedActivationPlate,2,7,0,0,1,2,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands,SubCommand,24,26,2,0,5,9,4,3,3,3
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands,SlimefunCommand,74,94,11,5,18,21,11,5,4,4
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands,SlimefunTabCompleter,203,6,26,0,37,3,16,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.reactors,ReactorMode,20,0,0,0,4,0,2,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.reactors,NetherStarReactor,49,30,8,0,7,7,7,5,3,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.reactors,Reactor,915,469,79,10,140,29,65,9,24,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.reactors,NuclearReactor,1,38,0,0,1,9,1,5,1,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.reactors,Reactor.new SimpleBlockBreakHandler() {...},37,6,2,0,8,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.reactors,Reactor.new BlockMenuPreset() {...},34,13,6,0,6,3,6,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.networks.cargo,ItemStackAndInteger,66,0,6,0,19,0,9,0,6,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.networks.cargo,AbstractItemNetwork,198,0,24,0,45,0,19,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.networks.cargo,CargoNetworkTask,344,0,36,0,75,0,26,0,8,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.networks.cargo,CargoNet,343,0,43,0,85,0,38,0,15,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.networks.cargo,ItemFilter,226,0,32,0,54,0,22,0,6,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.networks.cargo,CargoUtils,827,0,132,0,171,0,81,0,15,0
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.interfaces,InventoryBlock.new BlockMenuPreset() {...},34,19,8,0,6,3,6,2,2,2
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.interfaces,InventoryBlock,0,18,0,0,0,4,0,2,0,2
+Slimefun,me.mrCookieSlime.CSCoreLibPlugin.Configuration,Config,96,9,2,0,29,4,16,1,15,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks.miner,MiningTask,871,0,60,0,161,0,67,0,37,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks.miner,OreDictionary17,60,3,9,0,10,1,9,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks.miner,OreDictionary16,75,3,11,0,12,1,11,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks.miner,MinerStoppingReason,56,0,0,0,11,0,3,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks.miner,AdvancedIndustrialMiner,0,39,0,0,0,6,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks.miner,OreDictionary,4,8,1,1,1,2,1,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks.miner,IndustrialMiner,214,211,18,2,43,21,18,3,9,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.settings,TalismanEnchantment,26,0,0,0,6,0,3,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.settings,GoldPanDrop,8,26,2,2,3,6,3,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.settings,ClimbableSurface,0,16,0,0,0,4,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,BlockPlacer.new BlockPlaceHandler() {...},13,7,0,0,4,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,BrokenSpawner,0,18,0,0,0,4,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,Composter,186,119,18,4,38,20,16,5,7,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,RainbowBlock,0,14,0,0,0,4,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,AbstractMonsterSpawner,116,7,14,0,24,2,9,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,OutputChest,66,42,12,0,13,4,7,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,IgnitionChamber,123,38,16,0,25,4,10,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,BlockPlacer,318,58,52,0,75,8,37,3,11,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,WitherProofBlock,8,8,0,0,3,2,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,HardenedGlass,0,8,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,UnplaceableBlock,0,17,0,0,0,5,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,Crucible,364,246,59,5,67,37,40,5,10,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,EnhancedFurnace.new BlockTicker() {...},38,6,8,0,10,1,6,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,HologramProjector.new SimpleBlockBreakHandler() {...},3,6,0,0,2,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,HologramProjector.new BlockPlaceHandler() {...},23,7,0,0,6,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,RepairedSpawner,19,52,4,0,4,8,4,3,2,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,EnhancedFurnace,35,38,0,0,7,7,4,2,4,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,HologramProjector,331,41,20,0,57,6,18,4,8,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.blocks,RepairedSpawner.new BlockPlaceHandler() {...},39,7,2,0,11,1,5,1,4,1
+Slimefun,me.mrCookieSlime.Slimefun.api.inventory,DirtyChestMenu,247,0,32,0,60,0,32,0,16,0
+Slimefun,me.mrCookieSlime.Slimefun.api.inventory,UniversalBlockMenu,127,0,14,0,25,0,10,0,3,0
+Slimefun,me.mrCookieSlime.Slimefun.api.inventory,BlockMenuPreset,247,95,35,3,53,26,37,8,19,7
+Slimefun,me.mrCookieSlime.Slimefun.api.inventory,BlockMenu,231,0,20,0,50,0,21,0,11,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.backpacks,SoulboundBackpack,0,8,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.backpacks,Cooler,0,11,0,0,0,3,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.backpacks,EnderBackpack,0,27,0,0,0,8,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.backpacks,SlimefunBackpack,15,29,3,3,5,8,3,5,1,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.backpacks,RestoredBackpack,0,12,0,0,0,3,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.utils.itemstack,ColoredFireworkStar,0,63,1,5,0,12,1,4,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.utils.itemstack,SlimefunGuideItem,0,55,0,2,0,13,0,2,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.utils.itemstack,ItemStackWrapper,5,157,1,13,1,38,1,21,0,15
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.gps,GPSTransmitter,5,46,0,0,2,7,2,4,2,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.gps,GPSMarkerTool,21,9,2,0,5,3,2,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.gps,GPSTransmitter.new BlockTicker() {...},42,6,2,0,8,1,3,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.gps,GPSTransmitter.new BlockBreakHandler() {...},15,8,0,0,4,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.gps,GPSTransmitter.new BlockPlaceHandler() {...},9,7,0,0,2,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.gps,GPSControlPanel,43,10,8,0,9,3,6,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,CheatCommand,25,7,4,0,6,2,3,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,TimingsCommand,130,19,22,0,28,3,17,1,6,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,ResearchCommand,89,176,11,17,10,40,17,12,7,8
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,ChargeCommand,18,44,3,3,4,11,4,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,TeleporterCommand,87,7,10,0,14,2,8,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,VersionsCommand,368,7,30,0,87,2,18,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,StatsCommand,82,7,12,0,15,2,10,1,4,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,HelpCommand,5,7,0,0,2,2,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,SearchCommand,59,7,6,0,10,2,6,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,GuideCommand,5,39,1,3,1,9,1,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,BackpackCommand,33,98,6,8,7,24,7,6,2,4
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,SlimefunSubCommands,0,129,0,0,0,18,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,DebugFishCommand,0,35,1,3,0,6,1,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,OpenGuideCommand,26,7,4,0,6,2,3,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,GiveCommand,223,7,24,0,35,2,21,1,9,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.commands.subcommands,DebugCommand,72,7,10,0,17,2,9,1,4,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,GadgetsListener,136,0,26,0,30,0,17,0,4,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,BlockPhysicsListener,169,0,36,0,39,0,24,0,6,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,CoolerListener,25,193,17,19,7,40,16,10,1,7
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,TalismanListener,683,0,111,0,142,0,73,0,15,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,NetworkListener,18,26,2,0,4,8,2,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,EnhancedFurnaceListener,123,0,18,0,27,0,12,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,WorldListener,35,0,2,0,11,0,4,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,AutoCrafterListener,130,0,28,0,28,0,17,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,MiningAndroidListener,35,0,4,0,11,0,5,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,AncientAltarListener,854,0,108,0,160,0,69,0,15,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,DispenserListener,63,0,8,0,15,0,7,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,SeismicAxeListener,42,0,8,0,11,0,6,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,GrapplingHookEntity,58,0,12,0,16,0,10,0,4,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,PlayerProfileListener,0,25,0,0,0,9,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,GrapplingHookListener,399,13,46,0,91,3,39,1,16,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,ExplosionsListener,99,0,16,0,27,0,14,0,6,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,DeathpointListener,0,42,0,2,0,8,0,3,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,BlockListener,452,0,90,0,93,0,58,0,13,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,ElytraImpactListener,88,0,18,0,22,0,11,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,SlimefunBowListener,99,8,20,0,18,2,17,1,7,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,SlimefunBootsListener,135,0,32,0,33,0,21,0,5,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,SlimefunItemConsumeListener,44,0,4,0,11,0,5,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,ButcherAndroidListener,142,0,16,0,25,0,12,0,4,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,VillagerTradingListener,11,65,6,12,3,13,6,6,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,CargoNodeListener,0,42,0,6,0,9,0,6,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,MultiBlockListener,36,221,12,30,3,33,12,15,1,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,BeeWingsListener,54,0,12,0,11,0,8,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,DebugFishListener,392,0,46,0,79,0,29,0,6,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,ItemPickupListener,0,75,2,14,0,19,2,9,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,TeleporterListener,152,0,22,0,25,0,14,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,SlimefunItemHitListener,51,0,8,0,12,0,7,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,SoulboundListener,3,112,2,8,1,23,2,8,0,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,BackpackListener,61,281,23,33,14,62,19,21,0,12
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,SlimefunItemInteractListener,239,0,44,0,54,0,29,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,SlimefunGuideListener,91,42,15,5,24,10,11,4,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,MiddleClickListener,102,0,26,0,21,0,16,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,HopperListener,28,0,6,0,7,0,5,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.listeners,ItemDropListener,35,0,4,0,9,0,4,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,AndroidFuelSource,0,80,0,0,0,8,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,ProgrammableAndroid,1924,511,188,12,354,53,146,18,50,11
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,ProgrammableAndroid.new BlockMenuPreset() {...},130,13,6,0,23,3,9,2,6,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,ProgrammableAndroid.new BlockTicker() {...},12,6,4,0,4,1,4,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,ProgrammableAndroid.new ChestMenu.AdvancedMenuClickHandler() {...},15,6,6,0,2,1,5,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,ProgrammableAndroid.new BlockPlaceHandler() {...},55,7,2,0,14,1,3,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,ProgrammableAndroid.new BlockBreakHandler() {...},47,8,6,0,10,1,4,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,AndroidType,16,51,8,0,1,9,5,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,WoodcutterAndroid,239,8,29,0,60,2,23,1,5,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,Instruction,257,285,4,2,70,39,30,4,28,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,FisherAndroid,39,133,4,2,8,17,4,2,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,Script,424,0,24,0,85,0,31,0,19,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,FarmerAndroid,169,8,24,0,29,2,18,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,MinerAndroid,220,46,30,0,45,6,19,1,4,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,AndroidInterface,4,20,0,0,0,4,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,ButcherAndroid,146,8,31,0,18,2,20,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.androids,AndroidInstance,15,0,0,0,6,0,3,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,LumberAxe,182,27,28,0,33,5,20,3,6,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,PickaxeOfTheSeeker,199,29,16,0,31,5,11,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,PortableDustbin,0,30,0,0,0,8,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,GrapplingHook,128,47,16,0,23,7,9,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,ExplosivePickaxe,0,7,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,ExplosiveShovel,16,7,4,0,1,2,3,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,PickaxeOfContainment,60,10,6,0,15,3,5,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,GoldPan,114,137,17,3,25,24,15,7,6,6
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,NetherGoldPan,2,91,0,0,1,10,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,ExplosiveTool,292,42,46,0,62,6,30,2,7,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,SmeltersPickaxe,73,10,12,0,17,3,9,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,PortableCrafter,20,9,0,0,5,3,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,TapeMeasure,10,233,2,10,0,49,4,11,2,7
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,ClimbingPick,113,299,24,22,25,64,21,20,4,14
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.tools,PickaxeOfVeinMining,105,29,12,0,15,5,9,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,ResearchSetup,0,3848,2,8,0,276,2,7,0,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,SlimefunItemSetup,2,26881,4,12,0,1204,4,7,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,DefaultItemGroups,0,451,0,0,0,24,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,RickFlexGroup,20,12,4,0,5,2,4,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,SlimefunItemSetup.new NetherStarReactor() {...},4,7,0,0,2,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,SlimefunItemSetup.new NuclearReactor() {...},4,7,0,0,2,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,SlimefunItemSetup.new CropGrowthAccelerator() {...},6,7,0,0,3,1,3,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,SlimefunItemSetup.new CropGrowthAccelerator() {...},6,7,0,0,3,1,3,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,SlimefunItemSetup.new GPSTransmitter() {...},8,8,0,0,2,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,SlimefunItemSetup.new GPSTransmitter() {...},8,8,0,0,2,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,SlimefunItemSetup.new GPSTransmitter() {...},8,8,0,0,2,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,SlimefunItemSetup.new GPSTransmitter() {...},4,8,0,0,2,1,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.setup,PostSetup,79,504,21,49,16,98,19,28,1,11
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.profiler.inspectors,PlayerPerformanceInspector,47,0,8,0,16,0,10,0,6,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.profiler.inspectors,ConsolePerformanceInspector,22,0,0,0,9,0,4,0,4,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.staves,WindStaff,71,29,8,0,13,5,5,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.staves,WaterStaff,12,9,0,0,4,3,1,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.magical.staves,StormStaff,101,21,20,0,25,5,13,3,3,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,EnhancedCraftingTable,187,50,28,0,37,2,17,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,AutomatedPanningMachine,153,62,12,0,26,4,10,1,4,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,TableSaw,107,150,14,6,26,18,12,4,4,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,GrindStone,124,352,13,1,22,46,10,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,PressureChamber,202,74,16,0,34,2,13,1,5,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,Juicer,131,56,12,0,23,2,9,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,ArmorForge,184,53,26,0,36,2,17,1,4,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,MakeshiftSmeltery,65,62,2,0,10,2,3,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,OreWasher,216,115,18,0,44,9,14,2,5,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,Smeltery,105,93,10,0,17,7,8,2,3,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,OreCrusher.DoubleOreSetting,37,149,13,9,5,32,12,10,1,10
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,AbstractSmeltery,194,7,26,0,31,2,17,1,4,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,MagicWorkbench,334,53,44,0,60,2,28,1,6,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,OreCrusher,133,616,21,7,23,76,17,4,3,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,Compressor,172,121,20,0,30,11,15,2,5,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks,AbstractCraftingTable,250,7,32,0,50,2,23,1,7,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.weapons,SeismicAxe,262,10,34,0,51,3,23,2,6,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.weapons,VampireBlade,35,29,2,0,7,5,3,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.weapons,ExplosiveBow,143,28,12,0,20,5,8,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.weapons,SwordOfBeheading,115,89,16,0,18,9,11,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.weapons,SlimefunBow,0,19,0,0,0,5,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.weapons,IcyBow,55,8,8,0,10,3,5,2,1,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.machines,MachineOperation,13,0,2,0,2,0,3,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.machines,MachineProcessor,155,18,12,0,38,7,18,2,12,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.operations,FuelOperation,60,0,4,0,17,0,9,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.operations,CraftingOperation,64,0,4,0,18,0,9,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.operations,MiningOperation,46,0,4,0,13,0,7,0,5,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.handlers,VanillaInventoryDropHandler,59,11,12,0,14,4,8,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.handlers,SimpleBlockBreakHandler,14,5,0,0,6,2,3,1,3,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.recipes,RecipeType,201,586,19,9,43,65,21,15,11,11
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,ProtectionType,0,21,0,0,0,4,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,RecipeDisplayItem,9,0,0,0,2,0,2,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,HologramOwner,28,0,0,0,7,0,3,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,Placeable,2,0,0,0,1,0,1,0,1,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,MachineTier,0,56,0,0,0,11,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,DamageableItem,11,51,5,9,2,12,5,4,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,EnergyNetComponent,216,0,32,0,53,0,25,0,9,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,Rechargeable,0,158,0,28,0,35,0,18,0,4
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,MachineType,0,35,0,0,0,8,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,Radioactivity,5,57,0,0,1,10,1,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.core.attributes,EnergyNetProvider,4,0,0,0,2,0,2,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items,RadioactiveItem,0,34,0,0,0,8,0,4,0,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items,SimpleSlimefunItem,0,25,0,0,0,6,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items,HiddenItem,0,10,0,0,0,3,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items,LimitedUseItem,147,48,16,2,34,12,12,4,3,4
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items,VanillaItem,0,11,0,0,0,3,0,1,0,1
+Slimefun,me.mrCookieSlime.Slimefun.api.item_transport,ItemTransportFlow,15,0,0,0,3,0,1,0,1,0
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,AGenerator.new SimpleBlockBreakHandler() {...},26,6,2,0,6,1,2,1,1,1
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,AGenerator.new ChestMenu.AdvancedMenuClickHandler() {...},15,6,6,0,2,1,5,1,2,1
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,AGenerator.new BlockMenuPreset() {...},26,13,6,0,4,3,5,2,2,2
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,MachineRecipe,6,21,0,0,2,8,2,3,2,3
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,MachineFuel,16,33,1,1,4,10,5,2,4,2
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,AGenerator,238,385,35,15,45,39,26,14,5,10
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,AContainer,375,485,48,20,69,59,39,22,9,18
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,AContainer.new BlockTicker() {...},7,6,0,0,3,1,2,1,2,1
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,AContainer.new ChestMenu.AdvancedMenuClickHandler() {...},15,6,6,0,2,1,5,1,2,1
+Slimefun,me.mrCookieSlime.Slimefun.Objects.SlimefunItem.abstractItems,AContainer.new SimpleBlockBreakHandler() {...},26,6,2,0,6,1,2,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.exceptions,IdConflictException,0,8,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.exceptions,TagMisconfigurationException,0,14,0,0,0,4,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.api.exceptions,PrematureCodeException,5,0,0,0,2,0,1,0,1,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.exceptions,WrongItemStackException,0,5,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.exceptions,IncompatibleItemHandlerException,0,9,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.exceptions,MissingDependencyException,7,0,0,0,2,0,1,0,1,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.exceptions,UnregisteredItemException,0,6,0,0,0,2,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.exceptions,BiomeMapException,0,14,0,0,0,4,0,2,0,2
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items,SlimefunItem,251,1093,51,135,61,252,52,102,10,51
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items,ItemSpawnReason,51,0,0,0,9,0,1,0,1,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items,HashedArmorpiece,17,85,4,10,2,22,5,7,1,4
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items,ItemState,0,27,0,0,0,5,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items,ItemGroup,113,223,16,24,24,53,18,27,7,18
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items,SlimefunItemStack,73,441,14,32,19,105,17,41,4,31
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items,ItemHandler,0,2,0,0,0,1,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items,ItemSetting,85,144,13,13,16,32,12,14,2,11
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items.groups,NestedItemGroup,290,0,20,0,54,0,22,0,12,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items.groups,SeasonalItemGroup,2,24,1,1,1,7,1,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items.groups,LockedItemGroup,0,177,3,21,0,36,3,16,0,7
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items.groups,FlexItemGroup,0,34,0,0,0,9,0,7,0,7
+Slimefun,io.github.thebusybiscuit.slimefun4.api.items.groups,SubItemGroup,45,0,2,0,15,0,8,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.api.researches,PlayerResearchTask,52,208,7,13,4,43,10,14,4,10
+Slimefun,io.github.thebusybiscuit.slimefun4.api.researches,Research,39,291,7,41,5,67,9,34,3,16
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.localization,TextDirection,0,15,0,0,0,3,0,1,0,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.localization,LanguagePreset,9,405,0,0,3,56,3,6,3,6
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.localization,LanguageFile,5,56,0,0,1,12,1,3,1,3
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.localization,SlimefunLocalization,605,91,63,5,122,24,57,8,23,8
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.localization,Language,111,0,6,0,27,0,14,0,11,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide.options,FireworksOption,129,0,16,0,17,0,15,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide.options,LearningAnimationOption,123,0,16,0,21,0,15,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide.options,PlayerLanguageOption,413,0,14,0,58,0,23,0,16,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide.options,ContributorsMenu,389,0,22,0,55,0,18,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide.options,GuideModeOption,162,0,18,0,40,0,17,0,8,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.guide.options,SlimefunGuideSettings,733,0,10,0,97,0,23,0,18,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.debug,Debug,0,108,1,9,0,24,1,12,0,8
+Slimefun,io.github.thebusybiscuit.slimefun4.core.debug,TestCase,0,15,0,0,0,3,0,2,0,2
+Slimefun,me.mrCookieSlime.Slimefun.Objects.handlers,BlockTicker,40,8,6,0,12,3,7,2,4,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.guide,CheatSheetSlimefunGuide,51,17,6,0,10,5,5,3,2,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.guide,SurvivalSlimefunGuide,1974,64,204,0,359,9,150,4,48,4
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.holograms,Hologram,99,0,16,0,29,0,15,0,7,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.holograms,HologramsService,324,26,42,0,80,6,33,1,12,1
+Slimefun,io.github.thebusybiscuit.slimefun4.integrations,McMMOIntegration,62,0,6,0,21,0,9,0,6,0
+Slimefun,io.github.thebusybiscuit.slimefun4.integrations,ClearLagIntegration,39,0,6,0,12,0,6,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.integrations,OrebfuscatorIntegration,72,0,0,0,15,0,5,0,5,0
+Slimefun,io.github.thebusybiscuit.slimefun4.integrations,WorldEditIntegration,28,0,0,0,10,0,3,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.integrations,PlaceholderAPIIntegration,249,0,42,0,52,0,30,0,9,0
+Slimefun,io.github.thebusybiscuit.slimefun4.integrations,IntegrationsManager,296,27,18,0,76,10,36,1,27,1
+Slimefun,io.github.thebusybiscuit.slimefun4.integrations,WorldEditIntegration.new AbstractDelegateExtent() {...},48,0,6,0,8,0,5,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.github,GitHubIssuesConnector,65,0,6,0,21,0,8,0,5,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.github,Contributor,198,0,12,0,44,0,24,0,18,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.github,GitHubTask,243,0,34,0,57,0,23,0,6,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.github,GitHubService,352,46,10,0,72,13,27,1,22,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.github,ContributorRole,42,0,0,0,9,0,3,0,3,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.github,GitHubActivityConnector,39,0,0,0,12,0,5,0,5,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.github,GitHubConnector,202,0,16,0,43,0,13,0,5,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.github,ContributionsConnector,252,0,6,0,56,0,12,0,9,0
+Slimefun,io.github.thebusybiscuit.slimefun4.core.services.github,TranslatorsReader,88,0,6,0,20,0,5,0,2,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.elevator,ElevatorFloor,32,0,0,0,11,0,5,0,5,0
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.elevator,ElevatorPlate,511,31,36,0,83,6,33,3,15,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.elevator,ElevatorPlate.new BlockPlaceHandler() {...},16,7,0,0,4,1,1,1,1,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.generators,SolarGenerator,86,57,22,0,16,13,16,3,5,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.generators,CoalGenerator,0,283,0,20,0,39,0,13,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.generators,LavaGenerator,0,23,0,0,0,5,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.generators,MagnesiumGenerator,0,20,0,0,0,5,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.generators,BioGenerator,0,554,1,11,0,63,1,8,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.generators,CombustionGenerator,0,27,0,0,0,6,0,3,0,3
+Slimefun,io.github.thebusybiscuit.slimefun4.core.multiblocks,MultiBlock,36,201,3,41,2,45,5,29,2,10
+Slimefun,io.github.thebusybiscuit.slimefun4.core.multiblocks,MultiBlockMachine,99,171,15,11,19,36,14,15,6,10
+Slimefun,io.github.thebusybiscuit.slimefun4.api.gps,Waypoint,11,105,4,6,2,19,5,9,1,8
+Slimefun,io.github.thebusybiscuit.slimefun4.api.gps,TeleportationManager,552,228,30,0,81,4,31,1,16,1
+Slimefun,io.github.thebusybiscuit.slimefun4.api.gps,GPSNetwork,707,323,41,3,104,25,41,5,19,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.gadgets,MultiToolMode,12,36,0,0,2,5,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.gadgets,Multimeter,70,9,8,0,13,3,6,2,2,2
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.gadgets,MultiTool,140,77,16,2,31,15,15,6,7,5
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.gadgets,JetBoots,6,13,0,0,2,4,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.gadgets,SolarHelmet,48,30,3,1,12,5,4,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.implementation.items.electric.gadgets,Jetpack,6,13,0,0,2,4,2,1,2,1
+Slimefun,io.github.thebusybiscuit.slimefun4.core,SlimefunRegistry,27,309,1,1,8,75,8,32,7,32

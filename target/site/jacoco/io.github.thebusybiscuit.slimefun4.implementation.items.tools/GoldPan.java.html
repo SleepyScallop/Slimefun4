@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GoldPan.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.implementation.items.tools</a> &gt; <span class="el_source">GoldPan.java</span></div><h1>GoldPan.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.implementation.items.tools;
+
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import javax.annotation.Nonnull;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.Effect;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.ItemFrame;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.bakedlibs.dough.collections.RandomizedSet;
+import io.github.bakedlibs.dough.protection.Interaction;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemGroup;
+import io.github.thebusybiscuit.slimefun4.api.items.ItemSpawnReason;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.api.recipes.RecipeType;
+import io.github.thebusybiscuit.slimefun4.core.attributes.RecipeDisplayItem;
+import io.github.thebusybiscuit.slimefun4.core.handlers.EntityInteractHandler;
+import io.github.thebusybiscuit.slimefun4.core.handlers.ItemUseHandler;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.implementation.items.SimpleSlimefunItem;
+import io.github.thebusybiscuit.slimefun4.implementation.items.electric.machines.ElectricGoldPan;
+import io.github.thebusybiscuit.slimefun4.implementation.items.multiblocks.AutomatedPanningMachine;
+import io.github.thebusybiscuit.slimefun4.implementation.settings.GoldPanDrop;
+import io.github.thebusybiscuit.slimefun4.utils.SlimefunUtils;
+
+/**
+ * A {@link GoldPan} is a {@link SlimefunItem} which allows you to obtain various
+ * resources from Gravel.
+ * 
+ * @author TheBusyBiscuit
+ * 
+ * @see NetherGoldPan
+ * @see AutomatedPanningMachine
+ * @see ElectricGoldPan
+ *
+ */
+public class GoldPan extends SimpleSlimefunItem&lt;ItemUseHandler&gt; implements RecipeDisplayItem {
+
+<span class="fc" id="L49">    private final RandomizedSet&lt;ItemStack&gt; randomizer = new RandomizedSet&lt;&gt;();</span>
+<span class="fc" id="L50">    private final Set&lt;GoldPanDrop&gt; drops = new HashSet&lt;&gt;();</span>
+
+    @ParametersAreNonnullByDefault
+    public GoldPan(ItemGroup itemGroup, SlimefunItemStack item, RecipeType recipeType, ItemStack[] recipe) {
+<span class="fc" id="L54">        super(itemGroup, item, recipeType, recipe);</span>
+
+<span class="fc" id="L56">        drops.addAll(getGoldPanDrops());</span>
+<span class="fc" id="L57">        addItemSetting(drops.toArray(new GoldPanDrop[0]));</span>
+<span class="fc" id="L58">        addItemHandler(onEntityInteract());</span>
+<span class="fc" id="L59">    }</span>
+
+    /**
+     * This method returns the target {@link Material} for this {@link GoldPan}.
+     * 
+     * @return The {@link Material} this {@link GoldPan} can be used on
+     */
+    public @Nonnull Material getInputMaterial() {
+<span class="nc" id="L67">        return Material.GRAVEL;</span>
+    }
+
+    protected @Nonnull Set&lt;GoldPanDrop&gt; getGoldPanDrops() {
+<span class="fc" id="L71">        Set&lt;GoldPanDrop&gt; settings = new HashSet&lt;&gt;();</span>
+
+<span class="fc" id="L73">        settings.add(new GoldPanDrop(this, &quot;chance.FLINT&quot;, 40, new ItemStack(Material.FLINT)));</span>
+<span class="fc" id="L74">        settings.add(new GoldPanDrop(this, &quot;chance.CLAY&quot;, 20, new ItemStack(Material.CLAY_BALL)));</span>
+<span class="fc" id="L75">        settings.add(new GoldPanDrop(this, &quot;chance.SIFTED_ORE&quot;, 35, SlimefunItems.SIFTED_ORE));</span>
+<span class="fc" id="L76">        settings.add(new GoldPanDrop(this, &quot;chance.IRON_NUGGET&quot;, 5, new ItemStack(Material.IRON_NUGGET)));</span>
+
+<span class="fc" id="L78">        return settings;</span>
+    }
+
+    @Override
+    public void postRegister() {
+<span class="fc" id="L83">        super.postRegister();</span>
+<span class="fc" id="L84">        updateRandomizer();</span>
+<span class="fc" id="L85">    }</span>
+
+    /**
+     * &lt;strong&gt;Do not call this method directly&lt;/strong&gt;.
+     * 
+     * This method is for internal purposes only.
+     * It will update and re-calculate all weights in our {@link RandomizedSet}.
+     */
+    public void updateRandomizer() {
+<span class="fc" id="L94">        randomizer.clear();</span>
+
+<span class="fc bfc" id="L96" title="All 2 branches covered.">        for (GoldPanDrop setting : drops) {</span>
+<span class="pc bpc" id="L97" title="1 of 2 branches missed.">            if (setting.getValue() &gt; 0) {</span>
+<span class="fc" id="L98">                randomizer.add(setting.getOutput(), setting.getValue());</span>
+            }
+<span class="fc" id="L100">        }</span>
+<span class="fc" id="L101">    }</span>
+
+    /**
+     * This returns a random output {@link ItemStack} that can be obtained via
+     * this {@link GoldPan}.
+     * 
+     * @return a random {@link ItemStack} obtained by this {@link GoldPan}
+     */
+    public @Nonnull ItemStack getRandomOutput() {
+<span class="nc" id="L110">        ItemStack item = randomizer.getRandom();</span>
+
+        // Fixes #2804
+<span class="nc bnc" id="L113" title="All 2 branches missed.">        return item != null ? item : new ItemStack(Material.AIR);</span>
+    }
+
+    @Override
+    public @Nonnull String getLabelLocalPath() {
+<span class="nc" id="L118">        return &quot;guide.tooltips.recipes.gold-pan&quot;;</span>
+    }
+
+    @Override
+    public @Nonnull ItemUseHandler getItemHandler() {
+<span class="fc" id="L123">        return e -&gt; {</span>
+<span class="nc" id="L124">            Optional&lt;Block&gt; block = e.getClickedBlock();</span>
+
+<span class="nc bnc" id="L126" title="All 2 branches missed.">            if (block.isPresent()) {</span>
+<span class="nc" id="L127">                Block b = block.get();</span>
+
+                // Check the clicked block type and for protections
+<span class="nc bnc" id="L130" title="All 4 branches missed.">                if (b.getType() == getInputMaterial() &amp;&amp; Slimefun.getProtectionManager().hasPermission(e.getPlayer(), b.getLocation(), Interaction.BREAK_BLOCK)) {</span>
+<span class="nc" id="L131">                    ItemStack output = getRandomOutput();</span>
+
+<span class="nc" id="L133">                    b.getWorld().playEffect(b.getLocation(), Effect.STEP_SOUND, b.getType());</span>
+<span class="nc" id="L134">                    b.setType(Material.AIR);</span>
+
+                    // Make sure that the randomly selected item is not air
+<span class="nc bnc" id="L137" title="All 2 branches missed.">                    if (output.getType() != Material.AIR) {</span>
+<span class="nc" id="L138">                        SlimefunUtils.spawnItem(b.getLocation(), output.clone(), ItemSpawnReason.GOLD_PAN_USE, true);</span>
+                    }
+                }
+            }
+
+<span class="nc" id="L143">            e.cancel();</span>
+<span class="nc" id="L144">        };</span>
+    }
+
+    /**
+     * This method cancels {@link EntityInteractHandler} to prevent interacting {@link GoldPan}
+     * with entities.
+     *
+     * @return the {@link EntityInteractHandler} of this {@link SlimefunItem}
+     */
+    public @Nonnull EntityInteractHandler onEntityInteract() {
+<span class="fc" id="L154">        return (e, item, offHand) -&gt; {</span>
+<span class="nc bnc" id="L155" title="All 2 branches missed.">            if (!(e.getRightClicked() instanceof ItemFrame)) {</span>
+<span class="nc" id="L156">                e.setCancelled(true);</span>
+            }
+<span class="nc" id="L158">        };</span>
+    }
+
+    @Override
+    public @Nonnull List&lt;ItemStack&gt; getDisplayRecipes() {
+<span class="nc" id="L163">        List&lt;ItemStack&gt; recipes = new LinkedList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L165" title="All 2 branches missed.">        for (GoldPanDrop drop : drops) {</span>
+<span class="nc bnc" id="L166" title="All 2 branches missed.">            if (drop.getValue() &gt; 0) {</span>
+<span class="nc" id="L167">                recipes.add(new ItemStack(getInputMaterial()));</span>
+<span class="nc" id="L168">                recipes.add(drop.getOutput());</span>
+            }
+<span class="nc" id="L170">        }</span>
+
+<span class="nc" id="L172">        return recipes;</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

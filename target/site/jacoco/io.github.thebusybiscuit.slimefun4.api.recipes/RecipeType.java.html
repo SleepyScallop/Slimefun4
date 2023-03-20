@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>RecipeType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Slimefun</a> &gt; <a href="index.source.html" class="el_package">io.github.thebusybiscuit.slimefun4.api.recipes</a> &gt; <span class="el_source">RecipeType.java</span></div><h1>RecipeType.java</h1><pre class="source lang-java linenums">package io.github.thebusybiscuit.slimefun4.api.recipes;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.function.BiConsumer;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import org.bukkit.ChatColor;
+import org.bukkit.Keyed;
+import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
+import io.github.bakedlibs.dough.items.CustomItemStack;
+import io.github.bakedlibs.dough.recipes.MinecraftRecipe;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItem;
+import io.github.thebusybiscuit.slimefun4.api.items.SlimefunItemStack;
+import io.github.thebusybiscuit.slimefun4.core.multiblocks.MultiBlockMachine;
+import io.github.thebusybiscuit.slimefun4.implementation.Slimefun;
+import io.github.thebusybiscuit.slimefun4.implementation.SlimefunItems;
+import io.github.thebusybiscuit.slimefun4.implementation.items.altar.AltarRecipe;
+import io.github.thebusybiscuit.slimefun4.implementation.items.altar.AncientAltar;
+
+// TODO: Remove this class and rewrite the recipe system
+public class RecipeType implements Keyed {
+
+<span class="fc" id="L37">    public static final RecipeType MULTIBLOCK = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;multiblock&quot;), new CustomItemStack(Material.BRICKS, &quot;&amp;bMultiBlock&quot;, &quot;&quot;, &quot;&amp;a&amp;oBuild it in the World&quot;));</span>
+<span class="fc" id="L38">    public static final RecipeType ARMOR_FORGE = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;armor_forge&quot;), SlimefunItems.ARMOR_FORGE, &quot;&quot;, &quot;&amp;a&amp;oCraft it in an Armor Forge&quot;);</span>
+<span class="fc" id="L39">    public static final RecipeType GRIND_STONE = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;grind_stone&quot;), SlimefunItems.GRIND_STONE, &quot;&quot;, &quot;&amp;a&amp;oGrind it using the Grind Stone&quot;);</span>
+<span class="fc" id="L40">    public static final RecipeType SMELTERY = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;smeltery&quot;), SlimefunItems.SMELTERY, &quot;&quot;, &quot;&amp;a&amp;oSmelt it using a Smeltery&quot;);</span>
+<span class="fc" id="L41">    public static final RecipeType ORE_CRUSHER = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;ore_crusher&quot;), SlimefunItems.ORE_CRUSHER, &quot;&quot;, &quot;&amp;a&amp;oCrush it using the Ore Crusher&quot;);</span>
+<span class="fc" id="L42">    public static final RecipeType GOLD_PAN = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;gold_pan&quot;), SlimefunItems.GOLD_PAN, &quot;&quot;, &quot;&amp;a&amp;oUse a Gold Pan on Gravel to obtain this Item&quot;);</span>
+<span class="fc" id="L43">    public static final RecipeType COMPRESSOR = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;compressor&quot;), SlimefunItems.COMPRESSOR, &quot;&quot;, &quot;&amp;a&amp;oCompress it using the Compressor&quot;);</span>
+<span class="fc" id="L44">    public static final RecipeType PRESSURE_CHAMBER = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;pressure_chamber&quot;), SlimefunItems.PRESSURE_CHAMBER, &quot;&quot;, &quot;&amp;a&amp;oCompress it using the Pressure Chamber&quot;);</span>
+<span class="fc" id="L45">    public static final RecipeType MAGIC_WORKBENCH = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;magic_workbench&quot;), SlimefunItems.MAGIC_WORKBENCH, &quot;&quot;, &quot;&amp;a&amp;oCraft it in a Magic Workbench&quot;);</span>
+<span class="fc" id="L46">    public static final RecipeType ORE_WASHER = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;ore_washer&quot;), SlimefunItems.ORE_WASHER, &quot;&quot;, &quot;&amp;a&amp;oWash it in an Ore Washer&quot;);</span>
+<span class="fc" id="L47">    public static final RecipeType ENHANCED_CRAFTING_TABLE = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;enhanced_crafting_table&quot;), SlimefunItems.ENHANCED_CRAFTING_TABLE, &quot;&quot;, &quot;&amp;a&amp;oA regular Crafting Table cannot&quot;, &quot;&amp;a&amp;ohold this massive Amount of Power...&quot;);</span>
+<span class="fc" id="L48">    public static final RecipeType JUICER = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;juicer&quot;), SlimefunItems.JUICER, &quot;&quot;, &quot;&amp;a&amp;oUsed for Juice Creation&quot;);</span>
+
+<span class="fc" id="L50">    public static final RecipeType ANCIENT_ALTAR = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;ancient_altar&quot;), SlimefunItems.ANCIENT_ALTAR, (recipe, output) -&gt; {</span>
+<span class="fc" id="L51">        AltarRecipe altarRecipe = new AltarRecipe(Arrays.asList(recipe), output);</span>
+<span class="fc" id="L52">        AncientAltar altar = ((AncientAltar) SlimefunItems.ANCIENT_ALTAR.getItem());</span>
+<span class="fc" id="L53">        altar.getRecipes().add(altarRecipe);</span>
+<span class="fc" id="L54">    });</span>
+
+<span class="fc" id="L56">    public static final RecipeType MOB_DROP = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;mob_drop&quot;), new CustomItemStack(Material.IRON_SWORD, &quot;&amp;bMob Drop&quot;), RecipeType::registerMobDrop, &quot;&quot;, &quot;&amp;rKill the specified Mob to obtain this Item&quot;);</span>
+<span class="fc" id="L57">    public static final RecipeType BARTER_DROP = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;barter_drop&quot;), new CustomItemStack(Material.GOLD_INGOT, &quot;&amp;bBarter Drop&quot;), RecipeType::registerBarterDrop, &quot;&amp;aBarter with piglins for a chance&quot;, &quot;&amp;ato obtain this item&quot;);</span>
+<span class="fc" id="L58">    public static final RecipeType INTERACT = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;interact&quot;), new CustomItemStack(Material.PLAYER_HEAD, &quot;&amp;bInteract&quot;, &quot;&quot;, &quot;&amp;a&amp;oRight click with this item&quot;));</span>
+
+<span class="fc" id="L60">    public static final RecipeType HEATED_PRESSURE_CHAMBER = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;heated_pressure_chamber&quot;), SlimefunItems.HEATED_PRESSURE_CHAMBER);</span>
+<span class="fc" id="L61">    public static final RecipeType FOOD_FABRICATOR = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;food_fabricator&quot;), SlimefunItems.FOOD_FABRICATOR);</span>
+<span class="fc" id="L62">    public static final RecipeType FOOD_COMPOSTER = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;food_composter&quot;), SlimefunItems.FOOD_COMPOSTER);</span>
+<span class="fc" id="L63">    public static final RecipeType FREEZER = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;freezer&quot;), SlimefunItems.FREEZER);</span>
+<span class="fc" id="L64">    public static final RecipeType REFINERY = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;refinery&quot;), SlimefunItems.REFINERY);</span>
+
+<span class="fc" id="L66">    public static final RecipeType GEO_MINER = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;geo_miner&quot;), SlimefunItems.GEO_MINER);</span>
+<span class="fc" id="L67">    public static final RecipeType NUCLEAR_REACTOR = new RecipeType(new NamespacedKey(Slimefun.instance(), &quot;nuclear_reactor&quot;), SlimefunItems.NUCLEAR_REACTOR);</span>
+
+<span class="fc" id="L69">    public static final RecipeType NULL = new RecipeType();</span>
+
+    private final ItemStack item;
+    private final NamespacedKey key;
+    private final String machine;
+    private BiConsumer&lt;ItemStack[], ItemStack&gt; consumer;
+
+<span class="fc" id="L76">    private RecipeType() {</span>
+<span class="fc" id="L77">        this.item = null;</span>
+<span class="fc" id="L78">        this.machine = &quot;&quot;;</span>
+<span class="fc" id="L79">        this.key = new NamespacedKey(Slimefun.instance(), &quot;null&quot;);</span>
+<span class="fc" id="L80">    }</span>
+
+<span class="nc" id="L82">    public RecipeType(ItemStack item, String machine) {</span>
+<span class="nc" id="L83">        this.item = item;</span>
+<span class="nc" id="L84">        this.machine = machine;</span>
+
+<span class="nc bnc" id="L86" title="All 2 branches missed.">        if (machine.length() &gt; 0) {</span>
+<span class="nc" id="L87">            this.key = new NamespacedKey(Slimefun.instance(), machine.toLowerCase(Locale.ROOT));</span>
+        } else {
+<span class="nc" id="L89">            this.key = new NamespacedKey(Slimefun.instance(), &quot;unknown&quot;);</span>
+        }
+<span class="nc" id="L91">    }</span>
+
+    public RecipeType(NamespacedKey key, SlimefunItemStack slimefunItem, String... lore) {
+<span class="fc" id="L94">        this(key, slimefunItem, null, lore);</span>
+<span class="fc" id="L95">    }</span>
+
+<span class="fc" id="L97">    public RecipeType(NamespacedKey key, ItemStack item, BiConsumer&lt;ItemStack[], ItemStack&gt; callback, String... lore) {</span>
+<span class="fc" id="L98">        this.item = new CustomItemStack(item, null, lore);</span>
+<span class="fc" id="L99">        this.key = key;</span>
+<span class="fc" id="L100">        this.consumer = callback;</span>
+
+<span class="fc bfc" id="L102" title="All 2 branches covered.">        if (item instanceof SlimefunItemStack slimefunItemStack) {</span>
+<span class="fc" id="L103">            this.machine = slimefunItemStack.getItemId();</span>
+        } else {
+<span class="fc" id="L105">            this.machine = &quot;&quot;;</span>
+        }
+<span class="fc" id="L107">    }</span>
+
+<span class="fc" id="L109">    public RecipeType(NamespacedKey key, ItemStack item) {</span>
+<span class="fc" id="L110">        this.key = key;</span>
+<span class="fc" id="L111">        this.item = item;</span>
+<span class="fc bfc" id="L112" title="All 2 branches covered.">        this.machine = item instanceof SlimefunItemStack slimefunItemStack ? slimefunItemStack.getItemId() : &quot;&quot;;</span>
+<span class="fc" id="L113">    }</span>
+
+<span class="nc" id="L115">    public RecipeType(MinecraftRecipe&lt;?&gt; recipe) {</span>
+<span class="nc" id="L116">        this.item = new ItemStack(recipe.getMachine());</span>
+<span class="nc" id="L117">        this.machine = &quot;&quot;;</span>
+<span class="nc" id="L118">        this.key = NamespacedKey.minecraft(recipe.getRecipeClass().getSimpleName().toLowerCase(Locale.ROOT).replace(&quot;recipe&quot;, &quot;&quot;));</span>
+<span class="nc" id="L119">    }</span>
+
+    public void register(ItemStack[] recipe, ItemStack result) {
+<span class="fc bfc" id="L122" title="All 2 branches covered.">        if (consumer != null) {</span>
+<span class="fc" id="L123">            consumer.accept(recipe, result);</span>
+        } else {
+<span class="fc" id="L125">            SlimefunItem slimefunItem = SlimefunItem.getById(this.machine);</span>
+
+<span class="fc bfc" id="L127" title="All 2 branches covered.">            if (slimefunItem instanceof MultiBlockMachine mbm) {</span>
+<span class="fc" id="L128">                mbm.addRecipe(recipe, result);</span>
+            }
+        }
+<span class="fc" id="L131">    }</span>
+
+    public @Nullable ItemStack toItem() {
+<span class="nc" id="L134">        return this.item;</span>
+    }
+
+    public @Nonnull ItemStack getItem(Player p) {
+<span class="nc" id="L138">        return Slimefun.getLocalization().getRecipeTypeItem(p, this);</span>
+    }
+
+    public SlimefunItem getMachine() {
+<span class="nc" id="L142">        return SlimefunItem.getById(machine);</span>
+    }
+
+    @Override
+    public final @Nonnull NamespacedKey getKey() {
+<span class="fc" id="L147">        return key;</span>
+    }
+
+    @Override
+    public final boolean equals(Object obj) {
+<span class="pc bpc" id="L152" title="1 of 2 branches missed.">        if (obj instanceof RecipeType recipeType) {</span>
+<span class="fc" id="L153">            return recipeType.getKey().equals(this.getKey());</span>
+        } else {
+<span class="nc" id="L155">            return false;</span>
+        }
+    }
+
+    @Override
+    public final int hashCode() {
+<span class="nc" id="L161">        return getKey().hashCode();</span>
+    }
+
+    @ParametersAreNonnullByDefault
+    private static void registerBarterDrop(ItemStack[] recipe, ItemStack output) {
+<span class="fc" id="L166">        Slimefun.getRegistry().getBarteringDrops().add(output);</span>
+<span class="fc" id="L167">    }</span>
+
+    @ParametersAreNonnullByDefault
+    private static void registerMobDrop(ItemStack[] recipe, ItemStack output) {
+<span class="fc" id="L171">        String mob = ChatColor.stripColor(recipe[4].getItemMeta().getDisplayName()).toUpperCase(Locale.ROOT).replace(' ', '_');</span>
+<span class="fc" id="L172">        EntityType entity = EntityType.valueOf(mob);</span>
+<span class="fc" id="L173">        Set&lt;ItemStack&gt; dropping = Slimefun.getRegistry().getMobDrops().getOrDefault(entity, new HashSet&lt;&gt;());</span>
+<span class="fc" id="L174">        dropping.add(output);</span>
+<span class="fc" id="L175">        Slimefun.getRegistry().getMobDrops().put(entity, dropping);</span>
+<span class="fc" id="L176">    }</span>
+
+    public static List&lt;ItemStack&gt; getRecipeInputs(MultiBlockMachine machine) {
+<span class="nc bnc" id="L179" title="All 2 branches missed.">        if (machine == null) {</span>
+<span class="nc" id="L180">            return new ArrayList&lt;&gt;();</span>
+        }
+
+<span class="nc" id="L183">        List&lt;ItemStack[]&gt; recipes = machine.getRecipes();</span>
+<span class="nc" id="L184">        List&lt;ItemStack&gt; convertible = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L186" title="All 2 branches missed.">        for (int i = 0; i &lt; recipes.size(); i++) {</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">            if (i % 2 == 0) {</span>
+<span class="nc" id="L188">                convertible.add(recipes.get(i)[0]);</span>
+            }
+        }
+
+<span class="nc" id="L192">        return convertible;</span>
+    }
+
+    public static List&lt;ItemStack[]&gt; getRecipeInputList(MultiBlockMachine machine) {
+<span class="nc bnc" id="L196" title="All 2 branches missed.">        if (machine == null) {</span>
+<span class="nc" id="L197">            return new ArrayList&lt;&gt;();</span>
+        }
+
+<span class="nc" id="L200">        List&lt;ItemStack[]&gt; recipes = machine.getRecipes();</span>
+<span class="nc" id="L201">        List&lt;ItemStack[]&gt; convertible = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L203" title="All 2 branches missed.">        for (int i = 0; i &lt; recipes.size(); i++) {</span>
+<span class="nc bnc" id="L204" title="All 2 branches missed.">            if (i % 2 == 0) {</span>
+<span class="nc" id="L205">                convertible.add(recipes.get(i));</span>
+            }
+        }
+
+<span class="nc" id="L209">        convertible.sort(Comparator.comparing(recipe -&gt; {</span>
+<span class="nc" id="L210">            int emptySlots = 9;</span>
+
+<span class="nc bnc" id="L212" title="All 2 branches missed.">            for (ItemStack ingredient : recipe) {</span>
+<span class="nc bnc" id="L213" title="All 2 branches missed.">                if (ingredient != null) {</span>
+<span class="nc" id="L214">                    emptySlots--;</span>
+                }
+            }
+
+<span class="nc" id="L218">            return emptySlots;</span>
+        }));
+
+<span class="nc" id="L221">        return convertible;</span>
+    }
+
+    public static ItemStack getRecipeOutput(MultiBlockMachine machine, ItemStack input) {
+<span class="nc" id="L225">        List&lt;ItemStack[]&gt; recipes = machine.getRecipes();</span>
+<span class="nc" id="L226">        return recipes.get(((getRecipeInputs(machine).indexOf(input) * 2) + 1))[0].clone();</span>
+    }
+
+    public static ItemStack getRecipeOutputList(MultiBlockMachine machine, ItemStack[] input) {
+<span class="nc" id="L230">        List&lt;ItemStack[]&gt; recipes = machine.getRecipes();</span>
+<span class="nc" id="L231">        return recipes.get((recipes.indexOf(input) + 1))[0];</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>
